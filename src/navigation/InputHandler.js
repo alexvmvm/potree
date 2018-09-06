@@ -122,7 +122,7 @@ export class InputHandler extends EventDispatcher {
 		}
 	}
 
-	onTouchMove (e) {
+	onTouchMove(e) {
 		if (this.logMessages) console.log(this.constructor.name + ': onTouchMove');
 
 		e.preventDefault();
@@ -137,7 +137,7 @@ export class InputHandler extends EventDispatcher {
 				let names = hoveredElements.map(h => h.object.name).join(", ");
 				this.drag.object = hoveredElements[0].object;
 			}
-			if (this.drag && !this.touchedDownObject) {
+			if (this.drag) {
 				this.drag.mouse = 1;
 
 				this.drag.lastDrag.x = x - this.drag.end.x;
@@ -152,7 +152,6 @@ export class InputHandler extends EventDispatcher {
 						drag: this.drag,
 						viewer: this.viewer
 					});
-					this.touchedDownObject = true;
 				} else {
 					if (this.logMessages) console.log(this.constructor.name + ': drag: ');
 					for (let inputListener of this.getSortedListeners()) {
