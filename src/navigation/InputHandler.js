@@ -122,12 +122,17 @@ export class InputHandler extends EventDispatcher {
 		}
 	}
 
-	onTouchMove(e) {
+	onTouchMove (e) {
 		if (this.logMessages) console.log(this.constructor.name + ': onTouchMove');
 
 		e.preventDefault();
-		let hoveredElements = this.getHoveredElements();
+		// Get mouse pos
+		// Set Object to mouse Pos
+		// Drop object
+
 		if (e.touches.length === 1) {
+			let hoveredElements = this.getHoveredElements();
+			this.hoveredElements = hoveredElements;
 			let rect = this.domElement.getBoundingClientRect();
 			let x = e.touches[0].pageX - rect.left;
 			let y = e.touches[0].pageY - rect.top;
@@ -174,29 +179,6 @@ export class InputHandler extends EventDispatcher {
 				changedTouches: e.changedTouches
 			});
 		}
-
-
-		this.hoveredElements = hoveredElements;
-
-		for (let inputListener of this.getSortedListeners()) {
-			inputListener.dispatchEvent({
-				type: e.type,
-				touches: e.touches,
-				changedTouches: e.changedTouches
-			});
-		}
-
-		// DEBUG CODE
-		// let debugTouches = [...e.touches, {
-		//	pageX: this.domElement.clientWidth / 2,
-		//	pageY: this.domElement.clientHeight / 2}];
-		// for(let inputListener of this.getSortedListeners()){
-		//	inputListener.dispatchEvent({
-		//		type: e.type,
-		//		touches: debugTouches,
-		//		changedTouches: e.changedTouches
-		//	});
-		// }
 	}
 
 	onKeyDown (e) {
