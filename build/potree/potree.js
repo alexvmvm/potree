@@ -21432,14 +21432,14 @@ ENDSEC
 	 */
 
 	class InputHandler extends EventDispatcher {
-		constructor (viewer) {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
 			this.renderer = viewer.renderer;
 			this.domElement = this.renderer.domElement;
 			this.enabled = true;
-			
+
 			this.scene = null;
 			this.interactiveScenes = [];
 			this.interactiveObjects = new Set();
@@ -21487,8 +21487,8 @@ ENDSEC
 			this.inputListeners = this.inputListeners.filter(e => e !== listener);
 		}
 
-		getSortedListeners(){
-			return this.inputListeners.sort( (a, b) => {
+		getSortedListeners () {
+			return this.inputListeners.sort((a, b) => {
 				let ia = (a.importance !== undefined) ? a.importance : 0;
 				let ib = (b.importance !== undefined) ? b.importance : 0;
 
@@ -21510,7 +21510,7 @@ ENDSEC
 				this.startDragging(null);
 			}
 
-			
+
 			for (let inputListener of this.getSortedListeners()) {
 				inputListener.dispatchEvent({
 					type: e.type,
@@ -21548,13 +21548,22 @@ ENDSEC
 			if (this.logMessages) console.log(this.constructor.name + ': onTouchMove');
 
 			e.preventDefault();
+			// Get mouse pos
+			// Set Object to mouse Pos
+			// Drop object
 
 			if (e.touches.length === 1) {
+				let hoveredElements = this.getHoveredElements();
+				this.hoveredElements = hoveredElements;
 				let rect = this.domElement.getBoundingClientRect();
 				let x = e.touches[0].pageX - rect.left;
 				let y = e.touches[0].pageY - rect.top;
 				this.mouse.set(x, y);
 
+				if (hoveredElements.length > 0) {
+					let names = hoveredElements.map(h => h.object.name).join(", ");
+					this.drag.object = hoveredElements[0].object;
+				}
 				if (this.drag) {
 					this.drag.mouse = 1;
 
@@ -21563,14 +21572,25 @@ ENDSEC
 
 					this.drag.end.set(x, y);
 
-					if (this.logMessages) console.log(this.constructor.name + ': drag: ');
-					for (let inputListener of this.getSortedListeners()) {
-						inputListener.dispatchEvent({
+					if (this.drag.object) {
+						if (this.logMessages) console.log(this.constructor.name + ': drag: ' + this.drag.object.name);
+						this.drag.object.dispatchEvent({
 							type: 'drag',
 							drag: this.drag,
 							viewer: this.viewer
 						});
+					} else {
+						if (this.logMessages) console.log(this.constructor.name + ': drag: ');
+						for (let inputListener of this.getSortedListeners()) {
+							inputListener.dispatchEvent({
+								type: 'drag',
+								drag: this.drag,
+								viewer: this.viewer
+							});
+						}
 					}
+				} else {
+					//TODO
 				}
 			}
 
@@ -21581,18 +21601,6 @@ ENDSEC
 					changedTouches: e.changedTouches
 				});
 			}
-
-			// DEBUG CODE
-			// let debugTouches = [...e.touches, {
-			//	pageX: this.domElement.clientWidth / 2,
-			//	pageY: this.domElement.clientHeight / 2}];
-			// for(let inputListener of this.getSortedListeners()){
-			//	inputListener.dispatchEvent({
-			//		type: e.type,
-			//		touches: debugTouches,
-			//		changedTouches: e.changedTouches
-			//	});
-			// }
 		}
 
 		onKeyDown (e) {
@@ -21685,8 +21693,8 @@ ENDSEC
 						mouse: this.mouse
 					});
 				}
-			}else{
-				for(let hovered of this.hoveredElements){
+			} else {
+				for (let hovered of this.hoveredElements) {
 					let object = hovered.object;
 					object.dispatchEvent({
 						type: 'mousedown',
@@ -21694,7 +21702,7 @@ ENDSEC
 						consume: consume
 					});
 
-					if(consumed){
+					if (consumed) {
 						break;
 					}
 				}
@@ -21708,7 +21716,7 @@ ENDSEC
 						el.object._listeners['drag'].length > 0));
 
 				if (target) {
-					this.startDragging(target.object, {location: target.point});
+					this.startDragging(target.object, { location: target.point });
 				} else {
 					this.startDragging(null);
 				}
@@ -21726,7 +21734,7 @@ ENDSEC
 
 			let noMovement = this.getNormalizedDrag().length() === 0;
 
-			
+
 			let consumed = false;
 			let consume = () => { return consumed = true; };
 			if (this.hoveredElements.length === 0) {
@@ -21738,15 +21746,15 @@ ENDSEC
 						consume: consume
 					});
 
-					if(consumed){
+					if (consumed) {
 						break;
 					}
 				}
-			}else{
+			} else {
 				let hovered = this.hoveredElements
 					.map(e => e.object)
 					.find(e => (e._listeners && e._listeners['mouseup']));
-				if(hovered){
+				if (hovered) {
 					hovered.dispatchEvent({
 						type: 'mouseup',
 						viewer: this.viewer,
@@ -21776,7 +21784,7 @@ ENDSEC
 
 				// check for a click
 				let clicked = this.hoveredElements.map(h => h.object).find(v => v === this.drag.object) !== undefined;
-				if(clicked){
+				if (clicked) {
 					if (this.logMessages) console.log(`${this.constructor.name}: click ${this.drag.object.name}`);
 					this.drag.object.dispatchEvent({
 						type: 'click',
@@ -21788,7 +21796,7 @@ ENDSEC
 				this.drag = null;
 			}
 
-			if(!consumed){
+			if (!consumed) {
 				if (e.button === THREE.MOUSE.LEFT) {
 					if (noMovement) {
 						let selectable = this.hoveredElements
@@ -21824,7 +21832,7 @@ ENDSEC
 			this.mouse.set(x, y);
 
 			let hoveredElements = this.getHoveredElements();
-			if(hoveredElements.length > 0){
+			if (hoveredElements.length > 0) {
 				let names = hoveredElements.map(h => h.object.name).join(", ");
 				if (this.logMessages) console.log(`${this.constructor.name}: onMouseMove; hovered: '${names}'`);
 			}
@@ -21853,27 +21861,27 @@ ENDSEC
 							type: 'drag',
 							drag: this.drag,
 							viewer: this.viewer,
-							consume: () => {dragConsumed = true;}
+							consume: () => { dragConsumed = true; }
 						});
 
-						if(dragConsumed){
+						if (dragConsumed) {
 							break;
 						}
 					}
 				}
-			}else{
+			} else {
 				let curr = hoveredElements.map(a => a.object).find(a => true);
 				let prev = this.hoveredElements.map(a => a.object).find(a => true);
 
-				if(curr !== prev){
-					if(curr){
+				if (curr !== prev) {
+					if (curr) {
 						if (this.logMessages) console.log(`${this.constructor.name}: mouseover: ${curr.name}`);
 						curr.dispatchEvent({
 							type: 'mouseover',
 							object: curr,
 						});
 					}
-					if(prev){
+					if (prev) {
 						if (this.logMessages) console.log(`${this.constructor.name}: mouseleave: ${prev.name}`);
 						prev.dispatchEvent({
 							type: 'mouseleave',
@@ -21882,12 +21890,12 @@ ENDSEC
 					}
 				}
 
-				if(hoveredElements.length > 0){
+				if (hoveredElements.length > 0) {
 					let object = hoveredElements
 						.map(e => e.object)
 						.find(e => (e._listeners && e._listeners['mousemove']));
-					
-					if(object){
+
+					if (object) {
 						object.dispatchEvent({
 							type: 'mousemove',
 							object: object
@@ -21896,17 +21904,17 @@ ENDSEC
 				}
 
 			}
-			
-			
+
+
 
 			this.hoveredElements = hoveredElements;
 		}
-		
-		onMouseWheel(e){
-			if(!this.enabled) return;
 
-			if(this.logMessages) console.log(this.constructor.name + ": onMouseWheel");
-			
+		onMouseWheel (e) {
+			if (!this.enabled) return;
+
+			if (this.logMessages) console.log(this.constructor.name + ": onMouseWheel");
+
 			e.preventDefault();
 
 			let delta = 0;
@@ -21959,9 +21967,9 @@ ENDSEC
 
 		getMousePointCloudIntersection (mouse) {
 			return Utils.getMousePointCloudIntersection(
-				this.mouse, 
-				this.scene.getActiveCamera(), 
-				this.viewer, 
+				this.mouse,
+				this.scene.getActiveCamera(),
+				this.viewer,
 				this.scene.pointclouds);
 		}
 
@@ -21989,13 +21997,13 @@ ENDSEC
 			});
 		}
 
-		deselect(object){
+		deselect (object) {
 
 			let oldSelection = this.selection;
 
 			let index = this.selection.indexOf(object);
 
-			if(index >= 0){
+			if (index >= 0) {
 				this.selection.splice(index, 1);
 				object.dispatchEvent({
 					type: 'deselect'
@@ -22034,11 +22042,11 @@ ENDSEC
 			return index !== -1;
 		}
 
-		registerInteractiveObject(object){
+		registerInteractiveObject (object) {
 			this.interactiveObjects.add(object);
 		}
 
-		removeInteractiveObject(object){
+		removeInteractiveObject (object) {
 			this.interactiveObjects.delete(object);
 		}
 
@@ -22083,10 +22091,10 @@ ENDSEC
 					}
 				});
 			}
-			
+
 			let camera = this.scene.getActiveCamera();
 			let ray = Utils.mouseToRay(this.mouse, camera, this.domElement.clientWidth, this.domElement.clientHeight);
-			
+
 			let raycaster = new THREE.Raycaster();
 			raycaster.ray.set(ray.origin, ray.direction);
 			raycaster.linePrecision = 0.2;
