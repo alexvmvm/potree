@@ -373,7 +373,10 @@ export class Measure extends THREE.Object3D {
 				let distance = point.position.distanceTo(nextPoint.position);
 
 				edgeLabel.position.copy(center);
-				edgeLabel.setText(Utils.addCommas(distance.toFixed(2)) + ' ' + this.lengthUnit.code);
+				//HACK
+				//We are doing this in order to Fake the real size model
+				let displayDistance = distance*60;
+				edgeLabel.setText(Utils.addCommas(displayDistance.toFixed(2)) + ' ' + this.lengthUnit.code);
 				edgeLabel.visible = this.showDistances && (index < lastIndex || this.closed) && this.points.length >= 2 && distance > 0;
 			}
 
@@ -431,7 +434,9 @@ export class Measure extends THREE.Object3D {
 
 				let heightLabelPosition = start.clone().add(end).multiplyScalar(0.5);
 				this.heightLabel.position.copy(heightLabelPosition);
-				let msg = Utils.addCommas(height.toFixed(2)) + ' ' + this.lengthUnit.code;
+				//HACK
+				//We are doing this in order to Fake the real size model
+				let msg = Utils.addCommas((height*60).toFixed(2)) + ' ' + this.lengthUnit.code;
 				this.heightLabel.setText(msg);
 			}
 		}
