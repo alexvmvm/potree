@@ -254,7 +254,7 @@ export class Measure extends THREE.Object3D {
 		for (let i = 0; i < this.points.length; i++) {
 			let p1 = this.points[i].position;
 			let p2 = this.points[j].position;
-			area += (p2.x + p1.x) * (p1.y - p2.y);
+			area += (p2.x*10 + p1.x*10) * (p1.y*10 - p2.y*10);
 			j = i;
 		}
 
@@ -375,7 +375,7 @@ export class Measure extends THREE.Object3D {
 				edgeLabel.position.copy(center);
 				//HACK
 				//We are doing this in order to Fake the real size model
-				let displayDistance = distance*60;
+				let displayDistance = distance*5;
 				edgeLabel.setText(Utils.addCommas(displayDistance.toFixed(2)) + ' ' + this.lengthUnit.code);
 				edgeLabel.visible = this.showDistances && (index < lastIndex || this.closed) && this.points.length >= 2 && distance > 0;
 			}
@@ -436,7 +436,7 @@ export class Measure extends THREE.Object3D {
 				this.heightLabel.position.copy(heightLabelPosition);
 				//HACK
 				//We are doing this in order to Fake the real size model
-				let msg = Utils.addCommas((height*60).toFixed(2)) + ' ' + this.lengthUnit.code;
+				let msg = Utils.addCommas((height*5).toFixed(2)) + ' ' + this.lengthUnit.code;
 				this.heightLabel.setText(msg);
 			}
 		}
