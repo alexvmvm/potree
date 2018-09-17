@@ -1,8 +1,9 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.Potree = {})));
-}(this, (function (exports) { 'use strict';
+		typeof define === 'function' && define.amd ? define(['exports'], factory) :
+			(factory((global.Potree = {})));
+}(this, (function (exports) {
+	'use strict';
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/ https://github.com/mrdoob/eventdispatcher.js
@@ -37,64 +38,64 @@
 
 
 
-	class EventDispatcher{
+	class EventDispatcher {
 
-		constructor(){
+		constructor() {
 			this._listeners = {};
 		}
 
-		addEventListener(type, listener){
+		addEventListener (type, listener) {
 
 			const listeners = this._listeners;
 
-			if(listeners[type] === undefined){
+			if (listeners[type] === undefined) {
 				listeners[type] = [];
 			}
 
-			if(listeners[type].indexOf(listener) === - 1){
-				listeners[type].push( listener );
+			if (listeners[type].indexOf(listener) === - 1) {
+				listeners[type].push(listener);
 			}
 
 		}
 
-		hasEventListener(type, listener){
+		hasEventListener (type, listener) {
 
 			const listeners = this._listeners;
 
 			return listeners[type] !== undefined && listeners[type].indexOf(listener) !== - 1;
 		}
 
-		removeEventListener(type, listener){
+		removeEventListener (type, listener) {
 
 			let listeners = this._listeners;
 			let listenerArray = listeners[type];
 
-			if (listenerArray !== undefined){
+			if (listenerArray !== undefined) {
 
 				let index = listenerArray.indexOf(listener);
 
-				if(index !== - 1){
+				if (index !== - 1) {
 					listenerArray.splice(index, 1);
 				}
 			}
 
 		}
 
-		removeEventListeners(type){
-			if(this._listeners[type] !== undefined){
+		removeEventListeners (type) {
+			if (this._listeners[type] !== undefined) {
 				delete this._listeners[type];
 			}
 		};
 
-		dispatchEvent(event){
+		dispatchEvent (event) {
 
 			let listeners = this._listeners;
 			let listenerArray = listeners[event.type];
 
-			if ( listenerArray !== undefined ) {
+			if (listenerArray !== undefined) {
 				event.target = this;
 
-				for(let listener of listenerArray.slice(0)){
+				for (let listener of listenerArray.slice(0)) {
 					listener.call(this, event);
 				}
 			}
@@ -104,7 +105,7 @@
 	}
 
 	class Action extends EventDispatcher {
-		constructor (args = {}) {
+		constructor(args = {}) {
 			super();
 
 			this.icon = args.icon || '';
@@ -183,43 +184,43 @@
 	//	}
 	//};
 
-	class PathAnimation{
-		
-		constructor(path, start, end, speed, callback){
-				this.path = path;
-				this.length = this.path.spline.getLength();
-				this.speed = speed;
-				this.callback = callback;
-				this.tween = null;
-				this.startPoint = Math.max(start, 0);
-				this.endPoint = Math.min(end, this.length);
-				this.t = 0.0;
+	class PathAnimation {
+
+		constructor(path, start, end, speed, callback) {
+			this.path = path;
+			this.length = this.path.spline.getLength();
+			this.speed = speed;
+			this.callback = callback;
+			this.tween = null;
+			this.startPoint = Math.max(start, 0);
+			this.endPoint = Math.min(end, this.length);
+			this.t = 0.0;
 		}
 
-		start(resume = false){
-			if(this.tween){
+		start (resume = false) {
+			if (this.tween) {
 				this.tween.stop();
 				this.tween = null;
 			}
-		
+
 			let tStart;
-			if(resume){
+			if (resume) {
 				tStart = this.t;
-			}else{
+			} else {
 				tStart = this.startPoint / this.length;
 			}
 			let tEnd = this.endPoint / this.length;
 			let animationDuration = (tEnd - tStart) * this.length * 1000 / this.speed;
-		
-			let progress = {t: tStart};
-			this.tween = new TWEEN.Tween(progress).to({t: tEnd}, animationDuration);
+
+			let progress = { t: tStart };
+			this.tween = new TWEEN.Tween(progress).to({ t: tEnd }, animationDuration);
 			this.tween.easing(TWEEN.Easing.Linear.None);
 			this.tween.onUpdate((e) => {
 				this.t = progress.t;
 				this.callback(progress.t);
 			});
 			this.tween.onComplete(() => {
-				if(this.repeat){
+				if (this.repeat) {
 					this.start();
 				}
 			});
@@ -229,8 +230,8 @@
 			}, 0);
 		}
 
-		stop(){
-			if(!this.tween){
+		stop () {
+			if (!this.tween) {
 				return;
 			}
 			this.tween.stop();
@@ -238,28 +239,28 @@
 			this.t = 0;
 		}
 
-		pause(){
-			if(!this.tween){
+		pause () {
+			if (!this.tween) {
 				return;
 			}
-			
+
 			this.tween.stop();
 			TWEEN.remove(this.tween);
 			this.tween = null;
 		}
 
-		resume(){
+		resume () {
 			this.start(true);
 		}
 
-		getPoint(t){
+		getPoint (t) {
 			return this.path.spline.getPoint(t);
 		}
 
 	}
 
-	class AnimationPath{
-		constructor (points = []) {
+	class AnimationPath {
+		constructor(points = []) {
 			this.points = points;
 			this.spline = new THREE.CatmullRomCurve3(points);
 			//this.spline.reparametrizeByArcLength(1 / this.spline.getLength().total);
@@ -304,7 +305,7 @@
 				i++;
 			}
 
-			if(this.closed){
+			if (this.closed) {
 				let position = this.spline.getPoint(0);
 				geometry.vertices[i] = new THREE.Vector3(position.x, position.y, position.z);
 			}
@@ -312,42 +313,42 @@
 			return geometry;
 		}
 
-		get closed(){
+		get closed () {
 			return this.spline.closed;
 		}
 
-		set closed(value){
+		set closed (value) {
 			this.spline.closed = value;
 		}
 
 	}
-		
-		/*
-		{
-			let target = new THREE.Vector3(589854.34, 231411.19, 692.77);
-			let points = [
-				new THREE.Vector3(589815.52, 231738.31, 959.48 ),
-				new THREE.Vector3(589604.73, 231615.00, 968.10 ),
-				new THREE.Vector3(589579.11, 231354.41, 1010.06),
-				new THREE.Vector3(589723.00, 231169.95, 1015.57),
-				new THREE.Vector3(589960.76, 231116.87, 978.60 ),
-				new THREE.Vector3(590139.29, 231268.71, 972.33 )
-			];
-		
-			let path = new Potree.AnimationPath(points);
-		
-			let geometry = path.getGeometry();
-			let material = new THREE.LineBasicMaterial();
-			let line = new THREE.Line(geometry, material);
-			viewer.scene.scene.add(line);
-		
-			let [start, end, speed] = [0, path.getLength(), 10];
-			path.animate(start, end, speed, t => {
-				viewer.scene.view.position.copy(path.spline.getPoint(t));
-			});
-		
-		}
-		*/
+
+	/*
+	{
+		let target = new THREE.Vector3(589854.34, 231411.19, 692.77);
+		let points = [
+			new THREE.Vector3(589815.52, 231738.31, 959.48 ),
+			new THREE.Vector3(589604.73, 231615.00, 968.10 ),
+			new THREE.Vector3(589579.11, 231354.41, 1010.06),
+			new THREE.Vector3(589723.00, 231169.95, 1015.57),
+			new THREE.Vector3(589960.76, 231116.87, 978.60 ),
+			new THREE.Vector3(590139.29, 231268.71, 972.33 )
+		];
+	
+		let path = new Potree.AnimationPath(points);
+	
+		let geometry = path.getGeometry();
+		let material = new THREE.LineBasicMaterial();
+		let line = new THREE.Line(geometry, material);
+		viewer.scene.scene.add(line);
+	
+		let [start, end, speed] = [0, path.getLength(), 10];
+		path.animate(start, end, speed, t => {
+			viewer.scene.view.position.copy(path.spline.getPoint(t));
+		});
+	
+	}
+	*/
 
 	const XHRFactory = {
 		config: {
@@ -383,9 +384,9 @@
 	 * adapted from http://stemkoski.github.io/Three.js/Sprite-Text-Labels.html
 	 */
 
-	class TextSprite extends THREE.Object3D{
-		
-		constructor(text){
+	class TextSprite extends THREE.Object3D {
+
+		constructor(text) {
 			super();
 
 			let texture = new THREE.Texture();
@@ -394,7 +395,8 @@
 			let spriteMaterial = new THREE.SpriteMaterial({
 				map: texture,
 				depthTest: false,
-				depthWrite: false});
+				depthWrite: false
+			});
 
 			this.material = spriteMaterial;
 			this.sprite = new THREE.Sprite(spriteMaterial);
@@ -405,39 +407,39 @@
 			this.fontsize = 28;
 			this.borderColor = { r: 0, g: 0, b: 0, a: 1.0 };
 			this.backgroundColor = { r: 255, g: 255, b: 255, a: 1.0 };
-			this.textColor = {r: 255, g: 255, b: 255, a: 1.0};
+			this.textColor = { r: 255, g: 255, b: 255, a: 1.0 };
 			this.text = '';
 
 			this.setText(text);
 		}
 
-		setText(text){
-			if (this.text !== text){
+		setText (text) {
+			if (this.text !== text) {
 				this.text = text;
 
 				this.update();
 			}
 		}
 
-		setTextColor(color){
+		setTextColor (color) {
 			this.textColor = color;
 
 			this.update();
 		}
 
-		setBorderColor(color){
+		setBorderColor (color) {
 			this.borderColor = color;
 
 			this.update();
 		}
 
-		setBackgroundColor(color){
+		setBackgroundColor (color) {
 			this.backgroundColor = color;
 
 			this.update();
 		}
 
-		update(){
+		update () {
 			let canvas = document.createElement('canvas');
 			let context = canvas.getContext('2d');
 			context.font = 'Bold ' + this.fontsize + 'px ' + this.fontface;
@@ -482,7 +484,7 @@
 			this.sprite.scale.set(spriteWidth * 0.01, spriteHeight * 0.01, 1.0);
 		}
 
-		roundRect(ctx, x, y, w, h, r){
+		roundRect (ctx, x, y, w, h, r) {
 			ctx.beginPath();
 			ctx.moveTo(x + r, y);
 			ctx.lineTo(x + w - r, y);
@@ -501,10 +503,10 @@
 	}
 
 	class Volume extends THREE.Object3D {
-		constructor (args = {}) {
+		constructor(args = {}) {
 			super();
 
-			if(this.constructor.name === "Volume"){
+			if (this.constructor.name === "Volume") {
 				console.warn("Can't create object of class Volume directly. Use classes BoxVolume or SphereVolume instead.");
 			}
 
@@ -518,8 +520,8 @@
 			this._modifiable = args.modifiable || true;
 
 			this.label = new TextSprite('0');
-			this.label.setBorderColor({r: 0, g: 255, b: 0, a: 0.0});
-			this.label.setBackgroundColor({r: 0, g: 255, b: 0, a: 0.0});
+			this.label.setBorderColor({ r: 0, g: 255, b: 0, a: 0.0 });
+			this.label.setBackgroundColor({ r: 0, g: 255, b: 0, a: 0.0 });
 			this.label.material.depthTest = false;
 			this.label.material.depthWrite = false;
 			this.label.material.transparent = true;
@@ -535,26 +537,26 @@
 				this.label.matrixWorldNeedsUpdate = false;
 
 				for (let i = 0, l = this.label.children.length; i < l; i++) {
-					this.label.children[ i ].updateMatrixWorld(true);
+					this.label.children[i].updateMatrixWorld(true);
 				}
 			};
 
 			{ // event listeners
-				this.addEventListener('select', e => {});
-				this.addEventListener('deselect', e => {});
+				this.addEventListener('select', e => { });
+				this.addEventListener('deselect', e => { });
 			}
 
 		}
 
-		get visible(){
+		get visible () {
 			return this._visible;
 		}
 
-		set visible(value){
-			if(this._visible !== value){
+		set visible (value) {
+			if (this._visible !== value) {
 				this._visible = value;
 
-				this.dispatchEvent({type: "visibility_changed", object: this});
+				this.dispatchEvent({ type: "visibility_changed", object: this });
 			}
 		}
 
@@ -563,7 +565,7 @@
 		}
 
 		update () {
-			
+
 		};
 
 		raycast (raycaster, intersects) {
@@ -576,7 +578,7 @@
 
 		set clip (value) {
 
-			if(this._clip !== value){
+			if (this._clip !== value) {
 				this._clip = value;
 
 				this.update();
@@ -586,7 +588,7 @@
 					object: this
 				});
 			}
-			
+
 		}
 
 		get modifieable () {
@@ -601,9 +603,9 @@
 	}
 
 
-	class BoxVolume extends Volume{
+	class BoxVolume extends Volume {
 
-		constructor(args = {}){
+		constructor(args = {}) {
 			super(args);
 
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -648,20 +650,21 @@
 				transparent: true,
 				opacity: 0.3,
 				depthTest: true,
-				depthWrite: false});
+				depthWrite: false
+			});
 			this.box = new THREE.Mesh(boxGeometry, this.material);
 			this.box.geometry.computeBoundingBox();
 			this.boundingBox = this.box.geometry.boundingBox;
 			this.add(this.box);
 
-			this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
+			this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({ color: 0x000000 }));
 			// this.frame.mode = THREE.Lines;
 			this.add(this.frame);
 
 			this.update();
 		}
 
-		update(){
+		update () {
 			this.boundingBox = this.box.geometry.boundingBox;
 			this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 
@@ -688,15 +691,15 @@
 			}
 		}
 
-		getVolume(){
+		getVolume () {
 			return Math.abs(this.scale.x * this.scale.y * this.scale.z);
 		}
 
 	}
 
-	class SphereVolume extends Volume{
+	class SphereVolume extends Volume {
 
-		constructor(args = {}){
+		constructor(args = {}) {
 			super(args);
 
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -710,7 +713,8 @@
 				transparent: true,
 				opacity: 0.3,
 				depthTest: true,
-				depthWrite: false});
+				depthWrite: false
+			});
 			this.sphere = new THREE.Mesh(sphereGeometry, this.material);
 			this.sphere.visible = false;
 			this.sphere.geometry.computeBoundingBox();
@@ -727,13 +731,13 @@
 				let vSegments = 5;
 				let r = 1;
 
-				for(let uSegment = 0; uSegment < uSegments; uSegment++){
+				for (let uSegment = 0; uSegment < uSegments; uSegment++) {
 
 					let alpha = (uSegment / uSegments) * Math.PI * 2;
 					let dirx = Math.cos(alpha);
 					let diry = Math.sin(alpha);
 
-					for(let i = 0; i <= steps; i++){
+					for (let i = 0; i <= steps; i++) {
 						let v = (i / steps) * Math.PI * 2;
 						let vNext = v + 2 * Math.PI / steps;
 
@@ -752,16 +756,16 @@
 				}
 
 				// creates rings at poles, just because it's easier to implement
-				for(let vSegment = 0; vSegment <= vSegments + 1; vSegment++){
+				for (let vSegment = 0; vSegment <= vSegments + 1; vSegment++) {
 
 					//let height = (vSegment / (vSegments + 1)) * 2 - 1; // -1 to 1
 					let uh = (vSegment / (vSegments + 1)); // -1 to 1
-					uh = (1 - uh) * (-Math.PI / 2) + uh *(Math.PI / 2);
+					uh = (1 - uh) * (-Math.PI / 2) + uh * (Math.PI / 2);
 					let height = Math.sin(uh);
 
 					console.log(uh, height);
 
-					for(let i = 0; i <= steps; i++){
+					for (let i = 0; i <= steps; i++) {
 						let u = (i / steps) * Math.PI * 2;
 						let uNext = u + 2 * Math.PI / steps;
 
@@ -782,10 +786,10 @@
 				}
 			}
 
-			this.frame = new THREE.LineSegments(frameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
+			this.frame = new THREE.LineSegments(frameGeometry, new THREE.LineBasicMaterial({ color: 0x000000 }));
 			this.add(this.frame);
 
-			let frameMaterial = new THREE.MeshBasicMaterial({wireframe: true, color: 0x000000});
+			let frameMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0x000000 });
 			this.frame = new THREE.Mesh(sphereGeometry, frameMaterial);
 			//this.add(this.frame);
 
@@ -796,7 +800,7 @@
 			this.update();
 		}
 
-		update(){
+		update () {
 			this.boundingBox = this.sphere.geometry.boundingBox;
 			this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 
@@ -822,17 +826,17 @@
 				});
 			}
 		}
-		
+
 		// see https://en.wikipedia.org/wiki/Ellipsoid#Volume
-		getVolume(){
+		getVolume () {
 			return (4 / 3) * Math.PI * this.scale.x * this.scale.y * this.scale.z;
 		}
 
 	}
 
-	class Profile extends THREE.Object3D{
+	class Profile extends THREE.Object3D {
 
-		constructor () {
+		constructor() {
 			super();
 
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -856,7 +860,8 @@
 				//shading: THREE.SmoothShading,
 				color: 0xff0000,
 				depthTest: false,
-				depthWrite: false}
+				depthWrite: false
+			}
 			);
 
 			return sphereMaterial;
@@ -868,7 +873,7 @@
 			for (let i = 0; i < this.points.length - 1; i++) {
 				let start = this.points[i].clone();
 				let end = this.points[i + 1].clone();
-				segments.push({start: start, end: end});
+				segments.push({ start: start, end: end });
 			}
 
 			return segments;
@@ -879,7 +884,7 @@
 			let matrices = [];
 
 			for (let segment of segments) {
-				let {start, end} = segment;
+				let { start, end } = segment;
 
 				let box = new THREE.Object3D();
 
@@ -929,7 +934,7 @@
 				this.edges.push(edge);
 
 				let boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-				let boxMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true, opacity: 0.2});
+				let boxMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.2 });
 				let box = new THREE.Mesh(boxGeometry, boxMaterial);
 				box.visible = false;
 
@@ -940,9 +945,9 @@
 			{ // event listeners
 				let drag = (e) => {
 					let I = Utils.getMousePointCloudIntersection(
-						e.drag.end, 
-						e.viewer.scene.getActiveCamera(), 
-						e.viewer, 
+						e.drag.end,
+						e.viewer.scene.getActiveCamera(),
+						e.viewer,
 						e.viewer.scene.pointclouds);
 
 					if (I) {
@@ -1015,8 +1020,8 @@
 
 			let event = {
 				type: 'marker_moved',
-				profile:	this,
-				index:	index,
+				profile: this,
+				index: index,
 				position: point.clone()
 			};
 			this.dispatchEvent(event);
@@ -1029,8 +1034,8 @@
 
 			let event = {
 				type: 'width_changed',
-				profile:	this,
-				width:	width
+				profile: this,
+				width: width
 			};
 			this.dispatchEvent(event);
 
@@ -1151,7 +1156,7 @@
 	}
 
 	class Measure extends THREE.Object3D {
-		constructor () {
+		constructor() {
 			super();
 
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -1169,7 +1174,7 @@
 			this.sphereGeometry = new THREE.SphereGeometry(0.4, 10, 10);
 			this.color = new THREE.Color(0xff0000);
 
-			this.lengthUnit = {code: 'm'};
+			this.lengthUnit = { code: 'm' };
 
 			this.spheres = [];
 			this.edges = [];
@@ -1201,23 +1206,23 @@
 
 				{ // height label
 					this.heightLabel = new TextSprite('');
-					this.heightLabel.setBorderColor({r: 0, g: 0, b: 0, a: 0.8});
-					this.heightLabel.setBackgroundColor({r: 0, g: 0, b: 0, a: 0.3});
-					this.heightLabel.setTextColor({r: 180, g: 220, b: 180, a: 1.0});
+					this.heightLabel.setBorderColor({ r: 0, g: 0, b: 0, a: 0.8 });
+					this.heightLabel.setBackgroundColor({ r: 0, g: 0, b: 0, a: 0.3 });
+					this.heightLabel.setTextColor({ r: 180, g: 220, b: 180, a: 1.0 });
 					this.heightLabel.material.depthTest = false;
 					this.heightLabel.material.opacity = 1;
-					this.heightLabel.visible = false; 
+					this.heightLabel.visible = false;
 					this.add(this.heightLabel);
 				}
 			}
 
 			this.areaLabel = new TextSprite('');
-			this.areaLabel.setBorderColor({r: 0, g: 0, b: 0, a: 0.8});
-			this.areaLabel.setBackgroundColor({r: 0, g: 0, b: 0, a: 0.3});
-			this.areaLabel.setTextColor({r: 180, g: 220, b: 180, a: 1.0});
+			this.areaLabel.setBorderColor({ r: 0, g: 0, b: 0, a: 0.8 });
+			this.areaLabel.setBackgroundColor({ r: 0, g: 0, b: 0, a: 0.3 });
+			this.areaLabel.setTextColor({ r: 180, g: 220, b: 180, a: 1.0 });
 			this.areaLabel.material.depthTest = false;
 			this.areaLabel.material.opacity = 1;
-			this.areaLabel.visible = false; 
+			this.areaLabel.visible = false;
 			this.add(this.areaLabel);
 		}
 
@@ -1226,7 +1231,8 @@
 				//shading: THREE.SmoothShading,
 				color: this.color,
 				depthTest: false,
-				depthWrite: false}
+				depthWrite: false
+			}
 			);
 
 			return sphereMaterial;
@@ -1234,9 +1240,9 @@
 
 		addMarker (point) {
 			if (point instanceof THREE.Vector3) {
-				point = {position: point};
-			}else if(point instanceof Array){
-				point = {position: new THREE.Vector3(...point)};
+				point = { position: point };
+			} else if (point instanceof Array) {
+				point = { position: new THREE.Vector3(...point) };
 			}
 			this.points.push(point);
 
@@ -1263,8 +1269,8 @@
 
 			{ // edge labels
 				let edgeLabel = new TextSprite();
-				edgeLabel.setBorderColor({r: 0, g: 0, b: 0, a: 0.8});
-				edgeLabel.setBackgroundColor({r: 0, g: 0, b: 0, a: 0.3});
+				edgeLabel.setBorderColor({ r: 0, g: 0, b: 0, a: 0.8 });
+				edgeLabel.setBackgroundColor({ r: 0, g: 0, b: 0, a: 0.3 });
 				edgeLabel.material.depthTest = false;
 				edgeLabel.visible = false;
 				this.edgeLabels.push(edgeLabel);
@@ -1273,8 +1279,8 @@
 
 			{ // angle labels
 				let angleLabel = new TextSprite();
-				angleLabel.setBorderColor({r: 0, g: 0, b: 0, a: 0.8});
-				angleLabel.setBackgroundColor({r: 0, g: 0, b: 0, a: 0.3});
+				angleLabel.setBorderColor({ r: 0, g: 0, b: 0, a: 0.8 });
+				angleLabel.setBackgroundColor({ r: 0, g: 0, b: 0, a: 0.3 });
 				angleLabel.material.depthTest = false;
 				angleLabel.material.opacity = 1;
 				angleLabel.visible = false;
@@ -1284,8 +1290,8 @@
 
 			{ // coordinate labels
 				let coordinateLabel = new TextSprite();
-				coordinateLabel.setBorderColor({r: 0, g: 0, b: 0, a: 0.8});
-				coordinateLabel.setBackgroundColor({r: 0, g: 0, b: 0, a: 0.3});
+				coordinateLabel.setBorderColor({ r: 0, g: 0, b: 0, a: 0.8 });
+				coordinateLabel.setBackgroundColor({ r: 0, g: 0, b: 0, a: 0.3 });
 				coordinateLabel.material.depthTest = false;
 				coordinateLabel.material.opacity = 1;
 				coordinateLabel.visible = false;
@@ -1296,11 +1302,11 @@
 			{ // Event Listeners
 				let drag = (e) => {
 					let I = Utils.getMousePointCloudIntersection(
-						e.drag.end, 
-						e.viewer.scene.getActiveCamera(), 
-						e.viewer, 
+						e.drag.end,
+						e.viewer.scene.getActiveCamera(),
+						e.viewer,
 						e.viewer.scene.pointclouds,
-						{pickClipped: true});
+						{ pickClipped: true });
 
 					if (I) {
 						let i = this.spheres.indexOf(e.drag.object);
@@ -1362,7 +1368,7 @@
 
 			this.update();
 
-			this.dispatchEvent({type: 'marker_removed', measurement: this});
+			this.dispatchEvent({ type: 'marker_removed', measurement: this });
 		};
 
 		setMarker (index, point) {
@@ -1370,8 +1376,8 @@
 
 			let event = {
 				type: 'marker_moved',
-				measure:	this,
-				index:	index,
+				measure: this,
+				index: index,
 				position: point.position.clone()
 			};
 			this.dispatchEvent(event);
@@ -1385,8 +1391,8 @@
 
 			let event = {
 				type: 'marker_moved',
-				measure:	this,
-				index:	index,
+				measure: this,
+				index: index,
 				position: position.clone()
 			};
 			this.dispatchEvent(event);
@@ -1462,7 +1468,7 @@
 
 				{ // coordinate labels
 					let coordinateLabel = this.coordinateLabels[0];
-					
+
 					let msg = position.toArray().map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
 					coordinateLabel.setText(msg);
 
@@ -1665,9 +1671,9 @@
 
 	}
 
-	class PolygonClipVolume extends THREE.Object3D{
-		
-		constructor(camera){
+	class PolygonClipVolume extends THREE.Object3D {
+
+		constructor(camera) {
 			super();
 
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
@@ -1687,7 +1693,7 @@
 			this.initialized = false;
 		}
 
-		addMarker() {
+		addMarker () {
 
 			let marker = new THREE.Mesh();
 
@@ -1703,16 +1709,16 @@
 
 				marker.position.copy(projectedPos);
 			};
-			
-			let drop = e => {	
+
+			let drop = e => {
 				cancel();
 			};
-			
+
 			cancel = e => {
 				marker.removeEventListener("drag", drag);
 				marker.removeEventListener("drop", drop);
 			};
-			
+
 			marker.addEventListener("drag", drag);
 			marker.addEventListener("drop", drop);
 
@@ -1720,54 +1726,54 @@
 			this.markers.push(marker);
 		}
 
-		removeLastMarker() {
-			if(this.markers.length > 0) {
+		removeLastMarker () {
+			if (this.markers.length > 0) {
 				this.markers.splice(this.markers.length - 1, 1);
 			}
 		}
 
 	}
 
-	class EnumItem{
-		constructor(object){
-			for(let key of Object.keys(object)){
+	class EnumItem {
+		constructor(object) {
+			for (let key of Object.keys(object)) {
 				this[key] = object[key];
 			}
 		}
 
-		inspect(){
+		inspect () {
 			return `Enum(${this.name}: ${this.value})`;
 		}
 	}
 
-	class Enum{
+	class Enum {
 
-		constructor(object){
+		constructor(object) {
 			this.object = object;
 
-			for(let key of Object.keys(object)){
+			for (let key of Object.keys(object)) {
 				let value = object[key];
 
-				if(typeof value === "object"){
+				if (typeof value === "object") {
 					value.name = key;
-				}else{
-					value = {name: key, value: value};
+				} else {
+					value = { name: key, value: value };
 				}
-				
+
 				this[key] = new EnumItem(value);
 			}
 		}
 
-		fromValue(value){
-			for(let key of Object.keys(this.object)){
-				if(this[key].value === value){
+		fromValue (value) {
+			for (let key of Object.keys(this.object)) {
+				if (this[key].value === value) {
 					return this[key];
 				}
 			}
 
 			throw new Error(`No enum for value: ${value}`);
 		}
-		
+
 	}
 
 	const CameraMode = {
@@ -1812,7 +1818,7 @@
 		HEIGHT: 3,
 		ELEVATION: 3,
 		INTENSITY: 4,
-		INTENSITY_GRADIENT:	5,
+		INTENSITY_GRADIENT: 5,
 		LOD: 6,
 		LEVEL_OF_DETAIL: 6,
 		POINT_INDEX: 7,
@@ -1827,8 +1833,8 @@
 	};
 
 	const TreeType = {
-		OCTREE:	0,
-		KDTREE:	1
+		OCTREE: 0,
+		KDTREE: 1
 	};
 
 	class Utils {
@@ -1841,7 +1847,7 @@
 
 			let source = await shapefile.open(file);
 
-			while(true){
+			while (true) {
 				let result = await source.read();
 
 				if (result.done) {
@@ -1880,13 +1886,13 @@
 			return true;
 		};
 
-		static debugSphere(parent, position, scale, color){
+		static debugSphere (parent, position, scale, color) {
 			let geometry = new THREE.SphereGeometry(1, 8, 8);
 			let material;
 
-			if(color !== undefined){
-				material = new THREE.MeshBasicMaterial({color: color});
-			}else{
+			if (color !== undefined) {
+				material = new THREE.MeshBasicMaterial({ color: color });
+			} else {
 				material = new THREE.MeshNormalMaterial();
 			}
 			let sphere = new THREE.Mesh(geometry, material);
@@ -1895,16 +1901,16 @@
 			parent.add(sphere);
 		}
 
-		static debugLine(parent, start, end, color){
-			let material = new THREE.LineBasicMaterial({ color: color }); 
-			let geometry = new THREE.Geometry(); 
-			geometry.vertices.push( start, end); 
-			let tl = new THREE.Line( geometry, material ); 
+		static debugLine (parent, start, end, color) {
+			let material = new THREE.LineBasicMaterial({ color: color });
+			let geometry = new THREE.Geometry();
+			geometry.vertices.push(start, end);
+			let tl = new THREE.Line(geometry, material);
 			parent.add(tl);
 		}
 
-		static debugBox(parent, box, transform = new THREE.Matrix4(), color = 0xFFFF00){
-			
+		static debugBox (parent, box, transform = new THREE.Matrix4(), color = 0xFFFF00) {
+
 			let vertices = [
 				[box.min.x, box.min.y, box.min.z],
 				[box.min.x, box.min.y, box.max.z],
@@ -1926,37 +1932,37 @@
 			let center = box.getCenter(new THREE.Vector3());
 
 			let centroids = [
-				{position: [box.min.x, center.y, center.z], color: 0xFF0000},
-				{position: [box.max.x, center.y, center.z], color: 0x880000},
+				{ position: [box.min.x, center.y, center.z], color: 0xFF0000 },
+				{ position: [box.max.x, center.y, center.z], color: 0x880000 },
 
-				{position: [center.x, box.min.y, center.z], color: 0x00FF00},
-				{position: [center.x, box.max.y, center.z], color: 0x008800},
+				{ position: [center.x, box.min.y, center.z], color: 0x00FF00 },
+				{ position: [center.x, box.max.y, center.z], color: 0x008800 },
 
-				{position: [center.x, center.y, box.min.z], color: 0x0000FF},
-				{position: [center.x, center.y, box.max.z], color: 0x000088},
+				{ position: [center.x, center.y, box.min.z], color: 0x0000FF },
+				{ position: [center.x, center.y, box.max.z], color: 0x000088 },
 			];
 
-			for(let vertex of vertices){
+			for (let vertex of vertices) {
 				let pos = vertex.clone().applyMatrix4(transform);
 
 				Utils.debugSphere(parent, pos, 0.1, 0xFF0000);
 			}
 
-			for(let edge of edges){
+			for (let edge of edges) {
 				let start = vertices[edge[0]].clone().applyMatrix4(transform);
 				let end = vertices[edge[1]].clone().applyMatrix4(transform);
 
 				Utils.debugLine(parent, start, end, color);
 			}
 
-			for(let centroid of centroids){
+			for (let centroid of centroids) {
 				let pos = new THREE.Vector3(...centroid.position).applyMatrix4(transform);
 
 				Utils.debugSphere(parent, pos, 0.1, centroid.color);
 			}
 		}
 
-		static debugPlane(parent, plane, size = 1, color = 0x0000FF){
+		static debugPlane (parent, plane, size = 1, color = 0x0000FF) {
 
 			let planehelper = new THREE.PlaneHelper(plane, size, color);
 
@@ -2014,13 +2020,13 @@
 		 * code from http://stackoverflow.com/questions/10343913/how-to-create-a-web-worker-from-a-string
 		 */
 		static createWorker (code) {
-			let blob = new Blob([code], {type: 'application/javascript'});
+			let blob = new Blob([code], { type: 'application/javascript' });
 			let worker = new Worker(URL.createObjectURL(blob));
 
 			return worker;
 		};
 
-		static moveTo(scene, endPosition, endTarget){
+		static moveTo (scene, endPosition, endTarget) {
 
 			let view = scene.view;
 			let camera = scene.getActiveCamera();
@@ -2100,7 +2106,7 @@
 			// z up
 			scene.rotation.x = Math.PI / 2;
 
-			return {'camera': camera, 'scene': scene};
+			return { 'camera': camera, 'scene': scene };
 		};
 
 		static createGrid (width, length, spacing, color) {
@@ -2162,9 +2168,9 @@
 		}
 
 		static getMousePointCloudIntersection (mouse, camera, viewer, pointclouds, params = {}) {
-			
+
 			let renderer = viewer.renderer;
-			
+
 			let nmouse = {
 				x: (mouse.x / renderer.domElement.clientWidth) * 2 - 1,
 				y: -(mouse.y / renderer.domElement.clientHeight) * 2 + 1
@@ -2172,7 +2178,7 @@
 
 			let pickParams = {};
 
-			if(params.pickClipped){
+			if (params.pickClipped) {
 				pickParams.pickClipped = params.pickClipped;
 			}
 
@@ -2187,11 +2193,11 @@
 			let closestDistance = Infinity;
 			let closestIntersection = null;
 			let closestPoint = null;
-			
-			for(let pointcloud of pointclouds){
+
+			for (let pointcloud of pointclouds) {
 				let point = pointcloud.pick(viewer, camera, ray, pickParams);
-				
-				if(!point){
+
+				if (!point) {
 					continue;
 				}
 
@@ -2241,7 +2247,7 @@
 			return img;
 		}
 
-		static pixelsArrayToDataUrl(pixels, width, height) {
+		static pixelsArrayToDataUrl (pixels, width, height) {
 			let canvas = document.createElement('canvas');
 			canvas.width = width;
 			canvas.height = height;
@@ -2263,7 +2269,7 @@
 			return dataURL;
 		}
 
-		static pixelsArrayToCanvas(pixels, width, height){
+		static pixelsArrayToCanvas (pixels, width, height) {
 			let canvas = document.createElement('canvas');
 			canvas.width = width;
 			canvas.height = height;
@@ -2278,7 +2284,7 @@
 
 			// flip vertically
 			let bytesPerLine = width * 4;
-			for(let i = 0; i < parseInt(height / 2); i++){
+			for (let i = 0; i < parseInt(height / 2); i++) {
 				let j = height - i - 1;
 
 				let lineI = pixels.slice(i * bytesPerLine, i * bytesPerLine + bytesPerLine);
@@ -2294,17 +2300,17 @@
 			return canvas;
 		}
 
-		static removeListeners(dispatcher, type){
+		static removeListeners (dispatcher, type) {
 			if (dispatcher._listeners === undefined) {
 				return;
 			}
 
-			if (dispatcher._listeners[ type ]) {
-				delete dispatcher._listeners[ type ];
+			if (dispatcher._listeners[type]) {
+				delete dispatcher._listeners[type];
 			}
 		}
 
-		static mouseToRay(mouse, camera, width, height){
+		static mouseToRay (mouse, camera, width, height) {
 
 			let normalizedMouse = {
 				x: (mouse.x / width) * 2 - 1,
@@ -2322,24 +2328,24 @@
 			return ray;
 		}
 
-		static projectedRadius(radius, camera, distance, screenWidth, screenHeight){
-			if(camera instanceof THREE.OrthographicCamera){
+		static projectedRadius (radius, camera, distance, screenWidth, screenHeight) {
+			if (camera instanceof THREE.OrthographicCamera) {
 				return Utils.projectedRadiusOrtho(radius, camera.projectionMatrix, screenWidth, screenHeight);
-			}else if(camera instanceof THREE.PerspectiveCamera){
+			} else if (camera instanceof THREE.PerspectiveCamera) {
 				return Utils.projectedRadiusPerspective(radius, camera.fov * Math.PI / 180, distance, screenHeight);
-			}else{
+			} else {
 				throw new Error("invalid parameters");
 			}
 		}
 
-		static projectedRadiusPerspective(radius, fov, distance, screenHeight) {
+		static projectedRadiusPerspective (radius, fov, distance, screenHeight) {
 			let projFactor = (1 / Math.tan(fov / 2)) / distance;
 			projFactor = projFactor * screenHeight / 2;
 
 			return radius * projFactor;
 		}
 
-		static projectedRadiusOrtho(radius, proj, screenWidth, screenHeight) {
+		static projectedRadiusOrtho (radius, proj, screenWidth, screenHeight) {
 			let p1 = new THREE.Vector4(0);
 			let p2 = new THREE.Vector4(radius);
 
@@ -2353,9 +2359,9 @@
 			p2.y = (p2.y + 1.0) * 0.5 * screenHeight;
 			return p1.distanceTo(p2);
 		}
-			
-			
-		static topView(camera, node){
+
+
+		static topView (camera, node) {
 			camera.position.set(0, 1, 0);
 			camera.rotation.set(-Math.PI / 2, 0, 0);
 			camera.zoomTo(node, 1);
@@ -2393,7 +2399,7 @@
 			let minDistance = Number.MAX_VALUE;
 
 			for (let i = 0; i < 6; i++) {
-				let distance = planes[ i ].distanceToPoint(center);
+				let distance = planes[i].distanceToPoint(center);
 
 				if (distance < negRadius) {
 					return 0;
@@ -2416,9 +2422,9 @@
 			let b = Math.floor(color.b * 255);
 
 			for (let i = 0; i < size; i++) {
-				data[ i * 3 ] = r;
-				data[ i * 3 + 1 ] = g;
-				data[ i * 3 + 2 ] = b;
+				data[i * 3] = r;
+				data[i * 3 + 1] = g;
+				data[i * 3 + 2] = b;
 			}
 
 			let texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
@@ -2459,7 +2465,7 @@
 			window.history.replaceState({}, '', url);
 		}
 
-		static createChildAABB(aabb, index){
+		static createChildAABB (aabb, index) {
 			let min = aabb.min.clone();
 			let max = aabb.max.clone();
 			let size = new THREE.Vector3().subVectors(max, min);
@@ -2486,7 +2492,7 @@
 		}
 
 		// see https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-		static clipboardCopy(text){
+		static clipboardCopy (text) {
 			let textArea = document.createElement("textarea");
 
 			textArea.style.position = 'fixed';
@@ -2510,11 +2516,11 @@
 
 			textArea.select();
 
-			 try {
+			try {
 				let success = document.execCommand('copy');
-				if(success){
+				if (success) {
 					console.log("copied text to clipboard");
-				}else{
+				} else {
 					console.log("copy to clipboard failed");
 				}
 			} catch (err) {
@@ -2525,7 +2531,7 @@
 
 		}
 
-		static getMeasurementIcon(measurement){
+		static getMeasurementIcon (measurement) {
 			if (measurement instanceof Measure) {
 				if (measurement.showDistances && !measurement.showArea && !measurement.showAngles) {
 					return `${Potree.resourcePath}/icons/distance.svg`;
@@ -2549,8 +2555,8 @@
 			}
 		}
 
-		static toMaterialID(materialName){
-			if (materialName === 'RGB'){
+		static toMaterialID (materialName) {
+			if (materialName === 'RGB') {
 				return PointColorType.RGB;
 			} else if (materialName === 'Color') {
 				return PointColorType.COLOR;
@@ -2586,7 +2592,7 @@
 		};
 
 
-		static toMaterialName(materialID) {
+		static toMaterialName (materialID) {
 			if (materialID === PointColorType.RGB) {
 				return 'RGB';
 			} else if (materialID === PointColorType.COLOR) {
@@ -2643,13 +2649,13 @@
 	}();
 
 	class Annotation extends EventDispatcher {
-		constructor (args = {}) {
+		constructor(args = {}) {
 			super();
 
 			let valueOrDefault = (a, b) => {
-				if(a === null || a === undefined){
+				if (a === null || a === undefined) {
 					return b;
-				}else{
+				} else {
 					return a;
 				}
 			};
@@ -2712,10 +2718,10 @@
 			// this.elDescriptionContent = this.elDescription.find(".annotation-description-content");
 
 			this.clickTitle = () => {
-				if(this.hasView()){
+				if (this.hasView()) {
 					this.moveHere(this.scene.getActiveCamera());
 				}
-				this.dispatchEvent({type: 'click', target: this});
+				this.dispatchEvent({ type: 'click', target: this });
 			};
 
 			this.elTitle.click(this.clickTitle);
@@ -2738,7 +2744,7 @@
 			for (let action of actions) {
 				let elButton = $(`<img src="${action.icon}" class="annotation-action-icon">`);
 				this.elTitlebar.append(elButton);
-				elButton.click(() => action.onclick({annotation: this}));
+				elButton.click(() => action.onclick({ annotation: this }));
 			}
 
 			this.elDescriptionClose.hover(
@@ -2760,8 +2766,8 @@
 
 		}
 
-		installHandles(viewer){
-			if(this.handles !== undefined){
+		installHandles (viewer) {
+			if (this.handles !== undefined) {
 				return;
 			}
 
@@ -2774,7 +2780,7 @@
 				</svg>
 			</div>
 		`);
-			
+
 			let svg = domElement.find("svg")[0];
 			let elLine = domElement.find("line")[0];
 			let elStart = domElement.find("circle")[0];
@@ -2800,10 +2806,10 @@
 				let ya = start.y - end.y;
 				let xa = start.x - end.x;
 
-				if(ya > 0){
+				if (ya > 0) {
 					start.y = start.y - ya;
 				}
-				if(xa > 0){
+				if (xa > 0) {
 					start.x = start.x - xa;
 				}
 
@@ -2829,12 +2835,12 @@
 				stop: () => {
 					$(this.domElement).find(".annotation-titlebar").css("pointer-events", "");
 				},
-				drag: (event, ui ) => {
+				drag: (event, ui) => {
 					let renderAreaWidth = viewer.renderer.getSize().width;
 					let renderAreaHeight = viewer.renderer.getSize().height;
 
 					let diff = {
-						x: ui.originalPosition.left - ui.position.left, 
+						x: ui.originalPosition.left - ui.position.left,
 						y: ui.originalPosition.top - ui.position.top
 					};
 
@@ -2886,7 +2892,7 @@
 
 					return screenPos;
 				};
-				
+
 				start = toScreen(start);
 				end = toScreen(end);
 
@@ -2903,8 +2909,8 @@
 			};
 		}
 
-		removeHandles(viewer){
-			if(this.handles === undefined){
+		removeHandles (viewer) {
+			if (this.handles === undefined) {
 				return;
 			}
 
@@ -3036,7 +3042,7 @@
 			}
 		}
 
-		hasChild(annotation) {
+		hasChild (annotation) {
 			return this.children.includes(annotation);
 		}
 
@@ -3049,7 +3055,7 @@
 			}
 		}
 
-		removeAllChildren() {
+		removeAllChildren () {
 			this.children.forEach((child) => {
 				if (child.children.length > 0) {
 					child.removeAllChildren();
@@ -3207,10 +3213,10 @@
 				}
 
 				{ // animate radius
-					let t = {x: 0};
+					let t = { x: 0 };
 
 					let tween = new TWEEN.Tween(t)
-						.to({x: 1}, animationDuration)
+						.to({ x: 1 }, animationDuration)
 						.onUpdate(function () {
 							view.radius = this.x * endRadius + (1 - this.x) * startRadius;
 						});
@@ -3234,7 +3240,7 @@
 	const Features = (function () {
 		let ftCanvas = document.createElement('canvas');
 		let gl = ftCanvas.getContext('webgl') || ftCanvas.getContext('experimental-webgl');
-		if (gl === null)		{ return null; }
+		if (gl === null) { return null; }
 
 		// -- code taken from THREE.WebGLRenderer --
 		let _vertexShaderPrecisionHighpFloat = gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.HIGH_FLOAT);
@@ -3313,12 +3319,12 @@
 		E: 'E'.charCodeAt(0),
 		R: 'R'.charCodeAt(0),
 		F: 'F'.charCodeAt(0)
-		
+
 	};
 
-	class LRUItem{
+	class LRUItem {
 
-		constructor(node){
+		constructor(node) {
 			this.previous = null;
 			this.next = null;
 			this.node = node;
@@ -3330,9 +3336,9 @@
 	 *
 	 * @class A doubly-linked-list of the least recently used elements.
 	 */
-	class LRU{
+	class LRU {
 
-		constructor(){
+		constructor() {
 			// the least recently used item
 			this.first = null;
 			// the most recently used item
@@ -3343,15 +3349,15 @@
 			this.numPoints = 0;
 		}
 
-		size(){
+		size () {
 			return this.elements;
 		}
 
-		contains(node){
+		contains (node) {
 			return this.items[node.id] == null;
 		}
 
-		touch(node){
+		touch (node) {
 			if (!node.loaded) {
 				return;
 			}
@@ -3400,7 +3406,7 @@
 			}
 		}
 
-		remove(node){
+		remove (node) {
 			let lruItem = this.items[node.id];
 			if (lruItem) {
 				if (this.elements === 1) {
@@ -3427,7 +3433,7 @@
 			}
 		}
 
-		getLRUItem(){
+		getLRUItem () {
 			if (this.first === null) {
 				return null;
 			}
@@ -3436,7 +3442,7 @@
 			return lru.node;
 		}
 
-		toString(){
+		toString () {
 			let string = '{ ';
 			let curr = this.first;
 			while (curr !== null) {
@@ -3451,7 +3457,7 @@
 			return string;
 		}
 
-		freeMemory(){
+		freeMemory () {
 			if (this.elements <= 1) {
 				return;
 			}
@@ -3463,7 +3469,7 @@
 			}
 		}
 
-		disposeDescendants(node){
+		disposeDescendants (node) {
 			let stack = [];
 			stack.push(node);
 			while (stack.length > 0) {
@@ -3487,9 +3493,9 @@
 
 	}
 
-	class PointCloudGreyhoundGeometry{
+	class PointCloudGreyhoundGeometry {
 
-		constructor(){
+		constructor() {
 			this.spacing = 0;
 			this.boundingBox = null;
 			this.root = null;
@@ -3513,9 +3519,9 @@
 
 	}
 
-	class PointCloudTreeNode extends EventDispatcher{
+	class PointCloudTreeNode extends EventDispatcher {
 
-		constructor(){
+		constructor() {
 			super();
 			this.needsTransformUpdate = true;
 		}
@@ -3550,7 +3556,7 @@
 	}
 
 	class PointCloudTree extends THREE.Object3D {
-		constructor () {
+		constructor() {
 			super();
 		}
 
@@ -3559,9 +3565,9 @@
 		}
 	}
 
-	class PointCloudGreyhoundGeometryNode extends PointCloudTreeNode{
+	class PointCloudGreyhoundGeometryNode extends PointCloudTreeNode {
 
-		constructor(name, pcoGeometry, boundingBox, scale, offset){
+		constructor(name, pcoGeometry, boundingBox, scale, offset) {
 
 			this.id = PointCloudGreyhoundGeometryNode.IDCount++;
 
@@ -3601,31 +3607,31 @@
 			);
 		}
 
-		isGeometryNode(){
+		isGeometryNode () {
 			return true;
 		}
 
-		isTreeNode(){
+		isTreeNode () {
 			return false;
 		}
 
-		isLoaded(){
+		isLoaded () {
 			return this.loaded;
 		}
 
-		getBoundingSphere(){
+		getBoundingSphere () {
 			return this.boundingSphere;
 		}
 
-		getBoundingBox(){
+		getBoundingBox () {
 			return this.boundingBox;
 		}
 
-		getLevel(){
+		getLevel () {
 			return this.level;
 		}
 
-		getChildren(){
+		getChildren () {
 			let children = [];
 
 			for (let i = 0; i < 8; ++i) {
@@ -3637,21 +3643,21 @@
 			return children;
 		}
 
-		getURL(){
+		getURL () {
 			let schema = this.pcoGeometry.schema;
 			let bounds = this.greyhoundBounds;
 
 			let boundsString =
-						bounds.min.x + ',' + bounds.min.y + ',' + bounds.min.z + ',' +
-						bounds.max.x + ',' + bounds.max.y + ',' + bounds.max.z;
+				bounds.min.x + ',' + bounds.min.y + ',' + bounds.min.z + ',' +
+				bounds.max.x + ',' + bounds.max.y + ',' + bounds.max.z;
 
 			let url = '' + this.pcoGeometry.serverURL +
-						'read?depthBegin=' +
-						(this.baseLoaded ? (this.level + this.pcoGeometry.baseDepth) : 0) +
-						'&depthEnd=' + (this.level + this.pcoGeometry.baseDepth + 1) +
-						'&bounds=[' + boundsString + ']' +
-						'&schema=' + JSON.stringify(schema) +
-						'&compress=true';
+				'read?depthBegin=' +
+				(this.baseLoaded ? (this.level + this.pcoGeometry.baseDepth) : 0) +
+				'&depthEnd=' + (this.level + this.pcoGeometry.baseDepth + 1) +
+				'&bounds=[' + boundsString + ']' +
+				'&schema=' + JSON.stringify(schema) +
+				'&compress=true';
 
 			if (this.scale) {
 				url += '&scale=' + this.scale;
@@ -3667,12 +3673,12 @@
 			return url;
 		}
 
-		addChild(child){
+		addChild (child) {
 			this.children[child.index] = child;
 			child.parent = this;
 		}
 
-		load(){
+		load () {
 			if (
 				this.loading === true ||
 				this.loaded === true ||
@@ -3692,11 +3698,11 @@
 			}
 		}
 
-		loadPoints(){
+		loadPoints () {
 			this.pcoGeometry.loader.load(this);
 		}
 
-		loadHierarchyThenPoints(){
+		loadHierarchyThenPoints () {
 			// From Greyhound (Cartesian) ordering for the octree to Potree-default
 			let transform = [0, 2, 1, 3, 4, 6, 5, 7];
 
@@ -3826,7 +3832,7 @@
 				xhr.onreadystatechange = () => {
 					if (xhr.readyState === 4) {
 						if (xhr.status === 200 || xhr.status === 0) {
-							let greyhoundHierarchy = JSON.parse(xhr.responseText) || { };
+							let greyhoundHierarchy = JSON.parse(xhr.responseText) || {};
 							callback(that, greyhoundHierarchy);
 						} else {
 							console.log(
@@ -3845,11 +3851,11 @@
 			}
 		}
 
-		getNumPoints(){
+		getNumPoints () {
 			return this.numPoints;
 		}
 
-		dispose(){
+		dispose () {
 			if (this.geometry && this.parent != null) {
 				this.geometry.dispose();
 				this.geometry = null;
@@ -3869,9 +3875,9 @@
 
 	PointCloudGreyhoundGeometryNode.IDCount = 0;
 
-	class PointCloudOctreeGeometry{
+	class PointCloudOctreeGeometry {
 
-		constructor(){
+		constructor() {
 			this.url = null;
 			this.octreeDir = null;
 			this.spacing = 0;
@@ -3882,12 +3888,12 @@
 			this.hierarchyStepSize = -1;
 			this.loader = null;
 		}
-		
+
 	}
 
-	class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
+	class PointCloudOctreeGeometryNode extends PointCloudTreeNode {
 
-		constructor(name, pcoGeometry, boundingBox){
+		constructor(name, pcoGeometry, boundingBox) {
 			super();
 
 			this.id = PointCloudOctreeGeometryNode.IDCount++;
@@ -3904,31 +3910,31 @@
 			this.oneTimeDisposeHandlers = [];
 		}
 
-		isGeometryNode(){
+		isGeometryNode () {
 			return true;
 		}
 
-		getLevel(){
+		getLevel () {
 			return this.level;
 		}
 
-		isTreeNode(){
+		isTreeNode () {
 			return false;
 		}
 
-		isLoaded(){
+		isLoaded () {
 			return this.loaded;
 		}
 
-		getBoundingSphere(){
+		getBoundingSphere () {
 			return this.boundingSphere;
 		}
 
-		getBoundingBox(){
+		getBoundingBox () {
 			return this.boundingBox;
 		}
 
-		getChildren(){
+		getChildren () {
 			let children = [];
 
 			for (let i = 0; i < 8; i++) {
@@ -3940,11 +3946,11 @@
 			return children;
 		}
 
-		getBoundingBox(){
+		getBoundingBox () {
 			return this.boundingBox;
 		}
 
-		getURL(){
+		getURL () {
 			let url = '';
 
 			let version = this.pcoGeometry.loader.version;
@@ -3960,7 +3966,7 @@
 			return url;
 		}
 
-		getHierarchyPath(){
+		getHierarchyPath () {
 			let path = 'r/';
 
 			let hierarchyStepSize = this.pcoGeometry.hierarchyStepSize;
@@ -3976,12 +3982,12 @@
 			return path;
 		}
 
-		addChild(child) {
+		addChild (child) {
 			this.children[child.index] = child;
 			child.parent = this;
 		}
 
-		load(){
+		load () {
 			if (this.loading === true || this.loaded === true || Potree.numNodesLoading >= Potree.maxNodesLoading) {
 				return;
 			}
@@ -4001,11 +4007,11 @@
 			}
 		}
 
-		loadPoints(){
+		loadPoints () {
 			this.pcoGeometry.loader.load(this);
 		}
 
-		loadHierachyThenPoints(){
+		loadHierachyThenPoints () {
 			let node = this;
 
 			// load hierarchy
@@ -4016,7 +4022,7 @@
 				let children = view.getUint8(0);
 				let numPoints = view.getUint32(1, true);
 				node.numPoints = numPoints;
-				stack.push({children: children, numPoints: numPoints, name: node.name});
+				stack.push({ children: children, numPoints: numPoints, name: node.name });
 
 				let decoded = [];
 
@@ -4031,9 +4037,9 @@
 							let childChildren = view.getUint8(offset);
 							let childNumPoints = view.getUint32(offset + 1, true);
 
-							stack.push({children: childChildren, numPoints: childNumPoints, name: childName});
+							stack.push({ children: childChildren, numPoints: childNumPoints, name: childName });
 
-							decoded.push({children: childChildren, numPoints: childNumPoints, name: childName});
+							decoded.push({ children: childChildren, numPoints: childNumPoints, name: childName });
 
 							offset += 5;
 						}
@@ -4099,11 +4105,11 @@
 			}
 		}
 
-		getNumPoints(){
+		getNumPoints () {
 			return this.numPoints;
 		}
 
-		dispose(){
+		dispose () {
 			if (this.geometry && this.parent != null) {
 				this.geometry.dispose();
 				this.geometry = null;
@@ -4117,7 +4123,7 @@
 				this.oneTimeDisposeHandlers = [];
 			}
 		}
-		
+
 	}
 
 	PointCloudOctreeGeometryNode.IDCount = 0;
@@ -5601,11 +5607,11 @@ void main() {
 	};
 
 	Object.defineProperty(ClassificationScheme, 'RANDOM', {
-		get: function() { 
+		get: function () {
 
 			let scheme = {};
 
-			for(let i = 0; i <= 255; i++){
+			for (let i = 0; i <= 255; i++) {
 				scheme[i] = new THREE.Vector4(Math.random(), Math.random(), Math.random());
 			}
 
@@ -5625,7 +5631,7 @@ void main() {
 
 
 	class PointCloudMaterial extends THREE.RawShaderMaterial {
-		constructor (parameters = {}) {
+		constructor(parameters = {}) {
 			super();
 
 			this.visibleNodesTexture = Utils.generateDataTexture(2048, 1, new THREE.Color(0xffffff));
@@ -5633,9 +5639,9 @@ void main() {
 			this.visibleNodesTexture.magFilter = THREE.NearestFilter;
 
 			let getValid = (a, b) => {
-				if(a !== undefined){
+				if (a !== undefined) {
 					return a;
-				}else{
+				} else {
 					return b;
 				}
 			};
@@ -5679,69 +5685,69 @@ void main() {
 			};
 
 			this.uniforms = {
-				level:				{ type: "f", value: 0.0 },
-				vnStart:			{ type: "f", value: 0.0 },
-				spacing:			{ type: "f", value: 1.0 },
-				blendHardness:		{ type: "f", value: 2.0 },
-				blendDepthSupplement:	{ type: "f", value: 0.0 },
-				fov:				{ type: "f", value: 1.0 },
-				screenWidth:		{ type: "f", value: 1.0 },
-				screenHeight:		{ type: "f", value: 1.0 },
-				near:				{ type: "f", value: 0.1 },
-				far:				{ type: "f", value: 1.0 },
-				uColor:				{ type: "c", value: new THREE.Color( 0xffffff ) },
-				uOpacity:			{ type: "f", value: 1.0 },
-				size:				{ type: "f", value: pointSize },
-				minSize:			{ type: "f", value: minSize },
-				maxSize:			{ type: "f", value: maxSize },
-				octreeSize:			{ type: "f", value: 0 },
-				bbSize:				{ type: "fv", value: [0, 0, 0] },
-				elevationRange:		{ type: "2fv", value: [0, 0] },
+				level: { type: "f", value: 0.0 },
+				vnStart: { type: "f", value: 0.0 },
+				spacing: { type: "f", value: 1.0 },
+				blendHardness: { type: "f", value: 2.0 },
+				blendDepthSupplement: { type: "f", value: 0.0 },
+				fov: { type: "f", value: 1.0 },
+				screenWidth: { type: "f", value: 1.0 },
+				screenHeight: { type: "f", value: 1.0 },
+				near: { type: "f", value: 0.1 },
+				far: { type: "f", value: 1.0 },
+				uColor: { type: "c", value: new THREE.Color(0xffffff) },
+				uOpacity: { type: "f", value: 1.0 },
+				size: { type: "f", value: pointSize },
+				minSize: { type: "f", value: minSize },
+				maxSize: { type: "f", value: maxSize },
+				octreeSize: { type: "f", value: 0 },
+				bbSize: { type: "fv", value: [0, 0, 0] },
+				elevationRange: { type: "2fv", value: [0, 0] },
 
-				clipBoxCount:		{ type: "f", value: 0 },
+				clipBoxCount: { type: "f", value: 0 },
 				//clipSphereCount:	{ type: "f", value: 0 },
-				clipPolygonCount:	{ type: "i", value: 0 },
-				clipBoxes:			{ type: "Matrix4fv", value: [] },
+				clipPolygonCount: { type: "i", value: 0 },
+				clipBoxes: { type: "Matrix4fv", value: [] },
 				//clipSpheres:		{ type: "Matrix4fv", value: [] },
-				clipPolygons:		{ type: "3fv", value: [] },
-				clipPolygonVCount:	{ type: "iv", value: [] },
-				clipPolygonVP:		{ type: "Matrix4fv", value: [] },
+				clipPolygons: { type: "3fv", value: [] },
+				clipPolygonVCount: { type: "iv", value: [] },
+				clipPolygonVP: { type: "Matrix4fv", value: [] },
 
-				visibleNodes:		{ type: "t", value: this.visibleNodesTexture },
-				pcIndex:			{ type: "f", value: 0 },
-				gradient:			{ type: "t", value: this.gradientTexture },
-				classificationLUT:	{ type: "t", value: this.classificationTexture },
-				uHQDepthMap:		{ type: "t", value: null },
-				toModel:			{ type: "Matrix4f", value: [] },
-				diffuse:			{ type: "fv", value: [1, 1, 1] },
-				transition:			{ type: "f", value: 0.5 },
-				intensityRange:		{ type: "fv", value: [0, 65000] },
-				intensityGamma:		{ type: "f", value: 1 },
-				intensityContrast:	{ type: "f", value: 0 },
-				intensityBrightness:{ type: "f", value: 0 },
-				rgbGamma:			{ type: "f", value: 1 },
-				rgbContrast:		{ type: "f", value: 0 },
-				rgbBrightness:		{ type: "f", value: 0 },
-				wRGB:				{ type: "f", value: 1 },
-				wIntensity:			{ type: "f", value: 0 },
-				wElevation:			{ type: "f", value: 0 },
-				wClassification:	{ type: "f", value: 0 },
-				wReturnNumber:		{ type: "f", value: 0 },
-				wSourceID:			{ type: "f", value: 0 },
+				visibleNodes: { type: "t", value: this.visibleNodesTexture },
+				pcIndex: { type: "f", value: 0 },
+				gradient: { type: "t", value: this.gradientTexture },
+				classificationLUT: { type: "t", value: this.classificationTexture },
+				uHQDepthMap: { type: "t", value: null },
+				toModel: { type: "Matrix4f", value: [] },
+				diffuse: { type: "fv", value: [1, 1, 1] },
+				transition: { type: "f", value: 0.5 },
+				intensityRange: { type: "fv", value: [0, 65000] },
+				intensityGamma: { type: "f", value: 1 },
+				intensityContrast: { type: "f", value: 0 },
+				intensityBrightness: { type: "f", value: 0 },
+				rgbGamma: { type: "f", value: 1 },
+				rgbContrast: { type: "f", value: 0 },
+				rgbBrightness: { type: "f", value: 0 },
+				wRGB: { type: "f", value: 1 },
+				wIntensity: { type: "f", value: 0 },
+				wElevation: { type: "f", value: 0 },
+				wClassification: { type: "f", value: 0 },
+				wReturnNumber: { type: "f", value: 0 },
+				wSourceID: { type: "f", value: 0 },
 				useOrthographicCamera: { type: "b", value: false },
-				clipTask:			{ type: "i", value: 1 },
-				clipMethod:			{ type: "i", value: 1 },
-				uSnapshot:			{ type: "tv", value: [] },
-				uSnapshotDepth:		{ type: "tv", value: [] },
-				uSnapView:			{ type: "Matrix4fv", value: [] },
-				uSnapProj:			{ type: "Matrix4fv", value: [] },
-				uSnapProjInv:		{ type: "Matrix4fv", value: [] },
-				uSnapViewInv:		{ type: "Matrix4fv", value: [] },
-				uShadowColor:		{ type: "3fv", value: [0, 0, 0] },
+				clipTask: { type: "i", value: 1 },
+				clipMethod: { type: "i", value: 1 },
+				uSnapshot: { type: "tv", value: [] },
+				uSnapshotDepth: { type: "tv", value: [] },
+				uSnapView: { type: "Matrix4fv", value: [] },
+				uSnapProj: { type: "Matrix4fv", value: [] },
+				uSnapProjInv: { type: "Matrix4fv", value: [] },
+				uSnapViewInv: { type: "Matrix4fv", value: [] },
+				uShadowColor: { type: "3fv", value: [0, 0, 0] },
 
-				uFilterReturnNumberRange:		{ type: "fv", value: [0, 7]},
-				uFilterNumberOfReturnsRange:	{ type: "fv", value: [0, 7]},
-				uFilterGPSTimeClipRange:		{ type: "fv", value: [0, 7]},
+				uFilterReturnNumberRange: { type: "fv", value: [0, 7] },
+				uFilterNumberOfReturnsRange: { type: "fv", value: [0, 7] },
+				uFilterGPSTimeClipRange: { type: "fv", value: [0, 7] },
 			};
 
 			this.classification = ClassificationScheme.DEFAULT;
@@ -5755,18 +5761,18 @@ void main() {
 			this.vertexColors = THREE.VertexColors;
 		}
 
-		setDefine(key, value){
-			if(value !== undefined && value !== null){
-				if(this.defines.get(key) !== value){
+		setDefine (key, value) {
+			if (value !== undefined && value !== null) {
+				if (this.defines.get(key) !== value) {
 					this.defines.set(key, value);
 					this.updateShaderSource();
 				}
-			}else{
+			} else {
 				this.removeDefine(key);
 			}
 		}
 
-		removeDefine(key){
+		removeDefine (key) {
 			this.defines.delete(key);
 		}
 
@@ -5858,10 +5864,10 @@ void main() {
 			} else if (this._pointColorType === PointColorType.COMPOSITE) {
 				defines.push('#define color_type_composite');
 			}
-			
-			if(this._treeType === TreeType.OCTREE){
+
+			if (this._treeType === TreeType.OCTREE) {
 				defines.push('#define tree_type_octree');
-			}else if(this._treeType === TreeType.KDTREE){
+			} else if (this._treeType === TreeType.KDTREE) {
 				defines.push('#define tree_type_kdtree');
 			}
 
@@ -5869,7 +5875,7 @@ void main() {
 				defines.push('#define weighted_splats');
 			}
 
-			for(let [key, value] of this.defines){
+			for (let [key, value] of this.defines) {
 				defines.push(value);
 			}
 
@@ -5934,8 +5940,8 @@ void main() {
 		//	}
 		//}
 
-		setClipPolygons(clipPolygons, maxPolygonVertices) {
-			if(!clipPolygons){
+		setClipPolygons (clipPolygons, maxPolygonVertices) {
+			if (!clipPolygons) {
 				return;
 			}
 
@@ -5943,12 +5949,12 @@ void main() {
 
 			let doUpdate = (this.clipPolygons.length !== clipPolygons.length);
 
-			if(doUpdate){
+			if (doUpdate) {
 				this.updateShaderSource();
 			}
 		}
-		
-		get gradient(){
+
+		get gradient () {
 			return this._gradient;
 		}
 
@@ -5959,13 +5965,13 @@ void main() {
 				this.uniforms.gradient.value = this.gradientTexture;
 			}
 		}
-		
-		get useOrthographicCamera() {
+
+		get useOrthographicCamera () {
 			return this.uniforms.useOrthographicCamera.value;
 		}
 
-		set useOrthographicCamera(value) {
-			if(this.uniforms.useOrthographicCamera.value !== value){
+		set useOrthographicCamera (value) {
+			if (this.uniforms.useOrthographicCamera.value !== value) {
 				this.uniforms.useOrthographicCamera.value = value;
 			}
 		}
@@ -5978,17 +5984,17 @@ void main() {
 		set classification (value) {
 
 			let copy = {};
-			for(let key of Object.keys(value)){
+			for (let key of Object.keys(value)) {
 				copy[key] = value[key].clone();
 			}
 
 			let isEqual = false;
-			if(this._classification === undefined){
+			if (this._classification === undefined) {
 				isEqual = false;
-			}else{
+			} else {
 				isEqual = Object.keys(copy).length === Object.keys(this._classification).length;
 
-				for(let key of Object.keys(copy)){
+				for (let key of Object.keys(copy)) {
 					isEqual = isEqual && this._classification[key] !== undefined;
 					isEqual = isEqual && copy[key].equals(this._classification[key]);
 				}
@@ -6010,20 +6016,20 @@ void main() {
 			});
 		}
 
-		get numSnapshots(){
+		get numSnapshots () {
 			return this._numSnapshots;
 		}
 
-		set numSnapshots(value){
+		set numSnapshots (value) {
 			this._numSnapshots = value;
 		}
 
-		get snapEnabled(){
+		get snapEnabled () {
 			return this._snapEnabled;
 		}
 
-		set snapEnabled(value){
-			if(this._snapEnabled !== value){
+		set snapEnabled (value) {
+			if (this._snapEnabled !== value) {
 				this._snapEnabled = value;
 				//this.uniforms.snapEnabled.value = value;
 				this.updateShaderSource();
@@ -6051,23 +6057,23 @@ void main() {
 			}
 		}
 
-		get clipTask(){
+		get clipTask () {
 			return this.uniforms.clipTask.value;
 		}
 
-		set clipTask(mode){
+		set clipTask (mode) {
 			this.uniforms.clipTask.value = mode;
 		}
 
-		get clipMethod(){
+		get clipMethod () {
 			return this.uniforms.clipMethod.value;
 		}
 
-		set clipMethod(mode){
+		set clipMethod (mode) {
 			this.uniforms.clipMethod.value = mode;
 		}
 
-		get weighted(){
+		get weighted () {
 			return this._weighted;
 		}
 
@@ -6130,8 +6136,8 @@ void main() {
 				this.uniforms.far.value = value;
 			}
 		}
-		
-		get opacity(){
+
+		get opacity () {
 			return this.uniforms.uOpacity.value;
 		}
 
@@ -6190,7 +6196,7 @@ void main() {
 			}
 		}
 
-		get useEDL(){
+		get useEDL () {
 			return this._useEDL;
 		}
 
@@ -6208,7 +6214,7 @@ void main() {
 		set color (value) {
 			if (!this.uniforms.uColor.value.equals(value)) {
 				this.uniforms.uColor.value.copy(value);
-				
+
 				this.dispatchEvent({
 					type: 'color_changed',
 					target: this
@@ -6228,7 +6234,7 @@ void main() {
 			if (this._shape !== value) {
 				this._shape = value;
 				this.updateShaderSource();
-				this.dispatchEvent({type: 'point_shape_changed', target: this});
+				this.dispatchEvent({ type: 'point_shape_changed', target: this });
 				this.dispatchEvent({
 					type: 'material_property_changed',
 					target: this
@@ -6282,7 +6288,7 @@ void main() {
 			let changed = this.uniforms.elevationRange.value[0] !== value[0]
 				|| this.uniforms.elevationRange.value[1] !== value[1];
 
-			if(changed){
+			if (changed) {
 				this.uniforms.elevationRange.value = value;
 
 				this._defaultElevationRangeChanged = true;
@@ -6431,7 +6437,7 @@ void main() {
 		}
 
 		set weightRGB (value) {
-			if(this.uniforms.wRGB.value !== value){
+			if (this.uniforms.wRGB.value !== value) {
 				this.uniforms.wRGB.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6445,7 +6451,7 @@ void main() {
 		}
 
 		set weightIntensity (value) {
-			if(this.uniforms.wIntensity.value !== value){
+			if (this.uniforms.wIntensity.value !== value) {
 				this.uniforms.wIntensity.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6459,7 +6465,7 @@ void main() {
 		}
 
 		set weightElevation (value) {
-			if(this.uniforms.wElevation.value !== value){
+			if (this.uniforms.wElevation.value !== value) {
 				this.uniforms.wElevation.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6473,7 +6479,7 @@ void main() {
 		}
 
 		set weightClassification (value) {
-			if(this.uniforms.wClassification.value !== value){
+			if (this.uniforms.wClassification.value !== value) {
 				this.uniforms.wClassification.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6487,7 +6493,7 @@ void main() {
 		}
 
 		set weightReturnNumber (value) {
-			if(this.uniforms.wReturnNumber.value !== value){
+			if (this.uniforms.wReturnNumber.value !== value) {
 				this.uniforms.wReturnNumber.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6501,7 +6507,7 @@ void main() {
 		}
 
 		set weightSourceID (value) {
-			if(this.uniforms.wSourceID.value !== value){
+			if (this.uniforms.wSourceID.value !== value) {
 				this.uniforms.wSourceID.value = value;
 				this.dispatchEvent({
 					type: 'material_property_changed',
@@ -6533,11 +6539,11 @@ void main() {
 
 			context.fillStyle = ctxGradient;
 			context.fill();
-			
+
 			//let texture = new THREE.Texture(canvas);
 			let texture = new THREE.CanvasTexture(canvas);
 			texture.needsUpdate = true;
-			
+
 			texture.minFilter = THREE.LinearFilter;
 			// textureImage = texture.image;
 
@@ -6578,21 +6584,21 @@ void main() {
 			return texture;
 		}
 
-		disableEvents(){
-			if(this._hiddenListeners === undefined){
+		disableEvents () {
+			if (this._hiddenListeners === undefined) {
 				this._hiddenListeners = this._listeners;
 				this._listeners = {};
 			}
 		};
 
-		enableEvents(){
+		enableEvents () {
 			this._listeners = this._hiddenListeners;
 			this._hiddenListeners = undefined;
 		};
 
-		copyFrom(from){
+		copyFrom (from) {
 
-			for(let name of this.uniforms){
+			for (let name of this.uniforms) {
 				this.uniforms[name].value = from.uniforms[name].value;
 			}
 
@@ -6601,7 +6607,7 @@ void main() {
 	}
 
 	class PointCloudOctreeNode extends PointCloudTreeNode {
-		constructor () {
+		constructor() {
 			super();
 
 			//this.children = {};
@@ -6650,9 +6656,9 @@ void main() {
 			return children;
 		}
 
-		getPointsInBox(boxNode){
+		getPointsInBox (boxNode) {
 
-			if(!this.sceneNode){
+			if (!this.sceneNode) {
 				return null;
 			}
 
@@ -6668,7 +6674,7 @@ void main() {
 			let inBox = [];
 
 			let pos = new THREE.Vector4();
-			for(let i = 0; i < buffer.numElements; i++){
+			for (let i = 0; i < buffer.numElements; i++) {
 				let x = view.getFloat32(i * stride + posOffset + 0, true);
 				let y = view.getFloat32(i * stride + posOffset + 4, true);
 				let z = view.getFloat32(i * stride + posOffset + 8, true);
@@ -6676,9 +6682,9 @@ void main() {
 				pos.set(x, y, z, 1);
 				pos.applyMatrix4(objectToBox);
 
-				if(-0.5 < pos.x && pos.x < 0.5){
-					if(-0.5 < pos.y && pos.y < 0.5){
-						if(-0.5 < pos.z && pos.z < 0.5){
+				if (-0.5 < pos.x && pos.x < 0.5) {
+					if (-0.5 < pos.y && pos.y < 0.5) {
+						if (-0.5 < pos.z && pos.z < 0.5) {
 							pos.set(x, y, z, 1).applyMatrix4(this.sceneNode.matrixWorld);
 							inBox.push(new THREE.Vector3(pos.x, pos.y, pos.z));
 						}
@@ -6695,7 +6701,7 @@ void main() {
 	}
 
 	class PointCloudOctree extends PointCloudTree {
-		constructor (geometry, material) {
+		constructor(geometry, material) {
 			super();
 
 			this.pointBudget = Infinity;
@@ -6742,7 +6748,7 @@ void main() {
 		setName (name) {
 			if (this.name !== name) {
 				this.name = name;
-				this.dispatchEvent({type: 'name_changed', name: name, pointcloud: this});
+				this.dispatchEvent({ type: 'name_changed', name: name, pointcloud: this });
 			}
 		}
 
@@ -6803,7 +6809,7 @@ void main() {
 			//for (let key in geometryNode.children) {
 			//	node.children[key] = geometryNode.children[key];
 			//}
-			for(let i = 0; i < 8; i++){
+			for (let i = 0; i < 8; i++) {
 				node.children[i] = geometryNode.children[i];
 			}
 
@@ -6866,9 +6872,9 @@ void main() {
 			material.uniforms.octreeSize.value = this.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 		}
 
-		computeVisibilityTextureData(nodes, camera){
-			
-			if(Potree.measureTimings) performance.mark("computeVisibilityTextureData-start");
+		computeVisibilityTextureData (nodes, camera) {
+
+			if (Potree.measureTimings) performance.mark("computeVisibilityTextureData-start");
 
 			let data = new Uint8Array(nodes.length * 4);
 			let visibleNodeTextureOffsets = new Map();
@@ -6890,21 +6896,21 @@ void main() {
 			// code sample taken from three.js src/math/Ray.js
 			let v1 = new THREE.Vector3();
 			let intersectSphereBack = (ray, sphere) => {
-				v1.subVectors( sphere.center, ray.origin );
-				let tca = v1.dot( ray.direction );
-				let d2 = v1.dot( v1 ) - tca * tca;
+				v1.subVectors(sphere.center, ray.origin);
+				let tca = v1.dot(ray.direction);
+				let d2 = v1.dot(v1) - tca * tca;
 				let radius2 = sphere.radius * sphere.radius;
 
-				if(d2 > radius2){
+				if (d2 > radius2) {
 					return null;
 				}
 
-				let thc = Math.sqrt( radius2 - d2 );
+				let thc = Math.sqrt(radius2 - d2);
 
 				// t1 = second intersect point - exit point on back of sphere
 				let t1 = tca + thc;
 
-				if(t1 < 0 ){
+				if (t1 < 0) {
 					return null;
 				}
 
@@ -6922,13 +6928,13 @@ void main() {
 			let nodeMap = new Map();
 			let offsetsToChild = new Array(nodes.length).fill(Infinity);
 
-			for(let i = 0; i < nodes.length; i++){
+			for (let i = 0; i < nodes.length; i++) {
 				let node = nodes[i];
 
 				nodeMap.set(node.name, node);
 				visibleNodeTextureOffsets.set(node, i);
 
-				if(i > 0){
+				if (i > 0) {
 					let index = parseInt(node.name.slice(-1));
 					let parentName = node.name.slice(0, -1);
 					let parent = nodeMap.get(parentName);
@@ -6947,11 +6953,11 @@ void main() {
 			}
 
 			var a = 10;
-			
-			if(Potree.measureTimings){
+
+			if (Potree.measureTimings) {
 				performance.mark("computeVisibilityTextureData-end");
 				performance.measure("render.computeVisibilityTextureData", "computeVisibilityTextureData-start", "computeVisibilityTextureData-end");
-			} 
+			}
 
 			return {
 				data: data,
@@ -6969,7 +6975,7 @@ void main() {
 
 				let start = new THREE.Vector3(profile.points[i + 0].x, profile.points[i + 0].y, bsWorld.center.z);
 				let end = new THREE.Vector3(profile.points[i + 1].x, profile.points[i + 1].y, bsWorld.center.z);
-				
+
 				let closest = new THREE.Line3(start, end).closestPointToPoint(bsWorld.center, true, new THREE.Vector3());
 				let distance = closest.distanceTo(bsWorld.center);
 
@@ -7197,13 +7203,13 @@ void main() {
 		 * TODO: only draw pixels that are actually read with readPixels().
 		 *
 		 */
-		pick(viewer, camera, ray, params = {}){
+		pick (viewer, camera, ray, params = {}) {
 
 			let renderer = viewer.renderer;
 			let pRenderer = viewer.pRenderer;
-			
+
 			performance.mark("pick-start");
-			
+
 			let getVal = (a, b) => a !== undefined ? a : b;
 
 			let pickWindowSize = getVal(params.pickWindowSize, 17);
@@ -7224,7 +7230,7 @@ void main() {
 			if (nodes.length === 0) {
 				return null;
 			}
-			
+
 			if (!this.pickState) {
 				let scene = new THREE.Scene();
 
@@ -7233,9 +7239,11 @@ void main() {
 
 				let renderTarget = new THREE.WebGLRenderTarget(
 					1, 1,
-					{ minFilter: THREE.LinearFilter,
+					{
+						minFilter: THREE.LinearFilter,
 						magFilter: THREE.NearestFilter,
-						format: THREE.RGBAFormat }
+						format: THREE.RGBAFormat
+					}
 				);
 
 				this.pickState = {
@@ -7244,7 +7252,7 @@ void main() {
 					scene: scene
 				};
 			}
-			
+
 			let pickState = this.pickState;
 			let pickMaterial = pickState.material;
 
@@ -7260,19 +7268,19 @@ void main() {
 				pickMaterial.uniforms.minSize.value = this.material.uniforms.minSize.value;
 				pickMaterial.uniforms.maxSize.value = this.material.uniforms.maxSize.value;
 				pickMaterial.classification = this.material.classification;
-				if(params.pickClipped){
+				if (params.pickClipped) {
 					pickMaterial.clipBoxes = this.material.clipBoxes;
 					pickMaterial.uniforms.clipBoxes = this.material.uniforms.clipBoxes;
-					if(this.material.clipTask === Potree.ClipTask.HIGHLIGHT){
+					if (this.material.clipTask === Potree.ClipTask.HIGHLIGHT) {
 						pickMaterial.clipTask = Potree.ClipTask.NONE;
-					}else{
+					} else {
 						pickMaterial.clipTask = this.material.clipTask;
 					}
 					pickMaterial.clipMethod = this.material.clipMethod;
-				}else{
+				} else {
 					pickMaterial.clipBoxes = [];
 				}
-				
+
 				this.updateMaterial(pickMaterial, nodes, camera, renderer);
 			}
 
@@ -7281,7 +7289,7 @@ void main() {
 			pickState.renderTarget.setSize(width, height);
 
 			let pixelPos = new THREE.Vector2(params.x, params.y);
-			
+
 			let gl = renderer.getContext();
 			gl.enable(gl.SCISSOR_TEST);
 			gl.scissor(
@@ -7289,24 +7297,24 @@ void main() {
 				parseInt(pixelPos.y - (pickWindowSize - 1) / 2),
 				parseInt(pickWindowSize), parseInt(pickWindowSize));
 
-			
+
 			renderer.state.buffers.depth.setTest(pickMaterial.depthTest);
 			renderer.state.buffers.depth.setMask(pickMaterial.depthWrite);
 			renderer.state.setBlending(THREE.NoBlending);
-			
+
 			{ // RENDER
 				renderer.setRenderTarget(pickState.renderTarget);
 				gl.clearColor(0, 0, 0, 0);
-				renderer.clearTarget( pickState.renderTarget, true, true, true );
-				
+				renderer.clearTarget(pickState.renderTarget, true, true, true);
+
 				let tmp = this.material;
 				this.material = pickMaterial;
-				
+
 				pRenderer.renderOctree(this, nodes, camera, pickState.renderTarget);
-				
+
 				this.material = tmp;
 			}
-			
+
 			let clamp = (number, min, max) => Math.min(Math.max(min, number), max);
 
 			let x = parseInt(clamp(pixelPos.x - (pickWindowSize - 1) / 2, 0, width));
@@ -7316,14 +7324,14 @@ void main() {
 
 			let pixelCount = w * h;
 			let buffer = new Uint8Array(4 * pixelCount);
-			
-			gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer); 
-			
+
+			gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+
 			renderer.setRenderTarget(null);
 			renderer.state.reset();
 			renderer.setScissorTest(false);
 			gl.disable(gl.SCISSOR_TEST);
-			
+
 			let pixels = buffer;
 			let ibuffer = new Uint32Array(buffer.buffer);
 
@@ -7339,30 +7347,30 @@ void main() {
 					pixels[4 * offset + 3] = 0;
 					let pIndex = ibuffer[offset];
 
-					if(!(pcIndex === 0 && pIndex === 0) && (pcIndex !== undefined) && (pIndex !== undefined)){
+					if (!(pcIndex === 0 && pIndex === 0) && (pcIndex !== undefined) && (pIndex !== undefined)) {
 						let hit = {
 							pIndex: pIndex,
 							pcIndex: pcIndex,
 							distanceToCenter: distance
 						};
 
-						if(params.all){
+						if (params.all) {
 							hits.push(hit);
-						}else{
-							if(hits.length > 0){
-								if(distance < hits[0].distanceToCenter){
+						} else {
+							if (hits.length > 0) {
+								if (distance < hits[0].distanceToCenter) {
 									hits[0] = hit;
 								}
-							}else{
+							} else {
 								hits.push(hit);
 							}
 						}
 
-						
+
 					}
 				}
 			}
-			
+
 			// DEBUG: show panel with pick image
 			//{ 
 			//	let img = Utils.pixelsArrayToImage(buffer, w, h);
@@ -7385,33 +7393,33 @@ void main() {
 			//	//$(this.debugWindow.document).append($(`<img src="${screenshot}"/>`));
 			//	//this.debugWindow.document.write('<img src="'+screenshot+'"/>');
 			//}
-			
 
-			for(let hit of hits){
+
+			for (let hit of hits) {
 				let point = {};
-			
+
 				if (!nodes[hit.pcIndex]) {
 					return null;
 				}
-			
+
 				let node = nodes[hit.pcIndex];
 				let pc = node.sceneNode;
 				let geometry = node.geometryNode.geometry;
-				
-				for(let attributeName in geometry.attributes){
+
+				for (let attributeName in geometry.attributes) {
 					let attribute = geometry.attributes[attributeName];
-			
+
 					if (attributeName === 'position') {
 						let x = attribute.array[3 * hit.pIndex + 0];
 						let y = attribute.array[3 * hit.pIndex + 1];
 						let z = attribute.array[3 * hit.pIndex + 2];
-						
+
 						let position = new THREE.Vector3(x, y, z);
 						position.applyMatrix4(pc.matrixWorld);
-			
+
 						point[attributeName] = position;
 					} else if (attributeName === 'indices') {
-			
+
 					} else {
 						//if (values.itemSize === 1) {
 						//	point[attribute.name] = values.array[hit.pIndex];
@@ -7423,7 +7431,7 @@ void main() {
 						//	point[attribute.name] = value;
 						//}
 					}
-					
+
 				}
 
 				hit.point = point;
@@ -7432,29 +7440,29 @@ void main() {
 			performance.mark("pick-end");
 			performance.measure("pick", "pick-start", "pick-end");
 
-			if(params.all){
+			if (params.all) {
 				return hits.map(hit => hit.point);
-			}else{
-				if(hits.length === 0){
+			} else {
+				if (hits.length === 0) {
 					return null;
-				}else{
+				} else {
 					return hits[0].point;
 					//let sorted = hits.sort( (a, b) => a.distanceToCenter - b.distanceToCenter);
 
 					//return sorted[0].point;
 				}
 			}
-			
+
 		};
 
-		* getFittedBoxGen(boxNode){
+		* getFittedBoxGen (boxNode) {
 			let start = performance.now();
 
 			let shrinkedLocalBounds = new THREE.Box3();
 			let worldToBox = new THREE.Matrix4().getInverse(boxNode.matrixWorld);
 
-			for(let node of this.visibleNodes){
-				if(!node.sceneNode){
+			for (let node of this.visibleNodes) {
+				if (!node.sceneNode) {
 					continue;
 				}
 
@@ -7463,11 +7471,11 @@ void main() {
 				let posOffset = buffer.offset("position");
 				let stride = buffer.stride;
 				let view = new DataView(buffer.data);
-				
+
 				let objectToBox = new THREE.Matrix4().multiplyMatrices(worldToBox, node.sceneNode.matrixWorld);
 
 				let pos = new THREE.Vector4();
-				for(let i = 0; i < buffer.numElements; i++){
+				for (let i = 0; i < buffer.numElements; i++) {
 					let x = view.getFloat32(i * stride + posOffset + 0, true);
 					let y = view.getFloat32(i * stride + posOffset + 4, true);
 					let z = view.getFloat32(i * stride + posOffset + 8, true);
@@ -7475,9 +7483,9 @@ void main() {
 					pos.set(x, y, z, 1);
 					pos.applyMatrix4(objectToBox);
 
-					if(-0.5 < pos.x && pos.x < 0.5){
-						if(-0.5 < pos.y && pos.y < 0.5){
-							if(-0.5 < pos.z && pos.z < 0.5){
+					if (-0.5 < pos.x && pos.x < 0.5) {
+						if (-0.5 < pos.y && pos.y < 0.5) {
+							if (-0.5 < pos.z && pos.z < 0.5) {
 								shrinkedLocalBounds.expandByPoint(pos);
 							}
 						}
@@ -7503,7 +7511,7 @@ void main() {
 			yield fitted;
 		}
 
-		getFittedBox(boxNode, maxLevel = Infinity){
+		getFittedBox (boxNode, maxLevel = Infinity) {
 
 			maxLevel = Infinity;
 
@@ -7512,8 +7520,8 @@ void main() {
 			let shrinkedLocalBounds = new THREE.Box3();
 			let worldToBox = new THREE.Matrix4().getInverse(boxNode.matrixWorld);
 
-			for(let node of this.visibleNodes){
-				if(!node.sceneNode || node.getLevel() > maxLevel){
+			for (let node of this.visibleNodes) {
+				if (!node.sceneNode || node.getLevel() > maxLevel) {
 					continue;
 				}
 
@@ -7522,11 +7530,11 @@ void main() {
 				let posOffset = buffer.offset("position");
 				let stride = buffer.stride;
 				let view = new DataView(buffer.data);
-				
+
 				let objectToBox = new THREE.Matrix4().multiplyMatrices(worldToBox, node.sceneNode.matrixWorld);
 
 				let pos = new THREE.Vector4();
-				for(let i = 0; i < buffer.numElements; i++){
+				for (let i = 0; i < buffer.numElements; i++) {
 					let x = view.getFloat32(i * stride + posOffset + 0, true);
 					let y = view.getFloat32(i * stride + posOffset + 4, true);
 					let z = view.getFloat32(i * stride + posOffset + 8, true);
@@ -7534,9 +7542,9 @@ void main() {
 					pos.set(x, y, z, 1);
 					pos.applyMatrix4(objectToBox);
 
-					if(-0.5 < pos.x && pos.x < 0.5){
-						if(-0.5 < pos.y && pos.y < 0.5){
-							if(-0.5 < pos.z && pos.z < 0.5){
+					if (-0.5 < pos.x && pos.x < 0.5) {
+						if (-0.5 < pos.y && pos.y < 0.5) {
+							if (-0.5 < pos.z && pos.z < 0.5) {
 								shrinkedLocalBounds.expandByPoint(pos);
 							}
 						}
@@ -7564,12 +7572,12 @@ void main() {
 			return this.visibleNodes.length / this.visibleGeometry.length;
 		}
 
-		find(name){
+		find (name) {
 			let node = null;
-			for(let char of name){
-				if(char === "r"){
+			for (let char of name) {
+				if (char === "r") {
 					node = this.root;
-				}else{
+				} else {
 					node = node.children[char];
 				}
 			}
@@ -7577,16 +7585,16 @@ void main() {
 			return node;
 		}
 
-		get visible(){
+		get visible () {
 			return this._visible;
 		}
 
-		set visible(value){
+		set visible (value) {
 
-			if(value !== this._visible){
+			if (value !== this._visible) {
 				this._visible = value;
 
-				this.dispatchEvent({type: 'visibility_changed', pointcloud: this});
+				this.dispatchEvent({ type: 'visibility_changed', pointcloud: this });
 			}
 
 		}
@@ -7594,8 +7602,8 @@ void main() {
 	}
 
 	class Points {
-		
-		constructor () {
+
+		constructor() {
 			this.boundingBox = new THREE.Box3();
 			this.numPoints = 0;
 			this.data = {};
@@ -7652,10 +7660,10 @@ void main() {
 	 */
 
 	class Box3Helper extends THREE.LineSegments {
-		constructor (box, color) {
+		constructor(box, color) {
 			if (color === undefined) color = 0xffff00;
 
-			let indices = new Uint16Array([ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ]);
+			let indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
 			let positions = new Float32Array([
 				box.min.x, box.min.y, box.min.z,
 				box.max.x, box.min.y, box.min.z,
@@ -7677,7 +7685,7 @@ void main() {
 		}
 	}
 
-	function updatePointClouds(pointclouds, camera, renderer){
+	function updatePointClouds (pointclouds, camera, renderer) {
 
 		for (let pointcloud of pointclouds) {
 			let start = performance.now();
@@ -7686,7 +7694,7 @@ void main() {
 				profileRequest.update();
 
 				let duration = performance.now() - start;
-				if(duration > 5){
+				if (duration > 5) {
 					break;
 				}
 			}
@@ -7708,7 +7716,7 @@ void main() {
 
 
 
-	function updateVisibilityStructures(pointclouds, camera, renderer) {
+	function updateVisibilityStructures (pointclouds, camera, renderer) {
 		let frustums = [];
 		let camObjPositions = [];
 		let priorityQueue = new BinaryHeap(function (x) { return 1 / x.weight; });
@@ -7731,7 +7739,7 @@ void main() {
 			let frustum = new THREE.Frustum();
 			let viewI = camera.matrixWorldInverse;
 			let world = pointcloud.matrixWorld;
-			
+
 			// use close near plane for frustum intersection
 			let frustumCam = camera.clone();
 			frustumCam.near = Math.min(camera.near, 0.1);
@@ -7750,7 +7758,7 @@ void main() {
 			camObjPositions.push(camObjPos);
 
 			if (pointcloud.visible && pointcloud.root !== null) {
-				priorityQueue.push({pointcloud: i, node: pointcloud.root, weight: Number.MAX_VALUE});
+				priorityQueue.push({ pointcloud: i, node: pointcloud.root, weight: Number.MAX_VALUE });
 			}
 
 			// hide all previously visible nodes
@@ -7774,7 +7782,7 @@ void main() {
 	}
 
 
-	function updateVisibility(pointclouds, camera, renderer){
+	function updateVisibility (pointclouds, camera, renderer) {
 
 		let numVisibleNodes = 0;
 		let numVisiblePoints = 0;
@@ -7794,30 +7802,30 @@ void main() {
 		let priorityQueue = s.priorityQueue;
 
 		let loadedToGPUThisFrame = 0;
-		
+
 		let domWidth = renderer.domElement.clientWidth;
 		let domHeight = renderer.domElement.clientHeight;
 
 		// check if pointcloud has been transformed
 		// some code will only be executed if changes have been detected
-		if(!Potree._pointcloudTransformVersion){
+		if (!Potree._pointcloudTransformVersion) {
 			Potree._pointcloudTransformVersion = new Map();
 		}
 		let pointcloudTransformVersion = Potree._pointcloudTransformVersion;
-		for(let pointcloud of pointclouds){
+		for (let pointcloud of pointclouds) {
 
-			if(!pointcloud.visible){
+			if (!pointcloud.visible) {
 				continue;
 			}
 
 			pointcloud.updateMatrixWorld();
 
-			if(!pointcloudTransformVersion.has(pointcloud)){
-				pointcloudTransformVersion.set(pointcloud, {number: 0, transform: pointcloud.matrixWorld.clone()});
-			}else{
+			if (!pointcloudTransformVersion.has(pointcloud)) {
+				pointcloudTransformVersion.set(pointcloud, { number: 0, transform: pointcloud.matrixWorld.clone() });
+			} else {
 				let version = pointcloudTransformVersion.get(pointcloud);
 
-				if(!version.transform.equals(pointcloud.matrixWorld)){
+				if (!version.transform.equals(pointcloud.matrixWorld)) {
 					version.number++;
 					version.transform.copy(pointcloud.matrixWorld);
 
@@ -7855,16 +7863,16 @@ void main() {
 			visible = visible && level < maxLevel;
 			//visible = visible && node.name !== "r613";
 
-			
 
 
-			if(!window.warned125){
+
+			if (!window.warned125) {
 				console.log("TODO");
 				window.warned125 = true;
 			}
 
 			let clipBoxes = pointcloud.material.clipBoxes;
-			if(true && clipBoxes.length > 0){
+			if (true && clipBoxes.length > 0) {
 
 				//node.debug = false;
 
@@ -7875,7 +7883,7 @@ void main() {
 				//	var a = 10;
 				//}
 
-				for(let clipBox of clipBoxes){
+				for (let clipBox of clipBoxes) {
 
 					let pcWorldInverse = new THREE.Matrix4().getInverse(pointcloud.matrixWorld);
 					let toPCObject = pcWorldInverse.multiply(clipBox.box.matrixWorld);
@@ -7920,7 +7928,7 @@ void main() {
 					let frustum = new THREE.Frustum(pxPlane, nxPlane, pyPlane, nyPlane, pzPlane, nzPlane);
 					let intersects = frustum.intersectsBox(box);
 
-					if(intersects){
+					if (intersects) {
 						numIntersecting++;
 					}
 					numIntersectionVolumes++;
@@ -7929,15 +7937,15 @@ void main() {
 				let insideAny = numIntersecting > 0;
 				let insideAll = numIntersecting === numIntersectionVolumes;
 
-				if(pointcloud.material.clipTask === ClipTask.SHOW_INSIDE){
-					if(pointcloud.material.clipMethod === ClipMethod.INSIDE_ANY && insideAny){
+				if (pointcloud.material.clipTask === ClipTask.SHOW_INSIDE) {
+					if (pointcloud.material.clipMethod === ClipMethod.INSIDE_ANY && insideAny) {
 						//node.debug = true
-					}else if(pointcloud.material.clipMethod === ClipMethod.INSIDE_ALL && insideAll){
+					} else if (pointcloud.material.clipMethod === ClipMethod.INSIDE_ALL && insideAll) {
 						//node.debug = true;
-					}else{
+					} else {
 						visible = false;
 					}
-				} else if(pointcloud.material.clipTask === ClipTask.SHOW_OUTSIDE){
+				} else if (pointcloud.material.clipTask === ClipTask.SHOW_OUTSIDE) {
 					//if(pointcloud.material.clipMethod === ClipMethod.INSIDE_ANY && !insideAny){
 					//	//visible = true;
 					//	let a = 10;
@@ -7948,7 +7956,7 @@ void main() {
 					//	visible = false;
 					//}
 				}
-				
+
 
 			}
 
@@ -7996,13 +8004,13 @@ void main() {
 				visibleNodes.push(node);
 				pointcloud.visibleNodes.push(node);
 
-				if(node._transformVersion === undefined){
+				if (node._transformVersion === undefined) {
 					node._transformVersion = -1;
 				}
 				let transformVersion = pointcloudTransformVersion.get(pointcloud);
-				if(node._transformVersion !== transformVersion.number){
+				if (node._transformVersion !== transformVersion.number) {
 					node.sceneNode.updateMatrix();
-					node.sceneNode.matrixWorld.multiplyMatrices(pointcloud.matrixWorld, node.sceneNode.matrix);	
+					node.sceneNode.matrixWorld.multiplyMatrices(pointcloud.matrixWorld, node.sceneNode.matrix);
 					node._transformVersion = transformVersion.number;
 				}
 
@@ -8025,39 +8033,39 @@ void main() {
 			for (let i = 0; i < children.length; i++) {
 				let child = children[i];
 
-				let weight = 0; 
-				if(camera.isPerspectiveCamera){
+				let weight = 0;
+				if (camera.isPerspectiveCamera) {
 					let sphere = child.getBoundingSphere();
 					let center = sphere.center;
 					//let distance = sphere.center.distanceTo(camObjPos);
-					
+
 					let dx = camObjPos.x - center.x;
 					let dy = camObjPos.y - center.y;
 					let dz = camObjPos.z - center.z;
-					
+
 					let dd = dx * dx + dy * dy + dz * dz;
 					let distance = Math.sqrt(dd);
-					
-					
+
+
 					let radius = sphere.radius;
-					
+
 					let fov = (camera.fov * Math.PI) / 180;
 					let slope = Math.tan(fov / 2);
 					let projFactor = (0.5 * domHeight) / (slope * distance);
 					let screenPixelRadius = radius * projFactor;
-					
-					if(screenPixelRadius < pointcloud.minimumNodePixelSize){
+
+					if (screenPixelRadius < pointcloud.minimumNodePixelSize) {
 						continue;
 					}
-				
+
 					weight = screenPixelRadius;
 
-					if(distance - radius < 0){
+					if (distance - radius < 0) {
 						weight = Number.MAX_VALUE;
 					}
 				} else {
 					// TODO ortho visibility
-					let bb = child.getBoundingBox();				
+					let bb = child.getBoundingBox();
 					let distance = child.getBoundingSphere().center.distanceTo(camObjPos);
 					let diagonal = bb.max.clone().sub(bb.min).length();
 					//weight = diagonal / distance;
@@ -8065,7 +8073,7 @@ void main() {
 					weight = diagonal;
 				}
 
-				priorityQueue.push({pointcloud: element.pointcloud, node: child, parent: node, weight: weight});
+				priorityQueue.push({ pointcloud: element.pointcloud, node: child, parent: node, weight: weight });
 			}
 		}// end priority queue loop
 
@@ -8091,7 +8099,7 @@ void main() {
 	}
 
 	class PointCloudArena4DNode extends PointCloudTreeNode {
-		constructor () {
+		constructor() {
 			super();
 
 			this.left = null;
@@ -8168,8 +8176,8 @@ void main() {
 		}
 	}
 
-	class PointCloudArena4D$1 extends PointCloudTree{
-		constructor (geometry) {
+	class PointCloudArena4D$1 extends PointCloudTree {
+		constructor(geometry) {
 			super();
 
 			this.root = null;
@@ -8197,7 +8205,7 @@ void main() {
 			this.pcoGeometry = geometry;
 			this.boundingBox = this.pcoGeometry.boundingBox;
 			this.boundingSphere = this.pcoGeometry.boundingSphere;
-			this.material = new PointCloudMaterial({vertexColors: THREE.VertexColors, size: 0.05, treeType: TreeType.KDTREE});
+			this.material = new PointCloudMaterial({ vertexColors: THREE.VertexColors, size: 0.05, treeType: TreeType.KDTREE });
 			this.material.sizeType = PointSizeType.ATTENUATED;
 			this.material.size = 0.05;
 			this.profileRequests = [];
@@ -8216,7 +8224,7 @@ void main() {
 		setName (name) {
 			if (this.name !== name) {
 				this.name = name;
-				this.dispatchEvent({type: 'name_changed', name: name, pointcloud: this});
+				this.dispatchEvent({ type: 'name_changed', name: name, pointcloud: this });
 			}
 		}
 
@@ -8376,7 +8384,7 @@ void main() {
 			return nodesOnRay;
 		}
 
-		pick(viewer, camera, ray, params = {}){
+		pick (viewer, camera, ray, params = {}) {
 
 			let renderer = viewer.renderer;
 			let pRenderer = viewer.pRenderer;
@@ -8410,9 +8418,11 @@ void main() {
 
 				let renderTarget = new THREE.WebGLRenderTarget(
 					1, 1,
-					{ minFilter: THREE.LinearFilter,
+					{
+						minFilter: THREE.LinearFilter,
 						magFilter: THREE.NearestFilter,
-						format: THREE.RGBAFormat }
+						format: THREE.RGBAFormat
+					}
 				);
 
 				this.pickState = {
@@ -8433,24 +8443,24 @@ void main() {
 				pickMaterial.uniforms.minSize.value = this.material.uniforms.minSize.value;
 				pickMaterial.uniforms.maxSize.value = this.material.uniforms.maxSize.value;
 				pickMaterial.classification = this.material.classification;
-				if(params.pickClipped){
+				if (params.pickClipped) {
 					pickMaterial.clipBoxes = this.material.clipBoxes;
-					if(this.material.clipTask === ClipTask.HIGHLIGHT){
+					if (this.material.clipTask === ClipTask.HIGHLIGHT) {
 						pickMaterial.clipTask = ClipTask.NONE;
-					}else{
+					} else {
 						pickMaterial.clipTask = this.material.clipTask;
 					}
-				}else{
+				} else {
 					pickMaterial.clipBoxes = [];
 				}
-				
+
 				this.updateMaterial(pickMaterial, nodes, camera, renderer);
 			}
 
 			pickState.renderTarget.setSize(width, height);
 
 			let pixelPos = new THREE.Vector2(params.x, params.y);
-			
+
 			let gl = renderer.getContext();
 			gl.enable(gl.SCISSOR_TEST);
 			gl.scissor(
@@ -8468,13 +8478,13 @@ void main() {
 			{ // RENDER
 				renderer.setRenderTarget(pickState.renderTarget);
 				gl.clearColor(0, 0, 0, 0);
-				renderer.clearTarget( pickState.renderTarget, true, true, true );
-				
+				renderer.clearTarget(pickState.renderTarget, true, true, true);
+
 				let tmp = this.material;
 				this.material = pickMaterial;
-				
+
 				pRenderer.renderOctree(this, nodes, camera, pickState.renderTarget);
-				
+
 				this.material = tmp;
 			}
 
@@ -8487,14 +8497,14 @@ void main() {
 
 			let pixelCount = w * h;
 			let buffer = new Uint8Array(4 * pixelCount);
-			
-			gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer); 
-			
+
+			gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+
 			renderer.setRenderTarget(null);
 			renderer.state.reset();
 			renderer.setScissorTest(false);
 			gl.disable(gl.SCISSOR_TEST);
-			
+
 			let pixels = buffer;
 			let ibuffer = new Uint32Array(buffer.buffer);
 
@@ -8510,57 +8520,57 @@ void main() {
 					pixels[4 * offset + 3] = 0;
 					let pIndex = ibuffer[offset];
 
-					if(!(pcIndex === 0 && pIndex === 0) && (pcIndex !== undefined) && (pIndex !== undefined)){
+					if (!(pcIndex === 0 && pIndex === 0) && (pcIndex !== undefined) && (pIndex !== undefined)) {
 						let hit = {
 							pIndex: pIndex,
 							pcIndex: pcIndex,
 							distanceToCenter: distance
 						};
 
-						if(params.all){
+						if (params.all) {
 							hits.push(hit);
-						}else{
-							if(hits.length > 0){
-								if(distance < hits[0].distanceToCenter){
+						} else {
+							if (hits.length > 0) {
+								if (distance < hits[0].distanceToCenter) {
 									hits[0] = hit;
 								}
-							}else{
+							} else {
 								hits.push(hit);
 							}
 						}
 
-						
+
 					}
 				}
 			}
 
 
 
-			for(let hit of hits){
+			for (let hit of hits) {
 				let point = {};
-			
+
 				if (!nodes[hit.pcIndex]) {
 					return null;
 				}
-			
+
 				let node = nodes[hit.pcIndex];
 				let pc = node.sceneNode;
 				let geometry = node.geometryNode.geometry;
-				
-				for(let attributeName in geometry.attributes){
+
+				for (let attributeName in geometry.attributes) {
 					let attribute = geometry.attributes[attributeName];
-			
+
 					if (attributeName === 'position') {
 						let x = attribute.array[3 * hit.pIndex + 0];
 						let y = attribute.array[3 * hit.pIndex + 1];
 						let z = attribute.array[3 * hit.pIndex + 2];
-						
+
 						let position = new THREE.Vector3(x, y, z);
 						position.applyMatrix4(pc.matrixWorld);
-			
+
 						point[attributeName] = position;
 					} else if (attributeName === 'indices') {
-			
+
 					} else {
 						//if (values.itemSize === 1) {
 						//	point[attribute.name] = values.array[hit.pIndex];
@@ -8572,7 +8582,7 @@ void main() {
 						//	point[attribute.name] = value;
 						//}
 					}
-					
+
 				}
 
 				hit.point = point;
@@ -8581,20 +8591,20 @@ void main() {
 			performance.mark("pick-end");
 			performance.measure("pick", "pick-start", "pick-end");
 
-			if(params.all){
+			if (params.all) {
 				return hits.map(hit => hit.point);
-			}else{
-				if(hits.length === 0){
+			} else {
+				if (hits.length === 0) {
 					return null;
-				}else{
+				} else {
 					return hits[0].point;
 				}
 			}
 		}
 
-		computeVisibilityTextureData(nodes){
+		computeVisibilityTextureData (nodes) {
 
-			if(exports.measureTimings) performance.mark("computeVisibilityTextureData-start");
+			if (exports.measureTimings) performance.mark("computeVisibilityTextureData-start");
 
 			let data = new Uint8Array(nodes.length * 3);
 			let visibleNodeTextureOffsets = new Map();
@@ -8651,7 +8661,7 @@ void main() {
 				data[i * 3 + 2] = b3;
 			}
 
-			if(exports.measureTimings){
+			if (exports.measureTimings) {
 				performance.mark("computeVisibilityTextureData-end");
 				performance.measure("render.computeVisibilityTextureData", "computeVisibilityTextureData-start", "computeVisibilityTextureData-end");
 			}
@@ -8672,7 +8682,7 @@ void main() {
 	}
 
 	// Copied from three.js: WebGLRenderer.js
-	function paramThreeToGL(_gl, p) {
+	function paramThreeToGL (_gl, p) {
 
 		let extension;
 
@@ -8802,7 +8812,7 @@ void main() {
 		"position": 0,
 		"color": 1,
 		"intensity": 2,
-		"classification": 3, 
+		"classification": 3,
 		"returnNumber": 4,
 		"numberOfReturns": 5,
 		"pointSourceID": 6,
@@ -8832,14 +8842,14 @@ void main() {
 			this.update(vsSource, fsSource);
 		}
 
-		update(vsSource, fsSource) {
+		update (vsSource, fsSource) {
 			this.vsSource = vsSource;
 			this.fsSource = fsSource;
 
 			this.linkProgram();
 		}
 
-		compileShader(shader, source){
+		compileShader (shader, source) {
 			let gl = this.gl;
 
 			gl.shaderSource(shader, source);
@@ -8854,7 +8864,7 @@ void main() {
 			}
 		}
 
-		linkProgram() {
+		linkProgram () {
 
 			let gl = this.gl;
 
@@ -8878,7 +8888,7 @@ void main() {
 				this.fs = gl.createShader(gl.FRAGMENT_SHADER);
 				this.program = gl.createProgram();
 
-				for(let name of Object.keys(attributeLocations)){
+				for (let name of Object.keys(attributeLocations)) {
 					let location = attributeLocations[name];
 					gl.bindAttribLocation(this.program, location, name);
 				}
@@ -8942,7 +8952,7 @@ void main() {
 
 		}
 
-		setUniformMatrix4(name, value) {
+		setUniformMatrix4 (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -8954,7 +8964,7 @@ void main() {
 			gl.uniformMatrix4fv(location, false, tmp);
 		}
 
-		setUniform1f(name, value) {
+		setUniform1f (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -8965,7 +8975,7 @@ void main() {
 			gl.uniform1f(location, value);
 		}
 
-		setUniformBoolean(name, value) {
+		setUniformBoolean (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -8976,7 +8986,7 @@ void main() {
 			gl.uniform1i(location, value);
 		}
 
-		setUniformTexture(name, value) {
+		setUniformTexture (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -8987,7 +8997,7 @@ void main() {
 			gl.uniform1i(location, value);
 		}
 
-		setUniform2f(name, value) {
+		setUniform2f (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -8998,7 +9008,7 @@ void main() {
 			gl.uniform2f(location, value[0], value[1]);
 		}
 
-		setUniform3f(name, value) {
+		setUniform3f (name, value) {
 			const gl = this.gl;
 			const location = this.uniformLocations[name];
 
@@ -9009,7 +9019,7 @@ void main() {
 			gl.uniform3f(location, value[0], value[1], value[2]);
 		}
 
-		setUniform(name, value) {
+		setUniform (name, value) {
 
 			if (value.constructor === THREE.Matrix4) {
 				this.setUniformMatrix4(name, value);
@@ -9034,7 +9044,7 @@ void main() {
 		}
 
 
-		setUniform1i(name, value) {
+		setUniform1i (name, value) {
 			let gl = this.gl;
 			let location = this.uniformLocations[name];
 
@@ -9061,7 +9071,7 @@ void main() {
 			this.update(texture);
 		}
 
-		update() {
+		update () {
 
 			if (!this.texture.image) {
 				this.version = this.texture.version;
@@ -9153,7 +9163,7 @@ void main() {
 			this.toggle = 0;
 		}
 
-		createBuffer(geometry){
+		createBuffer (geometry) {
 			let gl = this.gl;
 			let webglBuffer = new WebGLBuffer();
 			webglBuffer.vao = gl.createVertexArray();
@@ -9161,7 +9171,7 @@ void main() {
 
 			gl.bindVertexArray(webglBuffer.vao);
 
-			for(let attributeName in geometry.attributes){
+			for (let attributeName in geometry.attributes) {
 				let bufferAttribute = geometry.attributes[attributeName];
 
 				let vbo = gl.createBuffer();
@@ -9191,14 +9201,14 @@ void main() {
 			return webglBuffer;
 		}
 
-		updateBuffer(geometry){
+		updateBuffer (geometry) {
 			let gl = this.gl;
 
 			let webglBuffer = this.buffers.get(geometry);
 
 			gl.bindVertexArray(webglBuffer.vao);
 
-			for(let attributeName in geometry.attributes){
+			for (let attributeName in geometry.attributes) {
 				let bufferAttribute = geometry.attributes[attributeName];
 
 				let attributeLocation = attributeLocations[attributeName];
@@ -9206,7 +9216,7 @@ void main() {
 				let type = this.glTypeMapping.get(bufferAttribute.array.constructor);
 
 				let vbo = null;
-				if(!webglBuffer.vbos.has(attributeName)){
+				if (!webglBuffer.vbos.has(attributeName)) {
 					vbo = gl.createBuffer();
 
 					webglBuffer.vbos.set(attributeName, {
@@ -9217,7 +9227,7 @@ void main() {
 						type: geometry.attributes.position.array.constructor,
 						version: bufferAttribute.version
 					});
-				}else{
+				} else {
 					vbo = webglBuffer.vbos.get(attributeName).handle;
 					webglBuffer.vbos.get(attributeName).version = bufferAttribute.version;
 				}
@@ -9232,7 +9242,7 @@ void main() {
 			gl.bindVertexArray(null);
 		}
 
-		traverse(scene) {
+		traverse (scene) {
 
 			let octrees = [];
 
@@ -9260,7 +9270,7 @@ void main() {
 
 
 
-		renderNodes(octree, nodes, visibilityTextureData, camera, target, shader, params) {
+		renderNodes (octree, nodes, visibilityTextureData, camera, target, shader, params) {
 
 			if (exports.measureTimings) performance.mark("renderNodes-start");
 
@@ -9277,11 +9287,11 @@ void main() {
 			let gpsMax = -Infinity;
 			for (let node of nodes) {
 
-				if(node instanceof PointCloudOctreeNode){
+				if (node instanceof PointCloudOctreeNode) {
 					let geometryNode = node.geometryNode;
 
-					if(geometryNode.gpsTime){
-						let {offset, range} = geometryNode.gpsTime;
+					if (geometryNode.gpsTime) {
+						let { offset, range } = geometryNode.gpsTime;
 						let nodeMin = offset;
 						let nodeMax = offset + range;
 
@@ -9297,8 +9307,8 @@ void main() {
 			let i = 0;
 			for (let node of nodes) {
 
-				if(exports.debug.allowedNodes !== undefined){
-					if(!exports.debug.allowedNodes.includes(node.name)){
+				if (exports.debug.allowedNodes !== undefined) {
+					if (!exports.debug.allowedNodes.includes(node.name)) {
 						continue;
 					}
 				}
@@ -9322,16 +9332,16 @@ void main() {
 
 				let level = node.getLevel();
 
-				if(node.debug){
+				if (node.debug) {
 					shader.setUniform("uDebug", true);
-				}else{
+				} else {
 					shader.setUniform("uDebug", false);
 				}
 
 				let isLeaf;
-				if(node instanceof PointCloudOctreeNode){
+				if (node instanceof PointCloudOctreeNode) {
 					isLeaf = Object.keys(node.children).length === 0;
-				}else if(node instanceof PointCloudArena4DNode){
+				} else if (node instanceof PointCloudArena4DNode) {
 					isLeaf = node.geometryNode.isLeaf;
 				}
 				shader.setUniform("uIsLeafNode", isLeaf);
@@ -9347,18 +9357,18 @@ void main() {
 				const lModelView = shader.uniformLocations["modelViewMatrix"];
 				//mat4holder.set(worldView.elements);
 				// faster then set in chrome 63
-				for(let j = 0; j < 16; j++){
+				for (let j = 0; j < 16; j++) {
 					mat4holder[j] = worldView.elements[j];
 				}
 				gl.uniformMatrix4fv(lModelView, false, mat4holder);
 
 				{ // Clip Polygons
-					if(material.clipPolygons && material.clipPolygons.length > 0){
+					if (material.clipPolygons && material.clipPolygons.length > 0) {
 
 						let clipPolygonVCount = [];
 						let worldViewProjMatrices = [];
 
-						for(let clipPolygon of material.clipPolygons){
+						for (let clipPolygon of material.clipPolygons) {
 
 							let view = clipPolygon.viewMatrix;
 							let proj = clipPolygon.projMatrix;
@@ -9372,9 +9382,9 @@ void main() {
 						let flattenedMatrices = [].concat(...worldViewProjMatrices.map(m => m.elements));
 
 						let flattenedVertices = new Array(8 * 3 * material.clipPolygons.length);
-						for(let i = 0; i < material.clipPolygons.length; i++){
+						for (let i = 0; i < material.clipPolygons.length; i++) {
 							let clipPolygon = material.clipPolygons[i];
-							for(let j = 0; j < clipPolygon.markers.length; j++){
+							for (let j = 0; j < clipPolygon.markers.length; j++) {
 								flattenedVertices[i * 24 + (j * 3 + 0)] = clipPolygon.markers[j].position.x;
 								flattenedVertices[i * 24 + (j * 3 + 1)] = clipPolygon.markers[j].position.y;
 								flattenedVertices[i * 24 + (j * 3 + 2)] = clipPolygon.markers[j].position.z;
@@ -9441,7 +9451,7 @@ void main() {
 
 				let geometry = node.geometryNode.geometry;
 
-				if(node.geometryNode.gpsTime){
+				if (node.geometryNode.gpsTime) {
 					let nodeMin = node.geometryNode.gpsTime.offset;
 					let nodeMax = nodeMin + node.geometryNode.gpsTime.range;
 
@@ -9456,25 +9466,25 @@ void main() {
 					let uFilterReturnNumberRange = material.uniforms.uFilterReturnNumberRange.value;
 					let uFilterNumberOfReturnsRange = material.uniforms.uFilterNumberOfReturnsRange.value;
 					let uFilterGPSTimeClipRange = material.uniforms.uFilterGPSTimeClipRange.value;
-					
+
 					let gpsCliPRangeMin = uFilterGPSTimeClipRange[0] - gpsMin;
 					let gpsCliPRangeMax = uFilterGPSTimeClipRange[1] - gpsMin;
-					
+
 					shader.setUniform2f("uFilterReturnNumberRange", uFilterReturnNumberRange);
 					shader.setUniform2f("uFilterNumberOfReturnsRange", uFilterNumberOfReturnsRange);
 					shader.setUniform2f("uFilterGPSTimeClipRange", [gpsCliPRangeMin, gpsCliPRangeMax]);
 				}
 
 				let webglBuffer = null;
-				if(!this.buffers.has(geometry)){
+				if (!this.buffers.has(geometry)) {
 					webglBuffer = this.createBuffer(geometry);
 					this.buffers.set(geometry, webglBuffer);
-				}else{
+				} else {
 					webglBuffer = this.buffers.get(geometry);
-					for(let attributeName in geometry.attributes){
+					for (let attributeName in geometry.attributes) {
 						let attribute = geometry.attributes[attributeName];
 
-						if(attribute.version > webglBuffer.vbos.get(attributeName).version){
+						if (attribute.version > webglBuffer.vbos.get(attributeName).version) {
 							this.updateBuffer(geometry);
 						}
 					}
@@ -9496,7 +9506,7 @@ void main() {
 			}
 		}
 
-		renderOctree(octree, nodes, camera, target, params = {}){
+		renderOctree (octree, nodes, camera, target, params = {}) {
 
 			let gl = this.gl;
 
@@ -9558,18 +9568,18 @@ void main() {
 						`#define num_clippolygons ${numClipPolygons}`,
 					];
 
-					if(octree.pcoGeometry.root.isLoaded()){
+					if (octree.pcoGeometry.root.isLoaded()) {
 						let attributes = octree.pcoGeometry.root.geometry.attributes;
 
-						if(attributes.gpsTime){
+						if (attributes.gpsTime) {
 							defines.push("#define clip_gps_enabled");
 						}
 
-						if(attributes.returnNumber){
+						if (attributes.returnNumber) {
 							defines.push("#define clip_return_number_enabled");
 						}
 
-						if(attributes.numberOfReturns){
+						if (attributes.numberOfReturns) {
 							defines.push("#define clip_number_of_returns_enabled");
 						}
 
@@ -9616,13 +9626,13 @@ void main() {
 			gl.useProgram(shader.program);
 
 			let transparent = false;
-			if(params.transparent !== undefined){
+			if (params.transparent !== undefined) {
 				transparent = params.transparent && material.opacity < 1;
-			}else{
+			} else {
 				transparent = material.opacity < 1;
 			}
 
-			if (transparent){
+			if (transparent) {
 				gl.enable(gl.BLEND);
 				gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 				gl.depthMask(false);
@@ -9633,26 +9643,26 @@ void main() {
 				gl.enable(gl.DEPTH_TEST);
 			}
 
-			if(params.blendFunc !== undefined){
+			if (params.blendFunc !== undefined) {
 				gl.enable(gl.BLEND);
 				gl.blendFunc(...params.blendFunc);
 			}
 
-			if(params.depthTest !== undefined){
-				if(params.depthTest === true){
+			if (params.depthTest !== undefined) {
+				if (params.depthTest === true) {
 					gl.enable(gl.DEPTH_TEST);
-				}else{
+				} else {
 					gl.disable(gl.DEPTH_TEST);
 				}
 			}
 
-			if(params.depthWrite !== undefined){
-				 if(params.depthWrite === true){
-					 gl.depthMask(true);
-				 }else{
-					 gl.depthMask(false);
-				 }
-				 
+			if (params.depthWrite !== undefined) {
+				if (params.depthWrite === true) {
+					gl.depthMask(true);
+				} else {
+					gl.depthMask(false);
+				}
+
 			}
 
 
@@ -9670,18 +9680,18 @@ void main() {
 				shader.setUniform1f("fov", Math.PI * camera.fov / 180);
 				shader.setUniform1f("near", camera.near);
 				shader.setUniform1f("far", camera.far);
-				
-				if(camera instanceof THREE.OrthographicCamera){
+
+				if (camera instanceof THREE.OrthographicCamera) {
 					shader.setUniform("uUseOrthographicCamera", true);
-					shader.setUniform("uOrthoWidth", camera.right - camera.left); 
+					shader.setUniform("uOrthoWidth", camera.right - camera.left);
 					shader.setUniform("uOrthoHeight", camera.top - camera.bottom);
-				}else{
+				} else {
 					shader.setUniform("uUseOrthographicCamera", false);
 				}
 
-				if(material.clipBoxes.length + material.clipPolygons.length === 0){
+				if (material.clipBoxes.length + material.clipPolygons.length === 0) {
 					shader.setUniform1i("clipTask", ClipTask.NONE);
-				}else{
+				} else {
 					shader.setUniform1i("clipTask", material.clipTask);
 				}
 
@@ -9698,12 +9708,12 @@ void main() {
 				}
 
 				// TODO CLIPSPHERES
-				if(params.clipSpheres && params.clipSpheres.length > 0){
+				if (params.clipSpheres && params.clipSpheres.length > 0) {
 
 					let clipSpheres = params.clipSpheres;
 
 					let matrices = [];
-					for(let clipSphere of clipSpheres){
+					for (let clipSphere of clipSpheres) {
 						//let mScale = new THREE.Matrix4().makeScale(...clipSphere.scale.toArray());
 						//let mTranslate = new THREE.Matrix4().makeTranslation(...clipSphere.position.toArray());
 
@@ -9721,7 +9731,7 @@ void main() {
 
 					const lClipSpheres = shader.uniformLocations["uClipSpheres[0]"];
 					gl.uniformMatrix4fv(lClipSpheres, false, flattenedMatrices);
-					
+
 					//const lClipSpheres = shader.uniformLocations["uClipSpheres[0]"];
 					//gl.uniformMatrix4fv(lClipSpheres, false, material.uniforms.clipSpheres.value);
 				}
@@ -9848,7 +9858,7 @@ void main() {
 			gl.activeTexture(gl.TEXTURE0);
 		}
 
-		render(scene, camera, target = null, params = {}) {
+		render (scene, camera, target = null, params = {}) {
 
 			const gl = this.gl;
 
@@ -9881,7 +9891,7 @@ void main() {
 	}
 
 	class ProfileData {
-		constructor (profile) {
+		constructor(profile) {
 			this.profile = profile;
 
 			this.segments = [];
@@ -9927,7 +9937,7 @@ void main() {
 	}
 
 	class ProfileRequest {
-		constructor (pointcloud, profile, maxDepth, callback) {
+		constructor(pointcloud, profile, maxDepth, callback) {
 			this.pointcloud = pointcloud;
 			this.profile = profile;
 			this.maxDepth = maxDepth || Number.MAX_VALUE;
@@ -9942,7 +9952,7 @@ void main() {
 		}
 
 		initialize () {
-			this.priorityQueue.push({node: this.pointcloud.pcoGeometry.root, weight: Infinity});
+			this.priorityQueue.push({ node: this.pointcloud.pcoGeometry.root, weight: Infinity });
 		};
 
 		// traverse the node and add intersecting descendants to queue
@@ -9959,7 +9969,7 @@ void main() {
 				let node = stack.pop();
 				let weight = node.boundingSphere.radius;
 
-				this.priorityQueue.push({node: node, weight: weight});
+				this.priorityQueue.push({ node: node, weight: weight });
 
 				// add children that intersect the cutting plane
 				if (node.level < this.maxDepth) {
@@ -9973,18 +9983,18 @@ void main() {
 			}
 		}
 
-		update(){
-			if(!this.updateGeneratorInstance){
+		update () {
+			if (!this.updateGeneratorInstance) {
 				this.updateGeneratorInstance = this.updateGenerator();
 			}
 
 			let result = this.updateGeneratorInstance.next();
-			if(result.done){
+			if (result.done) {
 				this.updateGeneratorInstance = null;
 			}
 		}
 
-		* updateGenerator(){
+		* updateGenerator () {
 			// load nodes in queue
 			// if hierarchy expands, also load nodes from expanded hierarchy
 			// once loaded, add data to this.points and remove node from queue
@@ -9999,7 +10009,7 @@ void main() {
 				let element = this.priorityQueue.pop();
 				let node = element.node;
 
-				if(node.level > this.maxDepth){
+				if (node.level > this.maxDepth) {
 					continue;
 				}
 
@@ -10022,15 +10032,15 @@ void main() {
 
 			if (intersectedNodes.length > 0) {
 
-				for(let done of this.getPointsInsideProfile(intersectedNodes, this.temporaryResult)){
-					if(!done){
+				for (let done of this.getPointsInsideProfile(intersectedNodes, this.temporaryResult)) {
+					if (!done) {
 						//console.log("updateGenerator yields");
 						yield false;
 					}
 				}
 				if (this.temporaryResult.size() > 100) {
 					this.pointsServed += this.temporaryResult.size();
-					this.callback.onProgress({request: this, points: this.temporaryResult});
+					this.callback.onProgress({ request: this, points: this.temporaryResult });
 					this.temporaryResult = new ProfileData(this.profile);
 				}
 			}
@@ -10040,11 +10050,11 @@ void main() {
 
 				if (this.temporaryResult.size() > 0) {
 					this.pointsServed += this.temporaryResult.size();
-					this.callback.onProgress({request: this, points: this.temporaryResult});
+					this.callback.onProgress({ request: this, points: this.temporaryResult });
 					this.temporaryResult = new ProfileData(this.profile);
 				}
 
-				this.callback.onFinish({request: this});
+				this.callback.onFinish({ request: this });
 
 				let index = this.pointcloud.profileRequests.indexOf(this);
 				if (index >= 0) {
@@ -10055,7 +10065,7 @@ void main() {
 			yield true;
 		};
 
-		* getAccepted(numPoints, node, matrix, segment, segmentDir, points, totalMileage){
+		* getAccepted (numPoints, node, matrix, segment, segmentDir, points, totalMileage) {
 			let checkpoint = performance.now();
 
 			let accepted = new Uint32Array(numPoints);
@@ -10074,7 +10084,7 @@ void main() {
 					view[i * 3 + 0],
 					view[i * 3 + 1],
 					view[i * 3 + 2]);
-			
+
 				pos.applyMatrix4(matrix);
 				let distance = Math.abs(segment.cutPlane.distanceToPoint(pos));
 				let centerDistance = Math.abs(segment.halfPlane.distanceToPoint(pos));
@@ -10094,9 +10104,9 @@ void main() {
 					numAccepted++;
 				}
 
-				if((i % 1000) === 0){
+				if ((i % 1000) === 0) {
 					let duration = performance.now() - checkpoint;
-					if(duration > 4){
+					if (duration > 4) {
 						//console.log(`getAccepted yield after ${duration}ms`);
 						yield false;
 						checkpoint = performance.now();
@@ -10117,7 +10127,7 @@ void main() {
 			yield [accepted, mileage, acceptedPositions];
 		}
 
-		* getPointsInsideProfile(nodes, target){
+		* getPointsInsideProfile (nodes, target) {
 			let checkpoint = performance.now();
 			let totalMileage = 0;
 
@@ -10128,7 +10138,7 @@ void main() {
 					let numPoints = node.numPoints;
 					let geometry = node.geometry;
 
-					if(!numPoints){
+					if (!numPoints) {
 						continue;
 					}
 
@@ -10138,13 +10148,13 @@ void main() {
 
 						let start = new THREE.Vector3(segment.start.x, segment.start.y, bsWorld.center.z);
 						let end = new THREE.Vector3(segment.end.x, segment.end.y, bsWorld.center.z);
-							
+
 						let closest = new THREE.Line3(start, end).closestPointToPoint(bsWorld.center, true, new THREE.Vector3());
 						let distance = closest.distanceTo(bsWorld.center);
 
 						let intersects = (distance < (bsWorld.radius + target.profile.width));
 
-						if(!intersects){
+						if (!intersects) {
 							continue;
 						}
 					}
@@ -10172,19 +10182,19 @@ void main() {
 					let accepted = null;
 					let mileage = null;
 					let acceptedPositions = null;
-					for(let result of this.getAccepted(numPoints, node, matrix, segment, segmentDir, points,totalMileage)){
-						if(!result){
+					for (let result of this.getAccepted(numPoints, node, matrix, segment, segmentDir, points, totalMileage)) {
+						if (!result) {
 							let duration = performance.now() - checkpoint;
 							//console.log(`getPointsInsideProfile yield after ${duration}ms`);
 							yield false;
 							checkpoint = performance.now();
-						}else{
+						} else {
 							[accepted, mileage, acceptedPositions] = result;
 						}
 					}
 
 					let duration = performance.now() - checkpoint;
-					if(duration > 4){
+					if (duration > 4) {
 						//console.log(`getPointsInsideProfile yield after ${duration}ms`);
 						yield false;
 						checkpoint = performance.now();
@@ -10193,12 +10203,12 @@ void main() {
 					points.data.position = acceptedPositions;
 
 					let relevantAttributes = Object.keys(geometry.attributes).filter(a => !["position", "indices"].includes(a));
-					for(let attributeName of relevantAttributes){
+					for (let attributeName of relevantAttributes) {
 
 						let attribute = geometry.attributes[attributeName];
 						let numElements = attribute.array.length / numPoints;
 
-						if(numElements !== parseInt(numElements)){
+						if (numElements !== parseInt(numElements)) {
 							debugger;
 						}
 
@@ -10209,10 +10219,10 @@ void main() {
 						let source = attribute.array;
 						let target = filteredBuffer;
 
-						for(let i = 0; i < accepted.length; i++){
+						for (let i = 0; i < accepted.length; i++) {
 
 							let index = accepted[i];
-							
+
 							let start = index * numElements;
 							let end = start + numElements;
 							let sub = source.subarray(start, end);
@@ -10263,9 +10273,9 @@ void main() {
 		};
 	}
 
-	class Version{
+	class Version {
 
-		constructor(version){
+		constructor(version) {
 			this.version = version;
 			let vmLength = (version.indexOf('.') === -1) ? version.length : version.indexOf('.');
 			this.versionMajor = parseInt(version.substr(0, vmLength));
@@ -10275,7 +10285,7 @@ void main() {
 			}
 		}
 
-		newerThan(version){
+		newerThan (version) {
 			let v = new Version(version);
 
 			if (this.versionMajor > v.versionMajor) {
@@ -10287,7 +10297,7 @@ void main() {
 			}
 		}
 
-		equalOrHigher(version){
+		equalOrHigher (version) {
 			let v = new Version(version);
 
 			if (this.versionMajor > v.versionMajor) {
@@ -10299,23 +10309,23 @@ void main() {
 			}
 		}
 
-		upTo(version){
+		upTo (version) {
 			return !this.newerThan(version);
 		}
 
 	}
 
-	class WorkerPool{
-		constructor(){
+	class WorkerPool {
+		constructor() {
 			this.workers = {};
 		}
 
-		getWorker(url){
-			if (!this.workers[url]){
+		getWorker (url) {
+			if (!this.workers[url]) {
 				this.workers[url] = [];
 			}
 
-			if (this.workers[url].length === 0){
+			if (this.workers[url].length === 0) {
 				let worker = new Worker(url);
 				this.workers[url].push(worker);
 			}
@@ -10325,7 +10335,7 @@ void main() {
 			return worker;
 		}
 
-		returnWorker(url, worker){
+		returnWorker (url, worker) {
 			this.workers[url].push(worker);
 		}
 	}
@@ -10341,24 +10351,24 @@ void main() {
 	// http://www.kitware.com/source/home/post/9
 	// https://tel.archives-ouvertes.fr/tel-00438464/document p. 115+ (french)
 
-	class EyeDomeLightingMaterial extends THREE.ShaderMaterial{
+	class EyeDomeLightingMaterial extends THREE.ShaderMaterial {
 
-		constructor(parameters = {}){
+		constructor(parameters = {}) {
 			super();
 
 			let uniforms = {
-				screenWidth: 	{ type: 'f', 	value: 0 },
-				screenHeight: 	{ type: 'f', 	value: 0 },
-				edlStrength: 	{ type: 'f', 	value: 1.0 },
-				radius: 		{ type: 'f', 	value: 1.0 },
-				neighbours:		{ type: '2fv', 	value: [] },
-				depthMap: 		{ type: 't', 	value: null },
+				screenWidth: { type: 'f', value: 0 },
+				screenHeight: { type: 'f', value: 0 },
+				edlStrength: { type: 'f', value: 1.0 },
+				radius: { type: 'f', value: 1.0 },
+				neighbours: { type: '2fv', value: [] },
+				depthMap: { type: 't', value: null },
 				//colorMap: 		{ type: 't', 	value: null },
-				uRegularColor:	{ type: 't', 	value: null },
-				uRegularDepth:	{ type: 't', 	value: null },
-				uEDLColor:		{ type: 't', 	value: null },
-				uEDLDepth:		{ type: 't', 	value: null },
-				opacity:		{ type: 'f',	value: 1.0 }
+				uRegularColor: { type: 't', value: null },
+				uRegularDepth: { type: 't', value: null },
+				uEDLColor: { type: 't', value: null },
+				uEDLDepth: { type: 't', value: null },
+				opacity: { type: 'f', value: 1.0 }
 			};
 
 			this.setValues({
@@ -10371,7 +10381,7 @@ void main() {
 			this.neighbourCount = 8;
 		}
 
-		getDefines() {
+		getDefines () {
 			let defines = '';
 
 			defines += '#define NEIGHBOUR_COUNT ' + this.neighbourCount + '\n';
@@ -10379,7 +10389,7 @@ void main() {
 			return defines;
 		}
 
-		updateShaderSource() {
+		updateShaderSource () {
 
 			let vs = this.getDefines() + Shaders['edl.vs'];
 			let fs = this.getDefines() + Shaders['edl.fs'];
@@ -10394,11 +10404,11 @@ void main() {
 			this.needsUpdate = true;
 		}
 
-		get neighbourCount(){
+		get neighbourCount () {
 			return this._neighbourCount;
 		}
 
-		set neighbourCount(value){
+		set neighbourCount (value) {
 			if (this._neighbourCount !== value) {
 				this._neighbourCount = value;
 				this.neighbours = new Float32Array(this._neighbourCount * 2);
@@ -10411,23 +10421,23 @@ void main() {
 			}
 		}
 
-		
+
 	}
 
-	class NormalizationEDLMaterial extends THREE.RawShaderMaterial{
+	class NormalizationEDLMaterial extends THREE.RawShaderMaterial {
 
-		constructor(parameters = {}){
+		constructor(parameters = {}) {
 			super();
 
 			let uniforms = {
-				screenWidth: 	{ type: 'f', 	value: 0 },
-				screenHeight: 	{ type: 'f', 	value: 0 },
-				edlStrength: 	{ type: 'f', 	value: 1.0 },
-				radius: 		{ type: 'f', 	value: 1.0 },
-				neighbours:		{ type: '2fv', 	value: [] },
-				uEDLMap:		{ type: 't', value: null },
-				uDepthMap:		{ type: 't', value: null },
-				uWeightMap:		{ type: 't', value: null },
+				screenWidth: { type: 'f', value: 0 },
+				screenHeight: { type: 'f', value: 0 },
+				edlStrength: { type: 'f', value: 1.0 },
+				radius: { type: 'f', value: 1.0 },
+				neighbours: { type: '2fv', value: [] },
+				uEDLMap: { type: 't', value: null },
+				uDepthMap: { type: 't', value: null },
+				uWeightMap: { type: 't', value: null },
 			};
 
 			this.setValues({
@@ -10439,7 +10449,7 @@ void main() {
 			this.neighbourCount = 8;
 		}
 
-		getDefines() {
+		getDefines () {
 			let defines = '';
 
 			defines += '#define NEIGHBOUR_COUNT ' + this.neighbourCount + '\n';
@@ -10447,7 +10457,7 @@ void main() {
 			return defines;
 		}
 
-		updateShaderSource() {
+		updateShaderSource () {
 
 			let vs = this.getDefines() + Shaders['normalize.vs'];
 			let fs = this.getDefines() + Shaders['normalize_and_edl.fs'];
@@ -10462,11 +10472,11 @@ void main() {
 			this.needsUpdate = true;
 		}
 
-		get neighbourCount(){
+		get neighbourCount () {
 			return this._neighbourCount;
 		}
 
-		set neighbourCount(value){
+		set neighbourCount (value) {
 			if (this._neighbourCount !== value) {
 				this._neighbourCount = value;
 				this.neighbours = new Float32Array(this._neighbourCount * 2);
@@ -10478,17 +10488,17 @@ void main() {
 				this.updateShaderSource();
 			}
 		}
-		
+
 	}
 
-	class NormalizationMaterial extends THREE.RawShaderMaterial{
+	class NormalizationMaterial extends THREE.RawShaderMaterial {
 
-		constructor(parameters = {}){
+		constructor(parameters = {}) {
 			super();
 
 			let uniforms = {
-				uDepthMap:		{ type: 't', value: null },
-				uWeightMap:		{ type: 't', value: null },
+				uDepthMap: { type: 't', value: null },
+				uWeightMap: { type: 't', value: null },
 			};
 
 			this.setValues({
@@ -10498,13 +10508,13 @@ void main() {
 			});
 		}
 
-		getDefines() {
+		getDefines () {
 			let defines = '';
 
 			return defines;
 		}
 
-		updateShaderSource() {
+		updateShaderSource () {
 
 			let vs = this.getDefines() + Shaders['normalize.vs'];
 			let fs = this.getDefines() + Shaders['normalize.fs'];
@@ -10530,7 +10540,7 @@ void main() {
 
 	class LasLazLoader {
 
-		constructor (version) {
+		constructor(version) {
 			if (typeof (version) === 'string') {
 				this.version = new Version(version);
 			} else {
@@ -10573,7 +10583,7 @@ void main() {
 			xhr.send(null);
 		}
 
-		parse(node, buffer){
+		parse (node, buffer) {
 			let lf = new LASFile(buffer);
 			let handler = new LasLazBatcher(node);
 
@@ -10613,71 +10623,71 @@ void main() {
 
 
 			lf.open()
-			.then( msg => {
-				lf.isOpen = true;
-				return lf;
-			}).catch( msg => {
-				console.log("failed to open file. :(");	
-			}).then( lf => {
-				return lf.getHeader().then(function (h) {
-					return [lf, h];
-				});
-			}).then( v => {
-				let lf = v[0];
-				let header = v[1];
-
-				let skip = 1;
-				let totalRead = 0;
-				let totalToRead = (skip <= 1 ? header.pointsCount : header.pointsCount / skip);
-				let reader = function () {
-					let p = lf.readData(1000000, 0, skip);
-					return p.then(function (data) {
-						handler.push(new LASDecoder(data.buffer,
-							header.pointsFormatId,
-							header.pointsStructSize,
-							data.count,
-							header.scale,
-							header.offset,
-							header.mins, header.maxs));
-
-						totalRead += data.count;
-						LasLazLoader.progressCB(totalRead / totalToRead);
-
-						if (data.hasMoreData) {
-							return reader();
-						} else {
-							header.totalRead = totalRead;
-							header.versionAsString = lf.versionAsString;
-							header.isCompressed = lf.isCompressed;
-							return [lf, header, handler];
-						}
+				.then(msg => {
+					lf.isOpen = true;
+					return lf;
+				}).catch(msg => {
+					console.log("failed to open file. :(");
+				}).then(lf => {
+					return lf.getHeader().then(function (h) {
+						return [lf, h];
 					});
-				};
+				}).then(v => {
+					let lf = v[0];
+					let header = v[1];
 
-				return reader();
-			}).then( v => {
-				let lf = v[0];
-				// we're done loading this file
-				//
-				LasLazLoader.progressCB(1);
+					let skip = 1;
+					let totalRead = 0;
+					let totalToRead = (skip <= 1 ? header.pointsCount : header.pointsCount / skip);
+					let reader = function () {
+						let p = lf.readData(1000000, 0, skip);
+						return p.then(function (data) {
+							handler.push(new LASDecoder(data.buffer,
+								header.pointsFormatId,
+								header.pointsStructSize,
+								data.count,
+								header.scale,
+								header.offset,
+								header.mins, header.maxs));
 
-				// Close it
-				return lf.close().then(function () {
-					lf.isOpen = false;
+							totalRead += data.count;
+							LasLazLoader.progressCB(totalRead / totalToRead);
 
-					return v.slice(1);
-				}).catch(e => {
-					// If there was a cancellation, make sure the file is closed, if the file is open
-					// close and then fail
-					if (lf.isOpen) {
-						return lf.close().then(function () {
-							lf.isOpen = false;
-							throw e;
+							if (data.hasMoreData) {
+								return reader();
+							} else {
+								header.totalRead = totalRead;
+								header.versionAsString = lf.versionAsString;
+								header.isCompressed = lf.isCompressed;
+								return [lf, header, handler];
+							}
 						});
-					}
-					throw e;	
-				});	
-			});
+					};
+
+					return reader();
+				}).then(v => {
+					let lf = v[0];
+					// we're done loading this file
+					//
+					LasLazLoader.progressCB(1);
+
+					// Close it
+					return lf.close().then(function () {
+						lf.isOpen = false;
+
+						return v.slice(1);
+					}).catch(e => {
+						// If there was a cancellation, make sure the file is closed, if the file is open
+						// close and then fail
+						if (lf.isOpen) {
+							return lf.close().then(function () {
+								lf.isOpen = false;
+								throw e;
+							});
+						}
+						throw e;
+					});
+				});
 		}
 
 		handle (node, url) {
@@ -10685,9 +10695,9 @@ void main() {
 		}
 	}
 
-	class LasLazBatcher{
+	class LasLazBatcher {
 
-		constructor (node) {
+		constructor(node) {
 			this.node = node;
 		}
 
@@ -10781,16 +10791,16 @@ void main() {
 	 * @class
 	 */
 	const PointAttributeTypes = {
-		DATA_TYPE_DOUBLE: {ordinal: 0, size: 8},
-		DATA_TYPE_FLOAT: {ordinal: 1, size: 4},
-		DATA_TYPE_INT8: {ordinal: 2, size: 1},
-		DATA_TYPE_UINT8: {ordinal: 3, size: 1},
-		DATA_TYPE_INT16: {ordinal: 4, size: 2},
-		DATA_TYPE_UINT16: {ordinal: 5, size: 2},
-		DATA_TYPE_INT32: {ordinal: 6, size: 4},
-		DATA_TYPE_UINT32: {ordinal: 7, size: 4},
-		DATA_TYPE_INT64: {ordinal: 8, size: 8},
-		DATA_TYPE_UINT64: {ordinal: 9, size: 8}
+		DATA_TYPE_DOUBLE: { ordinal: 0, size: 8 },
+		DATA_TYPE_FLOAT: { ordinal: 1, size: 4 },
+		DATA_TYPE_INT8: { ordinal: 2, size: 1 },
+		DATA_TYPE_UINT8: { ordinal: 3, size: 1 },
+		DATA_TYPE_INT16: { ordinal: 4, size: 2 },
+		DATA_TYPE_UINT16: { ordinal: 5, size: 2 },
+		DATA_TYPE_INT32: { ordinal: 6, size: 4 },
+		DATA_TYPE_UINT32: { ordinal: 7, size: 4 },
+		DATA_TYPE_INT64: { ordinal: 8, size: 8 },
+		DATA_TYPE_UINT64: { ordinal: 9, size: 8 }
 	};
 
 	let i = 0;
@@ -10800,9 +10810,9 @@ void main() {
 	}
 
 
-	class PointAttribute{
-		
-		constructor(name, type, numElements){
+	class PointAttribute {
+
+		constructor(name, type, numElements) {
 			this.name = name;
 			this.type = type;
 			this.numElements = numElements;
@@ -10852,15 +10862,15 @@ void main() {
 	PointAttribute.NORMAL = new PointAttribute(
 		PointAttributeNames.NORMAL,
 		PointAttributeTypes.DATA_TYPE_FLOAT, 3);
-		
+
 	PointAttribute.RETURN_NUMBER = new PointAttribute(
 		PointAttributeNames.RETURN_NUMBER,
 		PointAttributeTypes.DATA_TYPE_UINT8, 1);
-		
+
 	PointAttribute.NUMBER_OF_RETURNS = new PointAttribute(
 		PointAttributeNames.NUMBER_OF_RETURNS,
 		PointAttributeTypes.DATA_TYPE_UINT8, 1);
-		
+
 	PointAttribute.SOURCE_ID = new PointAttribute(
 		PointAttributeNames.SOURCE_ID,
 		PointAttributeTypes.DATA_TYPE_UINT16, 1);
@@ -10877,9 +10887,9 @@ void main() {
 		PointAttributeNames.GPS_TIME,
 		PointAttributeTypes.DATA_TYPE_DOUBLE, 1);
 
-	class PointAttributes{
+	class PointAttributes {
 
-		constructor(pointAttributes){
+		constructor(pointAttributes) {
 			this.attributes = [];
 			this.byteSize = 0;
 			this.size = 0;
@@ -10896,13 +10906,13 @@ void main() {
 		}
 
 
-		add(pointAttribute){
+		add (pointAttribute) {
 			this.attributes.push(pointAttribute);
 			this.byteSize += pointAttribute.byteSize;
 			this.size++;
 		};
 
-		hasColors(){
+		hasColors () {
 			for (let name in this.attributes) {
 				let pointAttribute = this.attributes[name];
 				if (pointAttribute.name === PointAttributeNames.COLOR_PACKED) {
@@ -10913,7 +10923,7 @@ void main() {
 			return false;
 		};
 
-		hasNormals(){
+		hasNormals () {
 			for (let name in this.attributes) {
 				let pointAttribute = this.attributes[name];
 				if (
@@ -10930,9 +10940,9 @@ void main() {
 
 	}
 
-	class BinaryLoader{
+	class BinaryLoader {
 
-		constructor(version, boundingBox, scale){
+		constructor(version, boundingBox, scale) {
 			if (typeof (version) === 'string') {
 				this.version = new Version(version);
 			} else {
@@ -10943,7 +10953,7 @@ void main() {
 			this.scale = scale;
 		}
 
-		load(node){
+		load (node) {
 			if (node.loaded) {
 				return;
 			}
@@ -10960,7 +10970,7 @@ void main() {
 			xhr.overrideMimeType('text/plain; charset=x-user-defined');
 			xhr.onreadystatechange = () => {
 				if (xhr.readyState === 4) {
-					if((xhr.status === 200 || xhr.status === 0) &&  xhr.response !== null){
+					if ((xhr.status === 200 || xhr.status === 0) && xhr.response !== null) {
 						let buffer = xhr.response;
 						this.parse(node, buffer);
 					} else {
@@ -10968,7 +10978,7 @@ void main() {
 					}
 				}
 			};
-			
+
 			try {
 				xhr.send(null);
 			} catch (e) {
@@ -10976,7 +10986,7 @@ void main() {
 			}
 		};
 
-		parse(node, buffer){
+		parse (node, buffer) {
 			let pointAttributes = node.pcoGeometry.pointAttributes;
 			let numPoints = buffer.byteLength / node.pcoGeometry.pointAttributes.byteSize;
 
@@ -11000,7 +11010,7 @@ void main() {
 
 				let geometry = new THREE.BufferGeometry();
 
-				for(let property in buffers){
+				for (let property in buffers) {
 					let buffer = buffers[property].buffer;
 
 					if (parseInt(property) === PointAttributeNames.POSITION_CARTESIAN) {
@@ -11046,7 +11056,7 @@ void main() {
 				tightBoundingBox.min.set(0, 0, 0);
 
 				let numPoints = e.data.buffer.byteLength / pointAttributes.byteSize;
-				
+
 				node.numPoints = numPoints;
 				node.geometry = geometry;
 				node.mean = new THREE.Vector3(...data.mean);
@@ -11061,7 +11071,7 @@ void main() {
 				buffer: buffer,
 				pointAttributes: pointAttributes,
 				version: this.version.version,
-				min: [ node.boundingBox.min.x, node.boundingBox.min.y, node.boundingBox.min.z ],
+				min: [node.boundingBox.min.x, node.boundingBox.min.y, node.boundingBox.min.z],
 				offset: [node.pcoGeometry.offset.x, node.pcoGeometry.offset.y, node.pcoGeometry.offset.z],
 				scale: this.scale,
 				spacing: node.spacing,
@@ -11071,12 +11081,12 @@ void main() {
 			worker.postMessage(message, [message.buffer]);
 		};
 
-		
+
 	}
 
 	class POCLoader {
 
-		static load(url, callback){
+		static load (url, callback) {
 			try {
 				let pco = new PointCloudOctreeGeometry();
 				pco.url = url;
@@ -11189,7 +11199,7 @@ void main() {
 			}
 		}
 
-		loadPointAttributes(mno){
+		loadPointAttributes (mno) {
 			let fpa = mno.pointAttributes;
 			let pa = new PointAttributes();
 
@@ -11201,7 +11211,7 @@ void main() {
 			return pa;
 		}
 
-		createChildAABB(aabb, index){
+		createChildAABB (aabb, index) {
 			let min = aabb.min.clone();
 			let max = aabb.max.clone();
 			let size = new THREE.Vector3().subVectors(max, min);
@@ -11228,9 +11238,9 @@ void main() {
 		}
 	}
 
-	class GreyhoundBinaryLoader{
+	class GreyhoundBinaryLoader {
 
-		constructor(version, boundingBox, scale){
+		constructor(version, boundingBox, scale) {
 			if (typeof (version) === 'string') {
 				this.version = new Version(version);
 			} else {
@@ -11241,7 +11251,7 @@ void main() {
 			this.scale = scale;
 		}
 
-		load(node){
+		load (node) {
 			if (node.loaded) return;
 
 			let scope = this;
@@ -11272,7 +11282,7 @@ void main() {
 			}
 		}
 
-		parse(node, buffer){
+		parse (node, buffer) {
 			let NUM_POINTS_BYTES = 4;
 
 			let view = new DataView(
@@ -11298,7 +11308,7 @@ void main() {
 
 				let geometry = new THREE.BufferGeometry();
 
-				for(let property in buffers){
+				for (let property in buffers) {
 					let buffer = buffers[property].buffer;
 
 					if (parseInt(property) === PointAttributeNames.POSITION_CARTESIAN) {
@@ -11427,7 +11437,7 @@ void main() {
 				if (xhr.readyState === 4) {
 					if (xhr.status === 200 || xhr.status === 0) {
 						cb(null, xhr.response);
-					}				else {
+					} else {
 						cb(xhr.responseText);
 					}
 				}
@@ -11487,9 +11497,9 @@ void main() {
 	}
 
 
-	class GreyhoundLoader{
+	class GreyhoundLoader {
 
-		constructor(){
+		constructor() {
 
 		}
 
@@ -11504,7 +11514,7 @@ void main() {
 		 * @param loadingFinishedListener executed after loading the binary has been
 		 * finished
 		 */
-		load(url, callback){
+		load (url, callback) {
 			let HIERARCHY_STEP_SIZE = 5;
 
 			try {
@@ -11665,7 +11675,7 @@ void main() {
 			}
 		}
 
-		loadPointAttributes(mno){
+		loadPointAttributes (mno) {
 			let fpa = mno.pointAttributes;
 			let pa = new PointAttributes();
 
@@ -11677,7 +11687,7 @@ void main() {
 			return pa;
 		}
 
-		createChildAABB(aabb, childIndex){
+		createChildAABB (aabb, childIndex) {
 			let min = aabb.min;
 			let max = aabb.max;
 			let dHalfLength = new THREE.Vector3().copy(max).sub(min).multiplyScalar(0.5);
@@ -11719,11 +11729,11 @@ void main() {
 
 	}
 
-	class ClipVolume extends THREE.Object3D{
-		
-		constructor(args){
+	class ClipVolume extends THREE.Object3D {
+
+		constructor(args) {
 			super();
-			
+
 			this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
 			this.name = "clip_volume_" + this.constructor.counter;
 
@@ -11737,12 +11747,12 @@ void main() {
 
 			this.clipOffset = 0.001;
 			this.clipRotOffset = 1;
-					
+
 			let boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 			boxGeometry.computeBoundingBox();
-			
+
 			let boxFrameGeometry = new THREE.Geometry();
-			{			
+			{
 				// bottom
 				boxFrameGeometry.vertices.push(new THREE.Vector3(-0.5, -0.5, 0.5));
 				boxFrameGeometry.vertices.push(new THREE.Vector3(0.5, -0.5, 0.5));
@@ -11775,7 +11785,7 @@ void main() {
 			}
 
 			let planeFrameGeometry = new THREE.Geometry();
-			{						
+			{
 				// middle line
 				planeFrameGeometry.vertices.push(new THREE.Vector3(-0.5, -0.5, 0.0));
 				planeFrameGeometry.vertices.push(new THREE.Vector3(-0.5, 0.5, 0.0));
@@ -11788,20 +11798,21 @@ void main() {
 			}
 
 			this.dimension = new THREE.Vector3(1, 1, 1);
-			this.material = new THREE.MeshBasicMaterial( {
-				color: 0x00ff00, 
-				transparent: true, 
+			this.material = new THREE.MeshBasicMaterial({
+				color: 0x00ff00,
+				transparent: true,
 				opacity: 0.3,
-				depthTest: true, 
-				depthWrite: false} );
+				depthTest: true,
+				depthWrite: false
+			});
 			this.box = new THREE.Mesh(boxGeometry, this.material);
 			this.box.geometry.computeBoundingBox();
 			this.boundingBox = this.box.geometry.boundingBox;
 			this.add(this.box);
-			
-			this.frame = new THREE.LineSegments( boxFrameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
+
+			this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({ color: 0x000000 }));
 			this.add(this.frame);
-			this.planeFrame = new THREE.LineSegments( planeFrameGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
+			this.planeFrame = new THREE.LineSegments(planeFrameGeometry, new THREE.LineBasicMaterial({ color: 0xff0000 }));
 			this.add(this.planeFrame);
 
 			// set default thickness
@@ -11810,29 +11821,30 @@ void main() {
 			// create local coordinate system
 			let createArrow = (name, direction, color) => {
 				let material = new THREE.MeshBasicMaterial({
-					color: color, 
-					depthTest: false, 
-					depthWrite: false});
-					
+					color: color,
+					depthTest: false,
+					depthWrite: false
+				});
+
 				let shaftGeometry = new THREE.Geometry();
 				shaftGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
 				shaftGeometry.vertices.push(new THREE.Vector3(0, 1, 0));
-				
+
 				let shaftMaterial = new THREE.LineBasicMaterial({
-					color: color, 
-					depthTest: false, 
+					color: color,
+					depthTest: false,
 					depthWrite: false,
 					transparent: true
-					});
+				});
 				let shaft = new THREE.Line(shaftGeometry, shaftMaterial);
 				shaft.name = name + "_shaft";
-				
+
 				let headGeometry = new THREE.CylinderGeometry(0, 0.04, 0.1, 10, 1, false);
 				let headMaterial = material;
 				let head = new THREE.Mesh(headGeometry, headMaterial);
 				head.name = name + "_head";
 				head.position.y = 1;
-				
+
 				let arrow = new THREE.Object3D();
 				arrow.name = name;
 				arrow.add(shaft);
@@ -11840,11 +11852,11 @@ void main() {
 
 				return arrow;
 			};
-			
+
 			this.arrowX = createArrow("arrow_x", new THREE.Vector3(1, 0, 0), 0xFF0000);
 			this.arrowY = createArrow("arrow_y", new THREE.Vector3(0, 1, 0), 0x00FF00);
 			this.arrowZ = createArrow("arrow_z", new THREE.Vector3(0, 0, 1), 0x0000FF);
-			
+
 			this.arrowX.rotation.z = -Math.PI / 2;
 			this.arrowZ.rotation.x = Math.PI / 2;
 
@@ -11855,111 +11867,111 @@ void main() {
 			this.add(this.arrowX);
 			this.add(this.arrowY);
 			this.add(this.arrowZ);
-			
+
 			{ // event listeners
-				this.addEventListener("ui_select", e => { 
+				this.addEventListener("ui_select", e => {
 					this.arrowX.visible = true;
 					this.arrowY.visible = true;
-					this.arrowZ.visible = true; 
+					this.arrowZ.visible = true;
 				});
 				this.addEventListener("ui_deselect", e => {
 					this.arrowX.visible = false;
 					this.arrowY.visible = false;
-					this.arrowZ.visible = false; 				
+					this.arrowZ.visible = false;
 				});
-				this.addEventListener("select", e => { 
+				this.addEventListener("select", e => {
 					let scene_header = $("#" + this.name + " .scene_header");
-					if(!scene_header.next().is(":visible")) {
+					if (!scene_header.next().is(":visible")) {
 						scene_header.click();
 					}
 				});
-				this.addEventListener("deselect", e => { 
+				this.addEventListener("deselect", e => {
 					let scene_header = $("#" + this.name + " .scene_header");
-					if(scene_header.next().is(":visible")) {
+					if (scene_header.next().is(":visible")) {
 						scene_header.click();
 					}
 				});
 			}
-			
+
 			this.update();
 		};
 
-		setClipOffset(offset) {		
-			this.clipOffset = offset;	
+		setClipOffset (offset) {
+			this.clipOffset = offset;
 		}
 
-		setClipRotOffset(offset) {		
-			this.clipRotOffset = offset;		
+		setClipRotOffset (offset) {
+			this.clipRotOffset = offset;
 		}
 
-		setScaleX(x) {
+		setScaleX (x) {
 			this.box.scale.x = x;
 			this.frame.scale.x = x;
-			this.planeFrame.scale.x = x;			
+			this.planeFrame.scale.x = x;
 		}
 
-		setScaleY(y) {
+		setScaleY (y) {
 			this.box.scale.y = y;
 			this.frame.scale.y = y;
-			this.planeFrame.scale.y = y;		
+			this.planeFrame.scale.y = y;
 		}
 
-		setScaleZ(z) {
+		setScaleZ (z) {
 			this.box.scale.z = z;
 			this.frame.scale.z = z;
-			this.planeFrame.scale.z = z;		
+			this.planeFrame.scale.z = z;
 		}
 
-		offset(args) {
+		offset (args) {
 			let cs = args.cs || null;
 			let axis = args.axis || null;
 			let dir = args.dir || null;
 
-			if(!cs || !axis || !dir) return;
+			if (!cs || !axis || !dir) return;
 
-			if(axis === "x") {
-				if(cs === "local") {
+			if (axis === "x") {
+				if (cs === "local") {
 					this.position.add(this.localX.clone().multiplyScalar(dir * this.clipOffset));
-				} else if(cs === "global") {
+				} else if (cs === "global") {
 					this.position.x = this.position.x + dir * this.clipOffset;
 				}
-			}else if(axis === "y") {
-				if(cs === "local") {
+			} else if (axis === "y") {
+				if (cs === "local") {
 					this.position.add(this.localY.clone().multiplyScalar(dir * this.clipOffset));
-				} else if(cs === "global") {
+				} else if (cs === "global") {
 					this.position.y = this.position.y + dir * this.clipOffset;
 				}
-			}else if(axis === "z") {
-				if(cs === "local") {
+			} else if (axis === "z") {
+				if (cs === "local") {
 					this.position.add(this.localZ.clone().multiplyScalar(dir * this.clipOffset));
-				} else if(cs === "global") {
+				} else if (cs === "global") {
 					this.position.z = this.position.z + dir * this.clipOffset;
 				}
 			}
 
-			this.dispatchEvent({"type": "clip_volume_changed", "viewer": viewer, "volume": this});
-		}	
+			this.dispatchEvent({ "type": "clip_volume_changed", "viewer": viewer, "volume": this });
+		}
 
-		rotate(args) {
+		rotate (args) {
 			let cs = args.cs || null;
 			let axis = args.axis || null;
 			let dir = args.dir || null;
 
-			if(!cs || !axis || !dir) return;
+			if (!cs || !axis || !dir) return;
 
-			if(cs === "local") {
-				if(axis === "x") {
+			if (cs === "local") {
+				if (axis === "x") {
 					this.rotateOnAxis(new THREE.Vector3(1, 0, 0), dir * this.clipRotOffset * Math.PI / 180);
-				} else if(axis === "y") {
+				} else if (axis === "y") {
 					this.rotateOnAxis(new THREE.Vector3(0, 1, 0), dir * this.clipRotOffset * Math.PI / 180);
-				} else if(axis === "z") {
+				} else if (axis === "z") {
 					this.rotateOnAxis(new THREE.Vector3(0, 0, 1), dir * this.clipRotOffset * Math.PI / 180);
 				}
-			} else if(cs === "global") {
-				let rotaxis = new THREE.Vector4(1, 0, 0, 0);	
-				if(axis === "y") {
+			} else if (cs === "global") {
+				let rotaxis = new THREE.Vector4(1, 0, 0, 0);
+				if (axis === "y") {
 					rotaxis = new THREE.Vector4(0, 1, 0, 0);
-				} else if(axis === "z") {
+				} else if (axis === "z") {
 					rotaxis = new THREE.Vector4(0, 0, 1, 0);
 				}
 				this.updateMatrixWorld();
@@ -11971,32 +11983,32 @@ void main() {
 
 			this.updateLocalSystem();
 
-			this.dispatchEvent({"type": "clip_volume_changed", "viewer": viewer, "volume": this});
-		}	
+			this.dispatchEvent({ "type": "clip_volume_changed", "viewer": viewer, "volume": this });
+		}
 
-		update(){
+		update () {
 			this.boundingBox = this.box.geometry.boundingBox;
 			this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
-			
+
 			this.box.visible = false;
 
 			this.updateLocalSystem();
 		};
 
-		updateLocalSystem() {		
+		updateLocalSystem () {
 			// extract local coordinate axes
 			let rotQuat = this.getWorldQuaternion();
 			this.localX = new THREE.Vector3(1, 0, 0).applyQuaternion(rotQuat).normalize();
 			this.localY = new THREE.Vector3(0, 1, 0).applyQuaternion(rotQuat).normalize();
 			this.localZ = new THREE.Vector3(0, 0, 1).applyQuaternion(rotQuat).normalize();
 		}
-		
-		raycast(raycaster, intersects){
-			
+
+		raycast (raycaster, intersects) {
+
 			let is = [];
 			this.box.raycast(raycaster, is);
-		
-			if(is.length > 0){
+
+			if (is.length > 0) {
 				let I = is[0];
 				intersects.push({
 					distance: I.distance,
@@ -12007,15 +12019,15 @@ void main() {
 		};
 	}
 
-	class ClippingTool extends EventDispatcher{
+	class ClippingTool extends EventDispatcher {
 
-		constructor(viewer){
-			super(); 
+		constructor(viewer) {
+			super();
 
 			this.viewer = viewer;
 
-			this.maxPolygonVertices = 8; 
-			
+			this.maxPolygonVertices = 8;
+
 			this.addEventListener("start_inserting_clipping_volume", e => {
 				this.viewer.dispatchEvent({
 					type: "cancel_insertions"
@@ -12030,11 +12042,11 @@ void main() {
 			this.onRemove = e => {
 				this.sceneVolume.remove(e.volume);
 			};
-			
+
 			this.onAdd = e => {
 				this.sceneVolume.add(e.volume);
 			};
-			
+
 			this.viewer.inputHandler.addEventListener("delete", e => {
 				let volumes = e.selection.filter(e => (e instanceof ClipVolume));
 				volumes.forEach(e => this.viewer.scene.removeClipVolume(e));
@@ -12043,30 +12055,30 @@ void main() {
 			});
 		}
 
-		setScene(scene){
-			if(this.scene === scene){
+		setScene (scene) {
+			if (this.scene === scene) {
 				return;
 			}
-			
-			if(this.scene){
+
+			if (this.scene) {
 				this.scene.removeEventListeners("clip_volume_added", this.onAdd);
 				this.scene.removeEventListeners("clip_volume_removed", this.onRemove);
 				this.scene.removeEventListeners("polygon_clip_volume_added", this.onAdd);
 				this.scene.removeEventListeners("polygon_clip_volume_removed", this.onRemove);
 			}
-			
+
 			this.scene = scene;
-			
+
 			this.scene.addEventListener("clip_volume_added", this.onAdd);
 			this.scene.addEventListener("clip_volume_removed", this.onRemove);
 			this.scene.addEventListener("polygon_clip_volume_added", this.onAdd);
 			this.scene.addEventListener("polygon_clip_volume_removed", this.onRemove);
 		}
 
-		startInsertion(args = {}) {	
+		startInsertion (args = {}) {
 			let type = args.type || null;
 
-			if(!type) return null;
+			if (!type) return null;
 
 			let domElement = this.viewer.renderer.domElement;
 			let canvasSize = this.viewer.renderer.getSize();
@@ -12101,7 +12113,7 @@ void main() {
 
 			let polyClipVol = new PolygonClipVolume(this.viewer.scene.getActiveCamera().clone());
 
-			this.dispatchEvent({"type": "start_inserting_clipping_volume"});
+			this.dispatchEvent({ "type": "start_inserting_clipping_volume" });
 
 			this.viewer.scene.addPolygonClipVolume(polyClipVol);
 			this.sceneMarker.add(polyClipVol);
@@ -12111,8 +12123,8 @@ void main() {
 			};
 
 			let insertionCallback = (e) => {
-				if(e.button === THREE.MOUSE.LEFT){
-					
+				if (e.button === THREE.MOUSE.LEFT) {
+
 					polyClipVol.addMarker();
 
 					// SVC Screen Line
@@ -12122,19 +12134,19 @@ void main() {
 						newPoint.y = e.offsetY;
 						let polyline = target.points.appendItem(newPoint);
 					});
-					
-					
-					if(polyClipVol.markers.length > this.maxPolygonVertices){
+
+
+					if (polyClipVol.markers.length > this.maxPolygonVertices) {
 						cancel.callback();
 					}
-					
+
 					this.viewer.inputHandler.startDragging(
 						polyClipVol.markers[polyClipVol.markers.length - 1]);
-				}else if(e.button === THREE.MOUSE.RIGHT){
+				} else if (e.button === THREE.MOUSE.RIGHT) {
 					cancel.callback(e);
 				}
 			};
-			
+
 			cancel.callback = e => {
 
 				//let first = svg.find("polyline")[0].points[0];
@@ -12146,9 +12158,9 @@ void main() {
 				//});
 				svg.remove();
 
-				if(polyClipVol.markers.length > 3) {
+				if (polyClipVol.markers.length > 3) {
 					polyClipVol.removeLastMarker();
-					polyClipVol.initialized = true;	
+					polyClipVol.initialized = true;
 				} else {
 					this.viewer.scene.removePolygonClipVolume(polyClipVol);
 				}
@@ -12157,11 +12169,11 @@ void main() {
 				this.viewer.removeEventListener("cancel_insertions", cancel.callback);
 				this.viewer.inputHandler.enabled = true;
 			};
-			
+
 			this.viewer.addEventListener("cancel_insertions", cancel.callback);
-			this.viewer.renderer.domElement.addEventListener("mouseup", insertionCallback , true);
+			this.viewer.renderer.domElement.addEventListener("mouseup", insertionCallback, true);
 			this.viewer.inputHandler.enabled = false;
-			
+
 			polyClipVol.addMarker();
 			this.viewer.inputHandler.startDragging(
 				polyClipVol.markers[polyClipVol.markers.length - 1]);
@@ -12169,376 +12181,376 @@ void main() {
 			return polyClipVol;
 		}
 
-		update() {
+		update () {
 
 		}
 	}
 
 	var GeoTIFF = (function (exports) {
-	'use strict';
+		'use strict';
 
-	const Endianness = new Enum({
-		LITTLE: "II",
-		BIG: "MM",
-	});
+		const Endianness = new Enum({
+			LITTLE: "II",
+			BIG: "MM",
+		});
 
-	const Type = new Enum({
-		BYTE: {value: 1, bytes: 1},
-		ASCII: {value: 2, bytes: 1},
-		SHORT: {value: 3, bytes: 2},
-		LONG: {value: 4, bytes: 4},
-		RATIONAL: {value: 5, bytes: 8},
-		SBYTE: {value: 6, bytes: 1},
-		UNDEFINED: {value: 7, bytes: 1},
-		SSHORT: {value: 8, bytes: 2},
-		SLONG: {value: 9, bytes: 4},
-		SRATIONAL: {value: 10, bytes: 8},
-		FLOAT: {value: 11, bytes: 4},
-		DOUBLE: {value: 12, bytes: 8},
-	});
+		const Type = new Enum({
+			BYTE: { value: 1, bytes: 1 },
+			ASCII: { value: 2, bytes: 1 },
+			SHORT: { value: 3, bytes: 2 },
+			LONG: { value: 4, bytes: 4 },
+			RATIONAL: { value: 5, bytes: 8 },
+			SBYTE: { value: 6, bytes: 1 },
+			UNDEFINED: { value: 7, bytes: 1 },
+			SSHORT: { value: 8, bytes: 2 },
+			SLONG: { value: 9, bytes: 4 },
+			SRATIONAL: { value: 10, bytes: 8 },
+			FLOAT: { value: 11, bytes: 4 },
+			DOUBLE: { value: 12, bytes: 8 },
+		});
 
-	const Tag = new Enum({
-		IMAGE_WIDTH: 256,
-		IMAGE_HEIGHT: 257,
-		BITS_PER_SAMPLE: 258,
-		COMPRESSION: 259,
-		PHOTOMETRIC_INTERPRETATION: 262,
-		STRIP_OFFSETS: 273,
-		ORIENTATION: 274,
-		SAMPLES_PER_PIXEL: 277,
-		ROWS_PER_STRIP: 278,
-		STRIP_BYTE_COUNTS: 279,
-		X_RESOLUTION: 282,
-		Y_RESOLUTION: 283,
-		PLANAR_CONFIGURATION: 284,
-		RESOLUTION_UNIT: 296,
-		SOFTWARE: 305,
-		COLOR_MAP: 320,
-		SAMPLE_FORMAT: 339,
-		MODEL_PIXEL_SCALE: 33550,         // [GeoTIFF] TYPE: double   N: 3
-		MODEL_TIEPOINT: 33922,            // [GeoTIFF] TYPE: double   N: 6 * NUM_TIEPOINTS
-		GEO_KEY_DIRECTORY: 34735,         // [GeoTIFF] TYPE: short    N: >= 4
-		GEO_DOUBLE_PARAMS: 34736,         // [GeoTIFF] TYPE: short    N: variable
-		GEO_ASCII_PARAMS: 34737,          // [GeoTIFF] TYPE: ascii    N: variable
-	});
+		const Tag = new Enum({
+			IMAGE_WIDTH: 256,
+			IMAGE_HEIGHT: 257,
+			BITS_PER_SAMPLE: 258,
+			COMPRESSION: 259,
+			PHOTOMETRIC_INTERPRETATION: 262,
+			STRIP_OFFSETS: 273,
+			ORIENTATION: 274,
+			SAMPLES_PER_PIXEL: 277,
+			ROWS_PER_STRIP: 278,
+			STRIP_BYTE_COUNTS: 279,
+			X_RESOLUTION: 282,
+			Y_RESOLUTION: 283,
+			PLANAR_CONFIGURATION: 284,
+			RESOLUTION_UNIT: 296,
+			SOFTWARE: 305,
+			COLOR_MAP: 320,
+			SAMPLE_FORMAT: 339,
+			MODEL_PIXEL_SCALE: 33550,         // [GeoTIFF] TYPE: double   N: 3
+			MODEL_TIEPOINT: 33922,            // [GeoTIFF] TYPE: double   N: 6 * NUM_TIEPOINTS
+			GEO_KEY_DIRECTORY: 34735,         // [GeoTIFF] TYPE: short    N: >= 4
+			GEO_DOUBLE_PARAMS: 34736,         // [GeoTIFF] TYPE: short    N: variable
+			GEO_ASCII_PARAMS: 34737,          // [GeoTIFF] TYPE: ascii    N: variable
+		});
 
-	const typeMapping = new Map([
-		[Type.BYTE, Uint8Array],
-		[Type.ASCII, Uint8Array],
-		[Type.SHORT, Uint16Array],
-		[Type.LONG, Uint32Array],
-		[Type.RATIONAL, Uint32Array],
-		[Type.SBYTE, Int8Array],
-		[Type.UNDEFINED, Uint8Array],
-		[Type.SSHORT, Int16Array],
-		[Type.SLONG, Int32Array],
-		[Type.SRATIONAL, Int32Array],
-		[Type.FLOAT, Float32Array],
-		[Type.DOUBLE, Float64Array],
-	]);
+		const typeMapping = new Map([
+			[Type.BYTE, Uint8Array],
+			[Type.ASCII, Uint8Array],
+			[Type.SHORT, Uint16Array],
+			[Type.LONG, Uint32Array],
+			[Type.RATIONAL, Uint32Array],
+			[Type.SBYTE, Int8Array],
+			[Type.UNDEFINED, Uint8Array],
+			[Type.SSHORT, Int16Array],
+			[Type.SLONG, Int32Array],
+			[Type.SRATIONAL, Int32Array],
+			[Type.FLOAT, Float32Array],
+			[Type.DOUBLE, Float64Array],
+		]);
 
-	class IFDEntry{
+		class IFDEntry {
 
-		constructor(tag, type, count, offset, value){
-			this.tag = tag;
-			this.type = type;
-			this.count = count;
-			this.offset = offset;
-			this.value = value;
-		}
-
-	}
-
-	class Image{
-
-		constructor(){
-			this.width = 0;
-			this.height = 0;
-			this.buffer = null;
-			this.metadata = [];
-		}
-
-	}
-
-	class Reader{
-
-		constructor(){
-
-		}
-
-		static read(data){
-
-			let endiannessTag = String.fromCharCode(...Array.from(data.slice(0, 2)));
-			let endianness = Endianness.fromValue(endiannessTag);
-
-			let tiffCheckTag = data.readUInt8(2);
-
-			if(tiffCheckTag !== 42){
-				throw new Error("not a valid tiff file");
+			constructor(tag, type, count, offset, value) {
+				this.tag = tag;
+				this.type = type;
+				this.count = count;
+				this.offset = offset;
+				this.value = value;
 			}
 
-			let offsetToFirstIFD = data.readUInt32LE(4);
+		}
 
-			console.log("offsetToFirstIFD", offsetToFirstIFD);
+		class Image {
 
-			let ifds = [];
-			let IFDsRead = false;
-			let currentIFDOffset = offsetToFirstIFD;
-			let i = 0;
-			while(IFDsRead || i < 100){
+			constructor() {
+				this.width = 0;
+				this.height = 0;
+				this.buffer = null;
+				this.metadata = [];
+			}
 
-				console.log("currentIFDOffset", currentIFDOffset);
-				let numEntries = data.readUInt16LE(currentIFDOffset);
-				let nextIFDOffset = data.readUInt32LE(currentIFDOffset + 2 + numEntries * 12);
+		}
 
-				console.log("next offset: ", currentIFDOffset + 2 + numEntries * 12);
+		class Reader {
 
-				let entryBuffer = data.slice(currentIFDOffset + 2, currentIFDOffset + 2 + 12 * numEntries);
+			constructor() {
 
-				for(let i = 0; i < numEntries; i++){
-					let tag = Tag.fromValue(entryBuffer.readUInt16LE(i * 12));
-					let type = Type.fromValue(entryBuffer.readUInt16LE(i * 12 + 2));
-					let count = entryBuffer.readUInt32LE(i * 12 + 4);
-					let offsetOrValue = entryBuffer.readUInt32LE(i * 12 + 8);
-					let valueBytes = type.bytes * count;
+			}
 
-					let value;
-					if(valueBytes <= 4){
-						value = offsetOrValue;
-					}else{
-						let valueBuffer = new Uint8Array(valueBytes);
-						valueBuffer.set(data.slice(offsetOrValue, offsetOrValue + valueBytes));
-						
-						let ArrayType = typeMapping.get(type);
+			static read (data) {
 
-						value = new ArrayType(valueBuffer.buffer);
+				let endiannessTag = String.fromCharCode(...Array.from(data.slice(0, 2)));
+				let endianness = Endianness.fromValue(endiannessTag);
 
-						if(type === Type.ASCII){
-							value = String.fromCharCode(...value);
+				let tiffCheckTag = data.readUInt8(2);
+
+				if (tiffCheckTag !== 42) {
+					throw new Error("not a valid tiff file");
+				}
+
+				let offsetToFirstIFD = data.readUInt32LE(4);
+
+				console.log("offsetToFirstIFD", offsetToFirstIFD);
+
+				let ifds = [];
+				let IFDsRead = false;
+				let currentIFDOffset = offsetToFirstIFD;
+				let i = 0;
+				while (IFDsRead || i < 100) {
+
+					console.log("currentIFDOffset", currentIFDOffset);
+					let numEntries = data.readUInt16LE(currentIFDOffset);
+					let nextIFDOffset = data.readUInt32LE(currentIFDOffset + 2 + numEntries * 12);
+
+					console.log("next offset: ", currentIFDOffset + 2 + numEntries * 12);
+
+					let entryBuffer = data.slice(currentIFDOffset + 2, currentIFDOffset + 2 + 12 * numEntries);
+
+					for (let i = 0; i < numEntries; i++) {
+						let tag = Tag.fromValue(entryBuffer.readUInt16LE(i * 12));
+						let type = Type.fromValue(entryBuffer.readUInt16LE(i * 12 + 2));
+						let count = entryBuffer.readUInt32LE(i * 12 + 4);
+						let offsetOrValue = entryBuffer.readUInt32LE(i * 12 + 8);
+						let valueBytes = type.bytes * count;
+
+						let value;
+						if (valueBytes <= 4) {
+							value = offsetOrValue;
+						} else {
+							let valueBuffer = new Uint8Array(valueBytes);
+							valueBuffer.set(data.slice(offsetOrValue, offsetOrValue + valueBytes));
+
+							let ArrayType = typeMapping.get(type);
+
+							value = new ArrayType(valueBuffer.buffer);
+
+							if (type === Type.ASCII) {
+								value = String.fromCharCode(...value);
+							}
+						}
+
+						let ifd = new IFDEntry(tag, type, count, offsetOrValue, value);
+
+						ifds.push(ifd);
+					}
+
+					console.log("nextIFDOffset", nextIFDOffset);
+
+					if (nextIFDOffset === 0) {
+						break;
+					}
+
+					currentIFDOffset = nextIFDOffset;
+					i++;
+				}
+
+				let ifdForTag = (tag) => {
+					for (let entry of ifds) {
+						if (entry.tag === tag) {
+							return entry;
 						}
 					}
 
-					let ifd = new IFDEntry(tag, type, count, offsetOrValue, value);
+					return null;
+				};
 
-					ifds.push(ifd);
+				let width = ifdForTag(Tag.IMAGE_WIDTH, ifds).value;
+				let height = ifdForTag(Tag.IMAGE_HEIGHT, ifds).value;
+				let compression = ifdForTag(Tag.COMPRESSION, ifds).value;
+				let rowsPerStrip = ifdForTag(Tag.ROWS_PER_STRIP, ifds).value;
+				let ifdStripOffsets = ifdForTag(Tag.STRIP_OFFSETS, ifds);
+				let ifdStripByteCounts = ifdForTag(Tag.STRIP_BYTE_COUNTS, ifds);
+
+				let numStrips = Math.ceil(height / rowsPerStrip);
+
+				let stripByteCounts = [];
+				for (let i = 0; i < ifdStripByteCounts.count; i++) {
+					let type = ifdStripByteCounts.type;
+					let offset = ifdStripByteCounts.offset + i * type.bytes;
+
+					let value;
+					if (type === Type.SHORT) {
+						value = data.readUInt16LE(offset);
+					} else if (type === Type.LONG) {
+						value = data.readUInt32LE(offset);
+					}
+
+					stripByteCounts.push(value);
 				}
 
-				console.log("nextIFDOffset", nextIFDOffset);
+				let stripOffsets = [];
+				for (let i = 0; i < ifdStripOffsets.count; i++) {
+					let type = ifdStripOffsets.type;
+					let offset = ifdStripOffsets.offset + i * type.bytes;
 
-				if(nextIFDOffset === 0){
-					break;
+					let value;
+					if (type === Type.SHORT) {
+						value = data.readUInt16LE(offset);
+					} else if (type === Type.LONG) {
+						value = data.readUInt32LE(offset);
+					}
+
+					stripOffsets.push(value);
 				}
 
-				currentIFDOffset = nextIFDOffset;
-				i++;
-			}
+				let imageBuffer = new Uint8Array(width * height * 3);
 
-			let ifdForTag = (tag) => {
-				for(let entry of ifds){
-					if(entry.tag === tag){
-						return entry;
+				let linesProcessed = 0;
+				for (let i = 0; i < numStrips; i++) {
+					let stripOffset = stripOffsets[i];
+					let stripBytes = stripByteCounts[i];
+					let stripData = data.slice(stripOffset, stripOffset + stripBytes);
+					let lineBytes = width * 3;
+					for (let y = 0; y < rowsPerStrip; y++) {
+						let line = stripData.slice(y * lineBytes, y * lineBytes + lineBytes);
+						imageBuffer.set(line, linesProcessed * lineBytes);
+
+						if (line.length === lineBytes) {
+							linesProcessed++;
+						} else {
+							break;
+						}
 					}
 				}
 
-				return null;
-			};
+				console.log(`width: ${width}`);
+				console.log(`height: ${height}`);
+				console.log(`numStrips: ${numStrips}`);
+				console.log("stripByteCounts", stripByteCounts.join(", "));
+				console.log("stripOffsets", stripOffsets.join(", "));
 
-			let width = ifdForTag(Tag.IMAGE_WIDTH, ifds).value;
-			let height = ifdForTag(Tag.IMAGE_HEIGHT, ifds).value;
-			let compression = ifdForTag(Tag.COMPRESSION, ifds).value;
-			let rowsPerStrip = ifdForTag(Tag.ROWS_PER_STRIP, ifds).value; 
-			let ifdStripOffsets = ifdForTag(Tag.STRIP_OFFSETS, ifds);
-			let ifdStripByteCounts = ifdForTag(Tag.STRIP_BYTE_COUNTS, ifds);
+				let image = new Image();
+				image.width = width;
+				image.height = height;
+				image.buffer = imageBuffer;
+				image.metadata = ifds;
 
-			let numStrips = Math.ceil(height / rowsPerStrip);
-
-			let stripByteCounts = [];
-			for(let i = 0; i < ifdStripByteCounts.count; i++){
-				let type = ifdStripByteCounts.type;
-				let offset = ifdStripByteCounts.offset + i * type.bytes;
-
-				let value;
-				if(type === Type.SHORT){
-					value = data.readUInt16LE(offset);
-				}else if(type === Type.LONG){
-					value = data.readUInt32LE(offset);
-				}
-
-				stripByteCounts.push(value);
+				return image;
 			}
 
-			let stripOffsets = [];
-			for(let i = 0; i < ifdStripOffsets.count; i++){
-				let type = ifdStripOffsets.type;
-				let offset = ifdStripOffsets.offset + i * type.bytes;
+		}
 
-				let value;
-				if(type === Type.SHORT){
-					value = data.readUInt16LE(offset);
-				}else if(type === Type.LONG){
-					value = data.readUInt32LE(offset);
-				}
 
-				stripOffsets.push(value);
+		class Exporter {
+
+			constructor() {
+
 			}
 
-			let imageBuffer = new Uint8Array(width * height * 3);
-			
-			let linesProcessed = 0;
-			for(let i = 0; i < numStrips; i++){
-				let stripOffset = stripOffsets[i];
-				let stripBytes = stripByteCounts[i];
-				let stripData = data.slice(stripOffset, stripOffset + stripBytes);
-				let lineBytes = width * 3;
-				for(let y = 0; y < rowsPerStrip; y++){
-					let line = stripData.slice(y * lineBytes, y * lineBytes + lineBytes);
-					imageBuffer.set(line, linesProcessed * lineBytes);
-			
-					if(line.length === lineBytes){
-						linesProcessed++;
-					}else{
-						break;
+			static toTiffBuffer (image, params = {}) {
+
+				let offsetToFirstIFD = 8;
+
+				let headerBuffer = new Uint8Array([0x49, 0x49, 42, 0, offsetToFirstIFD, 0, 0, 0]);
+
+				let [width, height] = [image.width, image.height];
+
+				let ifds = [
+					new IFDEntry(Tag.IMAGE_WIDTH, Type.SHORT, 1, null, width),
+					new IFDEntry(Tag.IMAGE_HEIGHT, Type.SHORT, 1, null, height),
+					new IFDEntry(Tag.BITS_PER_SAMPLE, Type.SHORT, 4, null, new Uint16Array([8, 8, 8, 8])),
+					new IFDEntry(Tag.COMPRESSION, Type.SHORT, 1, null, 1),
+					new IFDEntry(Tag.PHOTOMETRIC_INTERPRETATION, Type.SHORT, 1, null, 2),
+					new IFDEntry(Tag.ORIENTATION, Type.SHORT, 1, null, 1),
+					new IFDEntry(Tag.SAMPLES_PER_PIXEL, Type.SHORT, 1, null, 4),
+					new IFDEntry(Tag.ROWS_PER_STRIP, Type.LONG, 1, null, height),
+					new IFDEntry(Tag.STRIP_BYTE_COUNTS, Type.LONG, 1, null, width * height * 3),
+					new IFDEntry(Tag.PLANAR_CONFIGURATION, Type.SHORT, 1, null, 1),
+					new IFDEntry(Tag.RESOLUTION_UNIT, Type.SHORT, 1, null, 1),
+					new IFDEntry(Tag.SOFTWARE, Type.ASCII, 6, null, "......"),
+					new IFDEntry(Tag.STRIP_OFFSETS, Type.LONG, 1, null, null),
+					new IFDEntry(Tag.X_RESOLUTION, Type.RATIONAL, 1, null, new Uint32Array([1, 1])),
+					new IFDEntry(Tag.Y_RESOLUTION, Type.RATIONAL, 1, null, new Uint32Array([1, 1])),
+				];
+
+				if (params.ifdEntries) {
+					ifds.push(...params.ifdEntries);
+				}
+
+				let valueOffset = offsetToFirstIFD + 2 + ifds.length * 12 + 4;
+
+				// create 12 byte buffer for each ifd and variable length buffers for ifd values
+				let ifdEntryBuffers = new Map();
+				let ifdValueBuffers = new Map();
+				for (let ifd of ifds) {
+					let entryBuffer = new ArrayBuffer(12);
+					let entryView = new DataView(entryBuffer);
+
+					let valueBytes = ifd.type.bytes * ifd.count;
+
+					entryView.setUint16(0, ifd.tag.value, true);
+					entryView.setUint16(2, ifd.type.value, true);
+					entryView.setUint32(4, ifd.count, true);
+
+					if (ifd.count === 1 && ifd.type.bytes <= 4) {
+						entryView.setUint32(8, ifd.value, true);
+					} else {
+						entryView.setUint32(8, valueOffset, true);
+
+						let valueBuffer = new Uint8Array(ifd.count * ifd.type.bytes);
+						if (ifd.type === Type.ASCII) {
+							valueBuffer.set(new Uint8Array(ifd.value.split("").map(c => c.charCodeAt(0))));
+						} else {
+							valueBuffer.set(new Uint8Array(ifd.value.buffer));
+						}
+						ifdValueBuffers.set(ifd.tag, valueBuffer);
+
+						valueOffset = valueOffset + valueBuffer.byteLength;
 					}
+
+					ifdEntryBuffers.set(ifd.tag, entryBuffer);
 				}
-			}
 
-			console.log(`width: ${width}`);
-			console.log(`height: ${height}`);
-			console.log(`numStrips: ${numStrips}`);
-			console.log("stripByteCounts", stripByteCounts.join(", "));
-			console.log("stripOffsets", stripOffsets.join(", "));
+				let imageBufferOffset = valueOffset;
 
-			let image = new Image();
-			image.width = width;
-			image.height = height;
-			image.buffer = imageBuffer;
-			image.metadata = ifds;
+				new DataView(ifdEntryBuffers.get(Tag.STRIP_OFFSETS)).setUint32(8, imageBufferOffset, true);
 
-			return image;
-		}
+				let concatBuffers = (buffers) => {
 
-	}
+					let totalLength = buffers.reduce((sum, buffer) => (sum + buffer.byteLength), 0);
+					let merged = new Uint8Array(totalLength);
 
-
-	class Exporter{
-
-		constructor(){
-
-		}
-
-		static toTiffBuffer(image, params = {}){
-
-			let offsetToFirstIFD = 8;
-			
-			let headerBuffer = new Uint8Array([0x49, 0x49, 42, 0, offsetToFirstIFD, 0, 0, 0]);
-
-			let [width, height] = [image.width, image.height];
-
-			let ifds = [
-				new IFDEntry(Tag.IMAGE_WIDTH,                Type.SHORT,    1,   null, width),
-				new IFDEntry(Tag.IMAGE_HEIGHT,               Type.SHORT,    1,   null, height),
-				new IFDEntry(Tag.BITS_PER_SAMPLE,            Type.SHORT,    4,   null, new Uint16Array([8, 8, 8, 8])),
-				new IFDEntry(Tag.COMPRESSION,                Type.SHORT,    1,   null, 1),
-				new IFDEntry(Tag.PHOTOMETRIC_INTERPRETATION, Type.SHORT,    1,   null, 2),
-				new IFDEntry(Tag.ORIENTATION,                Type.SHORT,    1,   null, 1),
-				new IFDEntry(Tag.SAMPLES_PER_PIXEL,          Type.SHORT,    1,   null, 4),
-				new IFDEntry(Tag.ROWS_PER_STRIP,             Type.LONG,     1,   null, height),
-				new IFDEntry(Tag.STRIP_BYTE_COUNTS,          Type.LONG,     1,   null, width * height * 3),
-				new IFDEntry(Tag.PLANAR_CONFIGURATION,       Type.SHORT,    1,   null, 1),
-				new IFDEntry(Tag.RESOLUTION_UNIT,            Type.SHORT,    1,   null, 1),
-				new IFDEntry(Tag.SOFTWARE,                   Type.ASCII,    6,   null, "......"),
-				new IFDEntry(Tag.STRIP_OFFSETS,              Type.LONG,     1,   null, null),
-				new IFDEntry(Tag.X_RESOLUTION,               Type.RATIONAL, 1,   null, new Uint32Array([1, 1])),
-				new IFDEntry(Tag.Y_RESOLUTION,               Type.RATIONAL, 1,   null, new Uint32Array([1, 1])),
-			];
-
-			if(params.ifdEntries){
-				ifds.push(...params.ifdEntries);
-			}
-
-			let valueOffset = offsetToFirstIFD + 2 + ifds.length * 12 + 4;
-
-			// create 12 byte buffer for each ifd and variable length buffers for ifd values
-			let ifdEntryBuffers = new Map();
-			let ifdValueBuffers = new Map();
-			for(let ifd of ifds){
-				let entryBuffer = new ArrayBuffer(12);
-				let entryView = new DataView(entryBuffer);
-
-				let valueBytes = ifd.type.bytes * ifd.count;
-
-				entryView.setUint16(0, ifd.tag.value, true);
-				entryView.setUint16(2, ifd.type.value, true);
-				entryView.setUint32(4, ifd.count, true);
-
-				if(ifd.count === 1 && ifd.type.bytes <= 4){
-					entryView.setUint32(8, ifd.value, true);
-				}else{
-					entryView.setUint32(8, valueOffset, true);
-
-					let valueBuffer = new Uint8Array(ifd.count * ifd.type.bytes);
-					if(ifd.type === Type.ASCII){
-						valueBuffer.set(new Uint8Array(ifd.value.split("").map(c => c.charCodeAt(0))));
-					}else{
-						valueBuffer.set(new Uint8Array(ifd.value.buffer));
+					let offset = 0;
+					for (let buffer of buffers) {
+						merged.set(new Uint8Array(buffer), offset);
+						offset += buffer.byteLength;
 					}
-					ifdValueBuffers.set(ifd.tag, valueBuffer);
 
-					valueOffset = valueOffset + valueBuffer.byteLength;
-				}
+					return merged;
+				};
 
-				ifdEntryBuffers.set(ifd.tag, entryBuffer);
+				let ifdBuffer = concatBuffers([
+					new Uint16Array([ifds.length]),
+					...ifdEntryBuffers.values(),
+					new Uint32Array([0])]);
+				let ifdValueBuffer = concatBuffers([...ifdValueBuffers.values()]);
+
+				let tiffBuffer = concatBuffers([
+					headerBuffer,
+					ifdBuffer,
+					ifdValueBuffer,
+					image.buffer
+				]);
+
+				return { width: width, height: height, buffer: tiffBuffer };
 			}
 
-			let imageBufferOffset = valueOffset;
-
-			new DataView(ifdEntryBuffers.get(Tag.STRIP_OFFSETS)).setUint32(8, imageBufferOffset, true);
-
-			let concatBuffers = (buffers) => {
-
-				let totalLength = buffers.reduce( (sum, buffer) => (sum + buffer.byteLength), 0);
-				let merged = new Uint8Array(totalLength);
-
-				let offset = 0;
-				for(let buffer of buffers){
-					merged.set(new Uint8Array(buffer), offset);
-					offset += buffer.byteLength;
-				}
-
-				return merged;
-			};
-			
-			let ifdBuffer = concatBuffers([
-				new Uint16Array([ifds.length]), 
-				...ifdEntryBuffers.values(), 
-				new Uint32Array([0])]);
-			let ifdValueBuffer = concatBuffers([...ifdValueBuffers.values()]);
-
-			let tiffBuffer = concatBuffers([
-				headerBuffer,
-				ifdBuffer,
-				ifdValueBuffer,
-				image.buffer
-			]);
-
-			return {width: width, height: height, buffer: tiffBuffer};
 		}
 
-	}
+		exports.Tag = Tag;
+		exports.Type = Type;
+		exports.IFDEntry = IFDEntry;
+		exports.Image = Image;
+		exports.Reader = Reader;
+		exports.Exporter = Exporter;
 
-	exports.Tag = Tag;
-	exports.Type = Type;
-	exports.IFDEntry = IFDEntry;
-	exports.Image = Image;
-	exports.Reader = Reader;
-	exports.Exporter = Exporter;
-
-	return exports;
+		return exports;
 
 	}({}));
 
-	class MeasuringTool extends EventDispatcher{
-		constructor (viewer) {
+	class MeasuringTool extends EventDispatcher {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -12557,11 +12569,11 @@ void main() {
 
 			this.viewer.inputHandler.registerInteractiveScene(this.scene);
 
-			this.onRemove = (e) => { this.scene.remove(e.measurement);};
-			this.onAdd = e => {this.scene.add(e.measurement);};
+			this.onRemove = (e) => { this.scene.remove(e.measurement); };
+			this.onAdd = e => { this.scene.add(e.measurement); };
 
-			for(let measurement of viewer.scene.measurements){
-				this.onAdd({measurement: measurement});
+			for (let measurement of viewer.scene.measurements) {
+				this.onAdd({ measurement: measurement });
 			}
 
 			viewer.addEventListener("update", this.update.bind(this));
@@ -12572,8 +12584,8 @@ void main() {
 			viewer.scene.addEventListener('measurement_removed', this.onRemove);
 		}
 
-		onSceneChange(e){
-			if(e.oldScene){
+		onSceneChange (e) {
+			if (e.oldScene) {
 				e.oldScene.removeEventListener('measurement_added', this.onAdd);
 				e.oldScene.removeEventListener('measurement_removed', this.onRemove);
 			}
@@ -12644,8 +12656,8 @@ void main() {
 
 			return measure;
 		}
-		
-		update(){
+
+		update () {
 			let camera = this.viewer.scene.getActiveCamera();
 			let domElement = this.renderer.domElement;
 			let measurements = this.viewer.scene.measurements;
@@ -12661,7 +12673,7 @@ void main() {
 				measure.update();
 
 				// spheres
-				for(let sphere of measure.spheres){			
+				for (let sphere of measure.spheres) {
 					let distance = camera.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3()));
 					let pr = Utils.projectedRadius(1, camera, distance, clientWidth, clientHeight);
 					let scale = (15 / pr);
@@ -12670,7 +12682,7 @@ void main() {
 
 				// labels
 				let labels = measure.edgeLabels.concat(measure.angleLabels);
-				for(let label of labels){
+				for (let label of labels) {
 					let distance = camera.position.distanceTo(label.getWorldPosition(new THREE.Vector3()));
 					let pr = Utils.projectedRadius(1, camera, distance, clientWidth, clientHeight);
 					let scale = (70 / pr);
@@ -12691,12 +12703,12 @@ void main() {
 					screenPos.z = 0;
 					screenPos.y -= 30;
 
-					let labelPos = new THREE.Vector3( 
-						(screenPos.x / clientWidth) * 2 - 1, 
-						-(screenPos.y / clientHeight) * 2 + 1, 
-						0.5 );
+					let labelPos = new THREE.Vector3(
+						(screenPos.x / clientWidth) * 2 - 1,
+						-(screenPos.y / clientHeight) * 2 + 1,
+						0.5);
 					labelPos.unproject(camera);
-					if(this.viewer.scene.cameraMode == CameraMode.PERSPECTIVE) {
+					if (this.viewer.scene.cameraMode == CameraMode.PERSPECTIVE) {
 						let direction = labelPos.sub(camera.position).normalize();
 						labelPos = new THREE.Vector3().addVectors(
 							camera.position, direction.multiplyScalar(distance));
@@ -12764,14 +12776,14 @@ void main() {
 			}
 		}
 
-		render(){
+		render () {
 			this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
 		}
 	}
 
-	class Message{
+	class Message {
 
-		constructor(content){
+		constructor(content) {
 			this.content = content;
 
 			let closeIcon = `${exports.resourcePath}/icons/close.svg`;
@@ -12786,28 +12798,28 @@ void main() {
 
 			this.elContainer = this.element.find("span[name=content_container]");
 
-			if(typeof content === "string"){
+			if (typeof content === "string") {
 				this.elContainer.append($(`<span>${content}</span>`));
-			}else{
+			} else {
 				this.elContainer.append(content);
 			}
 
 		}
 
-		setMessage(content){
+		setMessage (content) {
 			this.elContainer.empty();
-			if(typeof content === "string"){
+			if (typeof content === "string") {
 				this.elContainer.append($(`<span>${content}</span>`));
-			}else{
+			} else {
 				this.elContainer.append(content);
 			}
 		}
 
 	}
 
-	class PointCloudSM{
+	class PointCloudSM {
 
-		constructor(potreeRenderer){
+		constructor(potreeRenderer) {
 
 			this.potreeRenderer = potreeRenderer;
 			this.threeRenderer = this.potreeRenderer.threeRenderer;
@@ -12833,7 +12845,7 @@ void main() {
 			this.threeRenderer.clearTarget(this.target, true, true, true);
 		}
 
-		setLight(light){
+		setLight (light) {
 			this.light = light;
 
 			let fov = (180 * light.angle) / Math.PI;
@@ -12853,17 +12865,17 @@ void main() {
 			this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
 		}
 
-		setSize(width, height){
-			if(this.target.width !== width || this.target.height !== height){
+		setSize (width, height) {
+			if (this.target.width !== width || this.target.height !== height) {
 				this.target.dispose();
 			}
 			this.target.setSize(width, height);
 		}
 
-		render(scene, camera){
+		render (scene, camera) {
 			//this.threeRenderer.setClearColor(0x00ff00, 1);
 
-			this.threeRenderer.clearTarget( this.target, true, true, true );
+			this.threeRenderer.clearTarget(this.target, true, true, true);
 			this.potreeRenderer.render(scene, this.camera, this.target, {});
 		}
 
@@ -12871,7 +12883,7 @@ void main() {
 	}
 
 	class ProfileTool extends EventDispatcher {
-		constructor (viewer) {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -12893,8 +12905,8 @@ void main() {
 			this.onRemove = e => this.scene.remove(e.profile);
 			this.onAdd = e => this.scene.add(e.profile);
 
-			for(let profile of viewer.scene.profiles){
-				this.onAdd({profile: profile});
+			for (let profile of viewer.scene.profiles) {
+				this.onAdd({ profile: profile });
 			}
 
 			viewer.addEventListener("update", this.update.bind(this));
@@ -12905,8 +12917,8 @@ void main() {
 			viewer.scene.addEventListener('profile_removed', this.onRemove);
 		}
 
-		onSceneChange(e){
-			if(e.oldScene){
+		onSceneChange (e) {
+			if (e.oldScene) {
 				e.oldScene.removeEventListeners('profile_added', this.onAdd);
 				e.oldScene.removeEventListeners('profile_removed', this.onRemove);
 			}
@@ -12933,8 +12945,8 @@ void main() {
 			};
 
 			let insertionCallback = (e) => {
-				if(e.button === THREE.MOUSE.LEFT){
-					if(profile.points.length <= 1){
+				if (e.button === THREE.MOUSE.LEFT) {
+					if (profile.points.length <= 1) {
 						let camera = this.viewer.scene.getActiveCamera();
 						let distance = camera.position.distanceTo(profile.points[0]);
 						let clientSize = this.viewer.renderer.getSize();
@@ -12970,8 +12982,8 @@ void main() {
 
 			return profile;
 		}
-		
-		update(){
+
+		update () {
 			let camera = this.viewer.scene.getActiveCamera();
 			let profiles = this.viewer.scene.profiles;
 			let clientWidth = this.renderer.getSize().width;
@@ -12980,8 +12992,8 @@ void main() {
 			this.light.position.copy(camera.position);
 
 			// make size independant of distance
-			for(let profile of profiles){
-				for(let sphere of profile.spheres){				
+			for (let profile of profiles) {
+				for (let sphere of profile.spheres) {
 					let distance = camera.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3()));
 					let pr = Utils.projectedRadius(1, camera, distance, clientWidth, clientHeight);
 					let scale = (15 / pr);
@@ -12990,15 +13002,15 @@ void main() {
 			}
 		}
 
-		render(){
+		render () {
 			this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
 		}
 
 	}
 
-	class ScreenBoxSelectTool extends EventDispatcher{
+	class ScreenBoxSelectTool extends EventDispatcher {
 
-		constructor(viewer){
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -13009,11 +13021,11 @@ void main() {
 			viewer.addEventListener("scene_changed", this.onSceneChange.bind(this));
 		}
 
-		onSceneChange(scene){
+		onSceneChange (scene) {
 			console.log("scene changed");
 		}
 
-		startInsertion(){
+		startInsertion () {
 			let domElement = this.viewer.renderer.domElement;
 
 			let volume = new BoxVolume();
@@ -13030,7 +13042,7 @@ void main() {
 			selectionBox.css("right", "10px");
 			selectionBox.css("bottom", "10px");
 
-			let drag = e =>{
+			let drag = e => {
 
 				volume.visible = true;
 
@@ -13051,7 +13063,7 @@ void main() {
 					e.viewer.renderer.getSize().width,
 					e.viewer.renderer.getSize().height);
 				let frustumSize = new THREE.Vector2(
-					camera.right - camera.left, 
+					camera.right - camera.left,
 					camera.top - camera.bottom);
 
 				let screenCentroid = new THREE.Vector2().addVectors(e.drag.end, e.drag.start).multiplyScalar(0.5);
@@ -13059,7 +13071,7 @@ void main() {
 
 				let diff = new THREE.Vector2().subVectors(e.drag.end, e.drag.start);
 				diff.divide(size).multiply(frustumSize);
-				
+
 				volume.position.copy(ray.origin);
 				volume.up.copy(camera.up);
 				volume.rotation.copy(camera.rotation);
@@ -13092,14 +13104,14 @@ void main() {
 				let allPointsFar = [];
 
 				// TODO support more than one point cloud
-				for(let pointcloud of this.viewer.scene.pointclouds){
+				for (let pointcloud of this.viewer.scene.pointclouds) {
 
-					if(!pointcloud.visible){
+					if (!pointcloud.visible) {
 						continue;
 					}
 
 					let volCam = camera.clone();
-					volCam.left = -volume.scale.x / 2; 
+					volCam.left = -volume.scale.x / 2;
 					volCam.right = +volume.scale.x / 2;
 					volCam.top = +volume.scale.y / 2;
 					volCam.bottom = -volume.scale.y / 2;
@@ -13119,13 +13131,14 @@ void main() {
 						ray.direction.clone().multiplyScalar(-1));
 
 					let pickerSettings = {
-						width: 8, 
-						height: 8, 
-						pickWindowSize: 8, 
+						width: 8,
+						height: 8,
+						pickWindowSize: 8,
 						all: true,
 						pickClipped: true,
 						pointSizeType: PointSizeType.FIXED,
-						pointSize: 1};
+						pointSize: 1
+					};
 					let pointsNear = pointcloud.pick(viewer, volCam, ray, pickerSettings);
 
 					volCam.rotateX(Math.PI);
@@ -13139,14 +13152,14 @@ void main() {
 					allPointsFar.push(...pointsFar);
 				}
 
-				if(allPointsNear.length > 0 && allPointsFar.length > 0){
+				if (allPointsNear.length > 0 && allPointsFar.length > 0) {
 					let viewLine = new THREE.Line3(ray.origin, new THREE.Vector3().addVectors(ray.origin, ray.direction));
 
 					let closestOnLine = allPointsNear.map(p => viewLine.closestPointToPoint(p.position, false, new THREE.Vector3()));
-					let closest = closestOnLine.sort( (a, b) => ray.origin.distanceTo(a) - ray.origin.distanceTo(b))[0];
+					let closest = closestOnLine.sort((a, b) => ray.origin.distanceTo(a) - ray.origin.distanceTo(b))[0];
 
 					let farthestOnLine = allPointsFar.map(p => viewLine.closestPointToPoint(p.position, false, new THREE.Vector3()));
-					let farthest = farthestOnLine.sort( (a, b) => ray.origin.distanceTo(b) - ray.origin.distanceTo(a))[0];
+					let farthest = farthestOnLine.sort((a, b) => ray.origin.distanceTo(b) - ray.origin.distanceTo(a))[0];
 
 					let distance = closest.distanceTo(farthest);
 					let centroid = new THREE.Vector3().addVectors(closest, farthest).multiplyScalar(0.5);
@@ -13165,19 +13178,19 @@ void main() {
 			return volume;
 		}
 
-		update(e){
+		update (e) {
 			//console.log(e.delta)
 		}
 
-		render(){
+		render () {
 			this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
 		}
 
 	}
 
-	class SpotLightHelper extends THREE.Object3D{
+	class SpotLightHelper extends THREE.Object3D {
 
-		constructor(light, color){
+		constructor(light, color) {
 			super();
 
 			this.light = light;
@@ -13196,20 +13209,20 @@ void main() {
 			}
 
 			{ // LINES
-				
+
 
 				let positions = new Float32Array([
-					+0, +0, +0,     +0, +0, +1,
+					+0, +0, +0, +0, +0, +1,
 
-					+0, +0, +0,     -1, -1, +1,
-					+0, +0, +0,     +1, -1, +1,
-					+0, +0, +0,     +1, +1, +1,
-					+0, +0, +0,     -1, +1, +1,
+					+0, +0, +0, -1, -1, +1,
+					+0, +0, +0, +1, -1, +1,
+					+0, +0, +0, +1, +1, +1,
+					+0, +0, +0, -1, +1, +1,
 
-					-1, -1, +1,     +1, -1, +1,
-					+1, -1, +1,     +1, +1, +1,
-					+1, +1, +1,     -1, +1, +1,
-					-1, +1, +1,     -1, -1, +1,
+					-1, -1, +1, +1, -1, +1,
+					+1, -1, +1, +1, +1, +1,
+					+1, +1, +1, -1, +1, +1,
+					-1, +1, +1, -1, -1, +1,
 				]);
 
 				let geometry = new THREE.BufferGeometry();
@@ -13225,7 +13238,7 @@ void main() {
 			this.update();
 		}
 
-		update(){
+		update () {
 
 			this.light.updateMatrix();
 			this.light.updateMatrixWorld();
@@ -13236,9 +13249,9 @@ void main() {
 			//	new THREE.Vector3().subVectors(light.position, this.light.getWorldDirection(new THREE.Vector3())));
 			let target = new THREE.Vector3().addVectors(
 				light.position, this.light.getWorldDirection(new THREE.Vector3()).multiplyScalar(-1));
-			
+
 			let quat = new THREE.Quaternion().setFromRotationMatrix(
-				new THREE.Matrix4().lookAt( position, target, new THREE.Vector3( 0, 0, 1 ) )
+				new THREE.Matrix4().lookAt(position, target, new THREE.Vector3(0, 0, 1))
 			);
 
 			this.setRotationFromQuaternion(quat);
@@ -13246,10 +13259,10 @@ void main() {
 
 
 			let coneLength = (this.light.distance > 0) ? this.light.distance : 1000;
-			let coneWidth = coneLength * Math.tan( this.light.angle * 0.5 );
+			let coneWidth = coneLength * Math.tan(this.light.angle * 0.5);
 
 			this.frustum.scale.set(coneWidth, coneWidth, coneLength);
-			
+
 
 
 			//{
@@ -13274,9 +13287,9 @@ void main() {
 
 	}
 
-	function toInterleavedBufferAttribute(pointAttribute){
+	function toInterleavedBufferAttribute (pointAttribute) {
 		let att = null;
-		
+
 		if (pointAttribute.name === PointAttribute.POSITION_CARTESIAN.name) {
 			att = new Potree.InterleavedBufferAttribute("position", 12, 3, "FLOAT", false);
 		} else if (pointAttribute.name === PointAttribute.COLOR_PACKED.name) {
@@ -13298,7 +13311,7 @@ void main() {
 		} else if (pointAttribute.name === PointAttribute.NORMAL.name) {
 			att = new Potree.InterleavedBufferAttribute("normal", 12, 3, "FLOAT", false);
 		}
-		
+
 		return att;
 	}
 
@@ -13315,13 +13328,13 @@ void main() {
 
 			this.viewer.inputHandler.registerInteractiveScene(this.scene);
 			this.viewer.inputHandler.addEventListener('selection_changed', (e) => {
-				for(let selected of this.selection){
+				for (let selected of this.selection) {
 					this.viewer.inputHandler.blacklist.delete(selected);
 				}
 
 				this.selection = e.selection;
 
-				for(let selected of this.selection){
+				for (let selected of this.selection) {
 					this.viewer.inputHandler.blacklist.add(selected);
 				}
 
@@ -13330,33 +13343,33 @@ void main() {
 			let red = 0xE73100;
 			let green = 0x44A24A;
 			let blue = 0x2669E7;
-			
+
 			this.activeHandle = null;
 			this.scaleHandles = {
-				"scale.x+": {name: "scale.x+", node: new THREE.Object3D(), color: red, alignment: [+1, +0, +0]},
-				"scale.x-": {name: "scale.x-", node: new THREE.Object3D(), color: red, alignment: [-1, +0, +0]},
-				"scale.y+": {name: "scale.y+", node: new THREE.Object3D(), color: green, alignment: [+0, +1, +0]},
-				"scale.y-": {name: "scale.y-", node: new THREE.Object3D(), color: green, alignment: [+0, -1, +0]},
-				"scale.z+": {name: "scale.z+", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, +1]},
-				"scale.z-": {name: "scale.z-", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, -1]},
+				"scale.x+": { name: "scale.x+", node: new THREE.Object3D(), color: red, alignment: [+1, +0, +0] },
+				"scale.x-": { name: "scale.x-", node: new THREE.Object3D(), color: red, alignment: [-1, +0, +0] },
+				"scale.y+": { name: "scale.y+", node: new THREE.Object3D(), color: green, alignment: [+0, +1, +0] },
+				"scale.y-": { name: "scale.y-", node: new THREE.Object3D(), color: green, alignment: [+0, -1, +0] },
+				"scale.z+": { name: "scale.z+", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, +1] },
+				"scale.z-": { name: "scale.z-", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, -1] },
 			};
 			this.focusHandles = {
-				"focus.x+": {name: "focus.x+", node:  new THREE.Object3D(), color: red, alignment: [+1, +0, +0]},
-				"focus.x-": {name: "focus.x-", node:  new THREE.Object3D(), color: red, alignment: [-1, +0, +0]},
-				"focus.y+": {name: "focus.y+", node:  new THREE.Object3D(), color: green, alignment: [+0, +1, +0]},
-				"focus.y-": {name: "focus.y-", node:  new THREE.Object3D(), color: green, alignment: [+0, -1, +0]},
-				"focus.z+": {name: "focus.z+", node:  new THREE.Object3D(), color: blue, alignment: [+0, +0, +1]},
-				"focus.z-": {name: "focus.z-", node:  new THREE.Object3D(), color: blue, alignment: [+0, +0, -1]},
+				"focus.x+": { name: "focus.x+", node: new THREE.Object3D(), color: red, alignment: [+1, +0, +0] },
+				"focus.x-": { name: "focus.x-", node: new THREE.Object3D(), color: red, alignment: [-1, +0, +0] },
+				"focus.y+": { name: "focus.y+", node: new THREE.Object3D(), color: green, alignment: [+0, +1, +0] },
+				"focus.y-": { name: "focus.y-", node: new THREE.Object3D(), color: green, alignment: [+0, -1, +0] },
+				"focus.z+": { name: "focus.z+", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, +1] },
+				"focus.z-": { name: "focus.z-", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, -1] },
 			};
 			this.translationHandles = {
-				"translation.x": {name: "translation.x", node:  new THREE.Object3D(), color: red, alignment: [1, 0, 0]},
-				"translation.y": {name: "translation.y", node:  new THREE.Object3D(), color: green, alignment: [0, 1, 0]},
-				"translation.z": {name: "translation.z", node:  new THREE.Object3D(), color: blue, alignment: [0, 0, 1]},
+				"translation.x": { name: "translation.x", node: new THREE.Object3D(), color: red, alignment: [1, 0, 0] },
+				"translation.y": { name: "translation.y", node: new THREE.Object3D(), color: green, alignment: [0, 1, 0] },
+				"translation.z": { name: "translation.z", node: new THREE.Object3D(), color: blue, alignment: [0, 0, 1] },
 			};
 			this.rotationHandles = {
-				"rotation.x": {name: "rotation.x", node:  new THREE.Object3D(), color: red, alignment: [1, 0, 0]},
-				"rotation.y": {name: "rotation.y", node:  new THREE.Object3D(), color: green, alignment: [0, 1, 0]},
-				"rotation.z": {name: "rotation.z", node:  new THREE.Object3D(), color: blue, alignment: [0, 0, 1]},
+				"rotation.x": { name: "rotation.x", node: new THREE.Object3D(), color: red, alignment: [1, 0, 0] },
+				"rotation.y": { name: "rotation.y", node: new THREE.Object3D(), color: green, alignment: [0, 1, 0] },
+				"rotation.z": { name: "rotation.z", node: new THREE.Object3D(), color: blue, alignment: [0, 0, 1] },
 			};
 			this.handles = Object.assign({}, this.scaleHandles, this.focusHandles, this.translationHandles, this.rotationHandles);
 			this.pickVolumes = [];
@@ -13397,17 +13410,17 @@ void main() {
 				boxFrameGeometry.vertices.push(new THREE.Vector3(-0.5, -0.5, -0.5));
 				boxFrameGeometry.vertices.push(new THREE.Vector3(-0.5, 0.5, -0.5));
 			}
-			this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({color: 0xffff00}));
+			this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({ color: 0xffff00 }));
 			this.scene.add(this.frame);
 
-			
+
 		}
 
-		initializeScaleHandles(){
+		initializeScaleHandles () {
 			let sgSphere = new THREE.SphereGeometry(1, 32, 32);
 			let sgLowPolySphere = new THREE.SphereGeometry(1, 16, 16);
 
-			for(let handleName of Object.keys(this.scaleHandles)){
+			for (let handleName of Object.keys(this.scaleHandles)) {
 				let handle = this.scaleHandles[handleName];
 				let node = handle.node;
 				this.scene.add(node);
@@ -13417,24 +13430,26 @@ void main() {
 					color: handle.color,
 					opacity: 0.4,
 					transparent: true
-					});
+				});
 
 				let outlineMaterial = new THREE.MeshBasicMaterial({
-					color: 0x000000, 
+					color: 0x000000,
 					side: THREE.BackSide,
 					opacity: 0.4,
-					transparent: true});
+					transparent: true
+				});
 
 				let pickMaterial = new THREE.MeshNormalMaterial({
 					opacity: 0.2,
 					transparent: true,
-					visible: this.showPickVolumes});
+					visible: this.showPickVolumes
+				});
 
 				let sphere = new THREE.Mesh(sgSphere, material);
 				sphere.scale.set(1.3, 1.3, 1.3);
 				sphere.name = `${handleName}.handle`;
 				node.add(sphere);
-				
+
 				let outline = new THREE.Mesh(sgSphere, outlineMaterial);
 				outline.scale.set(1.4, 1.4, 1.4);
 				outline.name = `${handleName}.outline`;
@@ -13448,8 +13463,8 @@ void main() {
 				this.pickVolumes.push(pickSphere);
 
 				node.setOpacity = (target) => {
-					let opacity = {x: material.opacity};
-					let t = new TWEEN.Tween(opacity).to({x: target}, 100);
+					let opacity = { x: material.opacity };
+					let t = new TWEEN.Tween(opacity).to({ x: target }, 100);
 					t.onUpdate(() => {
 						sphere.visible = opacity.x > 0;
 						pickSphere.visible = opacity.x > 0;
@@ -13477,14 +13492,14 @@ void main() {
 			}
 		}
 
-		initializeFocusHandles(){
+		initializeFocusHandles () {
 			//let sgBox = new THREE.BoxGeometry(1, 1, 1);
 			let sgPlane = new THREE.PlaneGeometry(4, 4, 1, 1);
 			let sgLowPolySphere = new THREE.SphereGeometry(1, 16, 16);
 
 			let texture = new THREE.TextureLoader().load(`${exports.resourcePath}/icons/eye_2.png`);
 
-			for(let handleName of Object.keys(this.focusHandles)){
+			for (let handleName of Object.keys(this.focusHandles)) {
 				let handle = this.focusHandles[handleName];
 				let node = handle.node;
 				this.scene.add(node);
@@ -13494,21 +13509,21 @@ void main() {
 				node.lookAt(new THREE.Vector3(...align));
 
 				let off = 0.8;
-				if(align[0] === 1){
+				if (align[0] === 1) {
 					node.position.set(1, off, -off).multiplyScalar(0.5);
 					node.rotation.z = Math.PI / 2;
-				}else if(align[0] === -1){
+				} else if (align[0] === -1) {
 					node.position.set(-1, -off, -off).multiplyScalar(0.5);
 					node.rotation.z = Math.PI / 2;
-				}else if(align[1] === 1){
+				} else if (align[1] === 1) {
 					node.position.set(-off, 1, -off).multiplyScalar(0.5);
 					node.rotation.set(Math.PI / 2, Math.PI, 0.0);
-				}else if(align[1] === -1){
+				} else if (align[1] === -1) {
 					node.position.set(off, -1, -off).multiplyScalar(0.5);
 					node.rotation.set(Math.PI / 2, 0.0, 0.0);
-				}else if(align[2] === 1){
+				} else if (align[2] === 1) {
 					node.position.set(off, off, 1).multiplyScalar(0.5);
-				}else if(align[2] === -1){
+				} else if (align[2] === -1) {
 					node.position.set(-off, off, -1).multiplyScalar(0.5);
 				}
 
@@ -13528,7 +13543,8 @@ void main() {
 				let pickMaterial = new THREE.MeshNormalMaterial({
 					//opacity: 0,
 					transparent: true,
-					visible: this.showPickVolumes});
+					visible: this.showPickVolumes
+				});
 
 				let box = new THREE.Mesh(sgPlane, material);
 				box.name = `${handleName}.handle`;
@@ -13537,7 +13553,7 @@ void main() {
 				box.visible = false;
 				node.add(box);
 				//handle.focusNode = box;
-				
+
 				//let outline = new THREE.Mesh(sgPlane, outlineMaterial);
 				//outline.scale.set(1.4, 1.4, 1.4);
 				//outline.name = `${handleName}.outline`;
@@ -13551,8 +13567,8 @@ void main() {
 				this.pickVolumes.push(pickSphere);
 
 				node.setOpacity = (target) => {
-					let opacity = {x: material.opacity};
-					let t = new TWEEN.Tween(opacity).to({x: target}, 100);
+					let opacity = { x: material.opacity };
+					let t = new TWEEN.Tween(opacity).to({ x: target }, 100);
 					t.onUpdate(() => {
 						pickSphere.visible = opacity.x > 0;
 						box.visible = opacity.x > 0;
@@ -13563,7 +13579,7 @@ void main() {
 					t.start();
 				};
 
-				pickSphere.addEventListener("drag", e => {});
+				pickSphere.addEventListener("drag", e => { });
 
 				pickSphere.addEventListener("mouseup", e => {
 					e.consume();
@@ -13598,10 +13614,10 @@ void main() {
 			}
 		}
 
-		initializeTranslationHandles(){
+		initializeTranslationHandles () {
 			let boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-			for(let handleName of Object.keys(this.translationHandles)){
+			for (let handleName of Object.keys(this.translationHandles)) {
 				let handle = this.handles[handleName];
 				let node = handle.node;
 				this.scene.add(node);
@@ -13609,13 +13625,15 @@ void main() {
 				let material = new THREE.MeshBasicMaterial({
 					color: handle.color,
 					opacity: 0.4,
-					transparent: true});
+					transparent: true
+				});
 
 				let outlineMaterial = new THREE.MeshBasicMaterial({
-					color: 0x000000, 
+					color: 0x000000,
 					side: THREE.BackSide,
 					opacity: 0.4,
-					transparent: true});
+					transparent: true
+				});
 
 				let pickMaterial = new THREE.MeshNormalMaterial({
 					opacity: 0.2,
@@ -13645,8 +13663,8 @@ void main() {
 				this.pickVolumes.push(pickVolume);
 
 				node.setOpacity = (target) => {
-					let opacity = {x: material.opacity};
-					let t = new TWEEN.Tween(opacity).to({x: target}, 100);
+					let opacity = { x: material.opacity };
+					let t = new TWEEN.Tween(opacity).to({ x: target }, 100);
 					t.onUpdate(() => {
 						box.visible = opacity.x > 0;
 						pickVolume.visible = opacity.x > 0;
@@ -13657,18 +13675,18 @@ void main() {
 					t.start();
 				};
 
-				pickVolume.addEventListener("drag", (e) => {this.dragTranslationHandle(e);});
-				pickVolume.addEventListener("drop", (e) => {this.dropTranslationHandle(e);});
+				pickVolume.addEventListener("drag", (e) => { this.dragTranslationHandle(e); });
+				pickVolume.addEventListener("drop", (e) => { this.dropTranslationHandle(e); });
 			}
 		}
 
-		initializeRotationHandles(){
+		initializeRotationHandles () {
 			let adjust = 0.5;
 			let torusGeometry = new THREE.TorusGeometry(1, adjust * 0.015, 8, 64, Math.PI / 2);
 			let outlineGeometry = new THREE.TorusGeometry(1, adjust * 0.04, 8, 64, Math.PI / 2);
 			let pickGeometry = new THREE.TorusGeometry(1, adjust * 0.1, 6, 4, Math.PI / 2);
 
-			for(let handleName of Object.keys(this.rotationHandles)){
+			for (let handleName of Object.keys(this.rotationHandles)) {
 				let handle = this.handles[handleName];
 				let node = handle.node;
 				this.scene.add(node);
@@ -13676,13 +13694,15 @@ void main() {
 				let material = new THREE.MeshBasicMaterial({
 					color: handle.color,
 					opacity: 0.4,
-					transparent: true});
+					transparent: true
+				});
 
 				let outlineMaterial = new THREE.MeshBasicMaterial({
-					color: 0x000000, 
+					color: 0x000000,
 					side: THREE.BackSide,
 					opacity: 0.4,
-					transparent: true});
+					transparent: true
+				});
 
 				let pickMaterial = new THREE.MeshNormalMaterial({
 					opacity: 0.2,
@@ -13711,8 +13731,8 @@ void main() {
 				this.pickVolumes.push(pickVolume);
 
 				node.setOpacity = (target) => {
-					let opacity = {x: material.opacity};
-					let t = new TWEEN.Tween(opacity).to({x: target}, 100);
+					let opacity = { x: material.opacity };
+					let t = new TWEEN.Tween(opacity).to({ x: target }, 100);
 					t.onUpdate(() => {
 						box.visible = opacity.x > 0;
 						pickVolume.visible = opacity.x > 0;
@@ -13728,18 +13748,18 @@ void main() {
 				//	//let a = this.viewer.scene.getActiveCamera().getWorldDirection(new THREE.Vector3()).dot(pickVolume.getWorldDirection(new THREE.Vector3()));
 				//	console.log(pickVolume.getWorldDirection(new THREE.Vector3()));
 				//});
-				
-				pickVolume.addEventListener("drag", (e) => {this.dragRotationHandle(e);});
-				pickVolume.addEventListener("drop", (e) => {this.dropRotationHandle(e);});
+
+				pickVolume.addEventListener("drag", (e) => { this.dragRotationHandle(e); });
+				pickVolume.addEventListener("drop", (e) => { this.dropRotationHandle(e); });
 			}
 		}
 
-		dragRotationHandle(e){
+		dragRotationHandle (e) {
 			let drag = e.drag;
 			let handle = this.activeHandle;
 			let camera = this.viewer.scene.getActiveCamera();
 
-			if(!handle){
+			if (!handle) {
 				return
 			}
 
@@ -13748,7 +13768,7 @@ void main() {
 			n.copy(new THREE.Vector4(...localNormal.toArray(), 0).applyMatrix4(handle.node.matrixWorld));
 			n.normalize();
 
-			if (!drag.intersectionStart){
+			if (!drag.intersectionStart) {
 
 				//this.viewer.scene.scene.remove(this.debug);
 				//this.debug = new THREE.Object3D();
@@ -13765,7 +13785,7 @@ void main() {
 
 				drag.dragPlane = plane;
 				drag.pivot = drag.intersectionStart;
-			}else{
+			} else {
 				handle = drag.handle;
 			}
 
@@ -13774,7 +13794,7 @@ void main() {
 			let mouse = drag.end;
 			let domElement = this.viewer.renderer.domElement;
 			let ray = Utils.mouseToRay(mouse, camera, domElement.clientWidth, domElement.clientHeight);
-			
+
 			let I = ray.intersectPlane(drag.dragPlane, new THREE.Vector3());
 
 			if (I) {
@@ -13805,17 +13825,17 @@ void main() {
 			}
 		}
 
-		dropRotationHandle(e){
+		dropRotationHandle (e) {
 			this.dragging = false;
 			this.setActiveHandle(null);
 		}
 
-		dragTranslationHandle(e){
+		dragTranslationHandle (e) {
 			let drag = e.drag;
 			let handle = this.activeHandle;
 			let camera = this.viewer.scene.getActiveCamera();
-				
-			if(!drag.intersectionStart && handle){
+
+			if (!drag.intersectionStart && handle) {
 				drag.intersectionStart = drag.location;
 				drag.objectStart = drag.object.getWorldPosition(new THREE.Vector3());
 
@@ -13830,7 +13850,7 @@ void main() {
 				let plane = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, drag.intersectionStart);
 				drag.dragPlane = plane;
 				drag.pivot = drag.intersectionStart;
-			}else{
+			} else {
 				handle = drag.handle;
 			}
 
@@ -13860,22 +13880,22 @@ void main() {
 			}
 		}
 
-		dropTranslationHandle(e){
+		dropTranslationHandle (e) {
 			this.dragging = false;
 			this.setActiveHandle(null);
 		}
 
-		dropScaleHandle(e){
+		dropScaleHandle (e) {
 			this.dragging = false;
 			this.setActiveHandle(null);
 		}
 
-		dragScaleHandle(e){
+		dragScaleHandle (e) {
 			let drag = e.drag;
 			let handle = this.activeHandle;
 			let camera = this.viewer.scene.getActiveCamera();
 
-			if(!drag.intersectionStart){
+			if (!drag.intersectionStart) {
 				drag.intersectionStart = drag.location;
 				drag.objectStart = drag.object.getWorldPosition(new THREE.Vector3());
 				drag.handle = handle;
@@ -13893,7 +13913,7 @@ void main() {
 				drag.pivot = drag.intersectionStart;
 
 				//Utils.debugSphere(viewer.scene.scene, drag.pivot, 0.05);
-			}else{
+			} else {
 				handle = drag.handle;
 			}
 
@@ -13907,14 +13927,14 @@ void main() {
 
 				if (I) {
 					let iOnLine = drag.line.closestPointToPoint(I, false, new THREE.Vector3());
-					let direction = handle.alignment.reduce( (a, v) => a + v, 0);
+					let direction = handle.alignment.reduce((a, v) => a + v, 0);
 
-					let toObjectSpace = new THREE.Matrix4().getInverse( this.selection[0].matrixWorld);
+					let toObjectSpace = new THREE.Matrix4().getInverse(this.selection[0].matrixWorld);
 					let iOnLineOS = iOnLine.clone().applyMatrix4(toObjectSpace);
 					let pivotOS = drag.pivot.clone().applyMatrix4(toObjectSpace);
 					let diffOS = new THREE.Vector3().subVectors(iOnLineOS, pivotOS);
 					let dragDirectionOS = diffOS.clone().normalize();
-					if(iOnLine.distanceTo(drag.pivot) === 0){
+					if (iOnLine.distanceTo(drag.pivot) === 0) {
 						dragDirectionOS.set(0, 0, 0);
 					}
 					let dragDirection = dragDirectionOS.dot(new THREE.Vector3(...handle.alignment));
@@ -13945,45 +13965,45 @@ void main() {
 			}
 		}
 
-		setActiveHandle(handle){
-			if(this.dragging){
+		setActiveHandle (handle) {
+			if (this.dragging) {
 				return;
 			}
 
-			if(this.activeHandle === handle){
+			if (this.activeHandle === handle) {
 				return;
 			}
 
 			this.activeHandle = handle;
 
-			if(handle === null){
-				for(let handleName of Object.keys(this.handles)){
+			if (handle === null) {
+				for (let handleName of Object.keys(this.handles)) {
 					let handle = this.handles[handleName];
 					handle.node.setOpacity(0);
 				}
 			}
 
-			for(let handleName of Object.keys(this.focusHandles)){
+			for (let handleName of Object.keys(this.focusHandles)) {
 				let handle = this.focusHandles[handleName];
 
-				if(this.activeHandle === handle){
+				if (this.activeHandle === handle) {
 					handle.node.setOpacity(1.0);
-				}else{
+				} else {
 					handle.node.setOpacity(0.4);
 				}
 			}
 
-			for(let handleName of Object.keys(this.translationHandles)){
+			for (let handleName of Object.keys(this.translationHandles)) {
 				let handle = this.translationHandles[handleName];
 
-				if(this.activeHandle === handle){
+				if (this.activeHandle === handle) {
 					handle.node.setOpacity(1.0);
-				}else{
+				} else {
 					handle.node.setOpacity(0.4);
 				}
 			}
 
-			for(let handleName of Object.keys(this.rotationHandles)){
+			for (let handleName of Object.keys(this.rotationHandles)) {
 				let handle = this.rotationHandles[handleName];
 
 				//if(this.activeHandle === handle){
@@ -13995,17 +14015,17 @@ void main() {
 				handle.node.setOpacity(0.4);
 			}
 
-			for(let handleName of Object.keys(this.scaleHandles)){
+			for (let handleName of Object.keys(this.scaleHandles)) {
 				let handle = this.scaleHandles[handleName];
 
-				if(this.activeHandle === handle){
+				if (this.activeHandle === handle) {
 					handle.node.setOpacity(1.0);
 
 					let relatedFocusHandle = this.focusHandles[handle.name.replace("scale", "focus")];
 					let relatedFocusNode = relatedFocusHandle.node;
 					relatedFocusNode.setOpacity(0.4);
 
-					for(let translationHandleName of Object.keys(this.translationHandles)){
+					for (let translationHandleName of Object.keys(this.translationHandles)) {
 						let translationHandle = this.translationHandles[translationHandleName];
 						translationHandle.node.setOpacity(0.4);
 					}
@@ -14016,25 +14036,25 @@ void main() {
 					//relatedTranslationNode.setOpacity(0.4);
 
 
-				}else{
+				} else {
 					handle.node.setOpacity(0.4);
 				}
 			}
 
-			
 
 
 
-			if(handle){
+
+			if (handle) {
 				handle.node.setOpacity(1.0);
 			}
 
-			
+
 		}
 
 		update () {
 
-			if(this.selection.length === 1){
+			if (this.selection.length === 1) {
 
 				this.scene.visible = true;
 
@@ -14057,7 +14077,7 @@ void main() {
 
 				{
 					// adjust scale of components
-					for(let handleName of Object.keys(this.handles)){
+					for (let handleName of Object.keys(this.handles)) {
 						let handle = this.handles[handleName];
 						let node = handle.node;
 
@@ -14082,7 +14102,7 @@ void main() {
 					}
 
 					// adjust rotation handles
-					if(!this.dragging){
+					if (!this.dragging) {
 						let tWorld = this.scene.matrixWorld;
 						let tObject = new THREE.Matrix4().getInverse(tWorld);
 						let camObjectPos = camera.getWorldPosition(new THREE.Vector3()).applyMatrix4(tObject);
@@ -14098,38 +14118,38 @@ void main() {
 						let below = !above;
 						let PI_HALF = Math.PI / 2;
 
-						if(above){
-							if(camObjectPos.x > 0 && camObjectPos.y > 0){
+						if (above) {
+							if (camObjectPos.x > 0 && camObjectPos.y > 0) {
 								x.x = 1 * PI_HALF;
 								y.y = 3 * PI_HALF;
 								z.z = 0 * PI_HALF;
-							}else if(camObjectPos.x < 0 && camObjectPos.y > 0){
+							} else if (camObjectPos.x < 0 && camObjectPos.y > 0) {
 								x.x = 1 * PI_HALF;
 								y.y = 2 * PI_HALF;
 								z.z = 1 * PI_HALF;
-							}else if(camObjectPos.x < 0 && camObjectPos.y < 0){
+							} else if (camObjectPos.x < 0 && camObjectPos.y < 0) {
 								x.x = 2 * PI_HALF;
 								y.y = 2 * PI_HALF;
 								z.z = 2 * PI_HALF;
-							}else if(camObjectPos.x > 0 && camObjectPos.y < 0){
+							} else if (camObjectPos.x > 0 && camObjectPos.y < 0) {
 								x.x = 2 * PI_HALF;
 								y.y = 3 * PI_HALF;
 								z.z = 3 * PI_HALF;
 							}
-						}else if(below){
-							if(camObjectPos.x > 0 && camObjectPos.y > 0){
+						} else if (below) {
+							if (camObjectPos.x > 0 && camObjectPos.y > 0) {
 								x.x = 0 * PI_HALF;
 								y.y = 0 * PI_HALF;
 								z.z = 0 * PI_HALF;
-							}else if(camObjectPos.x < 0 && camObjectPos.y > 0){
+							} else if (camObjectPos.x < 0 && camObjectPos.y > 0) {
 								x.x = 0 * PI_HALF;
 								y.y = 1 * PI_HALF;
 								z.z = 1 * PI_HALF;
-							}else if(camObjectPos.x < 0 && camObjectPos.y < 0){
+							} else if (camObjectPos.x < 0 && camObjectPos.y < 0) {
 								x.x = 3 * PI_HALF;
 								y.y = 1 * PI_HALF;
 								z.z = 2 * PI_HALF;
-							}else if(camObjectPos.x > 0 && camObjectPos.y < 0){
+							} else if (camObjectPos.x > 0 && camObjectPos.y < 0) {
 								x.x = 3 * PI_HALF;
 								y.y = 0 * PI_HALF;
 								z.z = 3 * PI_HALF;
@@ -14142,22 +14162,22 @@ void main() {
 						let raycaster = new THREE.Raycaster(ray.origin, ray.direction);
 						let intersects = raycaster.intersectObjects(this.pickVolumes.filter(v => v.visible), true);
 
-						if(intersects.length > 0){
+						if (intersects.length > 0) {
 							let I = intersects[0];
 							let handleName = I.object.handle;
 							this.setActiveHandle(this.handles[handleName]);
-						}else{
+						} else {
 							this.setActiveHandle(null);
 						}
 					}
 
 					// 
-					for(let handleName of Object.keys(this.scaleHandles)){
+					for (let handleName of Object.keys(this.scaleHandles)) {
 						let handle = this.handles[handleName];
 						let node = handle.node;
 						let alignment = handle.alignment;
 
-						
+
 
 					}
 				}
@@ -14179,16 +14199,16 @@ void main() {
 
 				}
 
-			}else{
+			} else {
 				this.scene.visible = false;
 			}
-			
+
 		}
 
 	}
 
-	class VolumeTool extends EventDispatcher{
-		constructor (viewer) {
+	class VolumeTool extends EventDispatcher {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -14213,8 +14233,8 @@ void main() {
 				this.scene.add(e.volume);
 			};
 
-			for(let volume of viewer.scene.volumes){
-				this.onAdd({volume: volume});
+			for (let volume of viewer.scene.volumes) {
+				this.onAdd({ volume: volume });
 			}
 
 			this.viewer.inputHandler.addEventListener('delete', e => {
@@ -14230,8 +14250,8 @@ void main() {
 			viewer.scene.addEventListener('volume_removed', this.onRemove);
 		}
 
-		onSceneChange(e){
-			if(e.oldScene){
+		onSceneChange (e) {
+			if (e.oldScene) {
 				e.oldScene.removeEventListeners('volume_added', this.onAdd);
 				e.oldScene.removeEventListeners('volume_removed', this.onRemove);
 			}
@@ -14242,12 +14262,12 @@ void main() {
 
 		startInsertion (args = {}) {
 			let volume;
-			if(args.type){
+			if (args.type) {
 				volume = new args.type();
-			}else{
+			} else {
 				volume = new BoxVolume();
 			}
-			
+
 			volume.clip = args.clip || false;
 			volume.name = args.name || 'Volume';
 
@@ -14265,13 +14285,13 @@ void main() {
 
 			let drag = e => {
 				let camera = this.viewer.scene.getActiveCamera();
-				
+
 				let I = Utils.getMousePointCloudIntersection(
-					e.drag.end, 
-					this.viewer.scene.getActiveCamera(), 
-					this.viewer, 
-					this.viewer.scene.pointclouds, 
-					{pickClipped: false});
+					e.drag.end,
+					this.viewer.scene.getActiveCamera(),
+					this.viewer,
+					this.viewer.scene.pointclouds,
+					{ pickClipped: false });
 
 				if (I) {
 					volume.position.copy(I.location);
@@ -14305,11 +14325,11 @@ void main() {
 			return volume;
 		}
 
-		update(){
+		update () {
 			if (!this.viewer.scene) {
 				return;
 			}
-			
+
 			let camera = this.viewer.scene.getActiveCamera();
 			let clientWidth = this.viewer.renderer.getSize().width;
 			let clientHeight = this.viewer.renderer.getSize().height;
@@ -14317,7 +14337,7 @@ void main() {
 			let volumes = this.viewer.scene.volumes;
 			for (let volume of volumes) {
 				let label = volume.label;
-				
+
 				{
 
 					let distance = label.position.distanceTo(camera.position);
@@ -14332,7 +14352,7 @@ void main() {
 			}
 		}
 
-		render(params){
+		render (params) {
 			this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera(), params.renderTarget);
 		}
 
@@ -14340,80 +14360,80 @@ void main() {
 
 	class PotreeRenderer {
 
-		constructor (viewer) {
+		constructor(viewer) {
 			this.viewer = viewer;
 		}
-	 
-		render(){
+
+		render () {
 			const viewer = this.viewer;
 
-			viewer.dispatchEvent({type: "render.pass.begin",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.begin", viewer: viewer });
 
 			// render skybox
-			if(viewer.background === "skybox"){
+			if (viewer.background === "skybox") {
 				viewer.renderer.clear(true, true, false);
 				viewer.skybox.camera.rotation.copy(viewer.scene.cameraP.rotation);
 				viewer.skybox.camera.fov = viewer.scene.cameraP.fov;
 				viewer.skybox.camera.aspect = viewer.scene.cameraP.aspect;
 				viewer.skybox.camera.updateProjectionMatrix();
 				viewer.renderer.render(viewer.skybox.scene, viewer.skybox.camera);
-			}else if(viewer.background === "gradient"){
+			} else if (viewer.background === "gradient") {
 				viewer.renderer.clear(true, true, false);
 				viewer.renderer.render(viewer.scene.sceneBG, viewer.scene.cameraBG);
-			}else if(viewer.background === "black"){
+			} else if (viewer.background === "black") {
 				viewer.renderer.setClearColor(0x000000, 1);
 				viewer.renderer.clear(true, true, false);
-			}else if(viewer.background === "white"){
+			} else if (viewer.background === "white") {
 				viewer.renderer.setClearColor(0xFFFFFF, 1);
 				viewer.renderer.clear(true, true, false);
-			}else{
+			} else {
 				viewer.renderer.setClearColor(0x000000, 0);
 				viewer.renderer.clear(true, true, false);
 			}
-			
-			for(let pointcloud of this.viewer.scene.pointclouds){
+
+			for (let pointcloud of this.viewer.scene.pointclouds) {
 				pointcloud.material.useEDL = false;
 			}
-			
+
 			let activeCam = viewer.scene.getActiveCamera();
 			//viewer.renderer.render(viewer.scene.scenePointCloud, activeCam);
-			
+
 			viewer.pRenderer.render(viewer.scene.scenePointCloud, activeCam, null, {
 				clipSpheres: viewer.scene.volumes.filter(v => (v instanceof Potree.SphereVolume)),
 			});
-			
+
 			// render scene
 			viewer.renderer.render(viewer.scene.scene, activeCam);
 
-			viewer.dispatchEvent({type: "render.pass.scene",viewer: viewer});
-			
+			viewer.dispatchEvent({ type: "render.pass.scene", viewer: viewer });
+
 			viewer.clippingTool.update();
 			viewer.renderer.render(viewer.clippingTool.sceneMarker, viewer.scene.cameraScreenSpace); //viewer.scene.cameraScreenSpace);
 			viewer.renderer.render(viewer.clippingTool.sceneVolume, activeCam);
 
 			viewer.renderer.render(viewer.controls.sceneControls, activeCam);
-			
+
 			viewer.renderer.clearDepth();
-			
+
 			viewer.transformationTool.update();
-			
-			viewer.dispatchEvent({type: "render.pass.perspective_overlay",viewer: viewer});
-			
+
+			viewer.dispatchEvent({ type: "render.pass.perspective_overlay", viewer: viewer });
+
 			viewer.renderer.render(viewer.transformationTool.scene, activeCam);
 
-			viewer.renderer.setViewport(viewer.renderer.domElement.clientWidth - viewer.navigationCube.width, 
-										viewer.renderer.domElement.clientHeight - viewer.navigationCube.width, 
-										viewer.navigationCube.width, viewer.navigationCube.width);
-			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
+			viewer.renderer.setViewport(viewer.renderer.domElement.clientWidth - viewer.navigationCube.width,
+				viewer.renderer.domElement.clientHeight - viewer.navigationCube.width,
+				viewer.navigationCube.width, viewer.navigationCube.width);
+			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);
 			viewer.renderer.setViewport(0, 0, viewer.renderer.domElement.clientWidth, viewer.renderer.domElement.clientHeight);
 
-			viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.end", viewer: viewer });
 		}
 
 	}
 
-	class EDLRenderer{
-		constructor(viewer){
+	class EDLRenderer {
+		constructor(viewer) {
 			this.viewer = viewer;
 
 			this.edlMaterial = null;
@@ -14426,7 +14446,7 @@ void main() {
 			this.shadowMap = new PointCloudSM(this.viewer.pRenderer);
 		}
 
-		initEDL(){
+		initEDL () {
 			if (this.edlMaterial != null) {
 				return;
 			}
@@ -14450,7 +14470,7 @@ void main() {
 				format: THREE.RGBAFormat,
 				depthTexture: new THREE.DepthTexture(undefined, undefined, THREE.UnsignedIntType)
 			});
-			
+
 			//{
 			//	let geometry = new THREE.PlaneBufferGeometry( 1, 1, 32, 32);
 			//	let material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: this.shadowMap.target.texture} );
@@ -14461,32 +14481,32 @@ void main() {
 			//}
 		};
 
-		resize(){
+		resize () {
 			const viewer = this.viewer;
 
 			let pixelRatio = viewer.renderer.getPixelRatio();
-			let {width, height} = viewer.renderer.getSize();
+			let { width, height } = viewer.renderer.getSize();
 
-			if(this.screenshot){
+			if (this.screenshot) {
 				width = this.screenshot.target.width;
 				height = this.screenshot.target.height;
 			}
 
-			this.rtEDL.setSize(width * pixelRatio , height * pixelRatio);
-			this.rtRegular.setSize(width * pixelRatio , height * pixelRatio);
+			this.rtEDL.setSize(width * pixelRatio, height * pixelRatio);
+			this.rtRegular.setSize(width * pixelRatio, height * pixelRatio);
 		}
 
-		makeScreenshot(camera, size, callback){
+		makeScreenshot (camera, size, callback) {
 
-			if(camera === undefined || camera === null){
+			if (camera === undefined || camera === null) {
 				camera = this.viewer.scene.getActiveCamera();
 			}
 
-			if(size === undefined || size === null){
+			if (size === undefined || size === null) {
 				size = this.viewer.renderer.getSize();
 			}
 
-			let {width, height} = size;
+			let { width, height } = size;
 
 			//let maxTextureSize = viewer.renderer.capabilities.maxTextureSize;
 			//if(width * 4 < 
@@ -14512,7 +14532,7 @@ void main() {
 
 			// flip vertically
 			let bytesPerLine = width * 4;
-			for(let i = 0; i < parseInt(height / 2); i++){
+			for (let i = 0; i < parseInt(height / 2); i++) {
 				let j = height - i - 1;
 
 				let lineI = buffer.slice(i * bytesPerLine, i * bytesPerLine + bytesPerLine);
@@ -14531,20 +14551,20 @@ void main() {
 			};
 		}
 
-		render(){
+		render () {
 			this.initEDL();
 			const viewer = this.viewer;
 
-			viewer.dispatchEvent({type: "render.pass.begin",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.begin", viewer: viewer });
 
 			this.resize();
 
-			if(this.screenshot){
+			if (this.screenshot) {
 				let oldBudget = Potree.pointBudget;
 				Potree.pointBudget = Math.max(10 * 1000 * 1000, 2 * oldBudget);
 				let result = Potree.updatePointClouds(
-					viewer.scene.pointclouds, 
-					viewer.scene.getActiveCamera(), 
+					viewer.scene.pointclouds,
+					viewer.scene.getActiveCamera(),
 					viewer.renderer);
 				Potree.pointBudget = oldBudget;
 			}
@@ -14553,12 +14573,12 @@ void main() {
 
 			let lights = [];
 			viewer.scene.scene.traverse(node => {
-				if(node instanceof THREE.SpotLight){
+				if (node instanceof THREE.SpotLight) {
 					lights.push(node);
 				}
 			});
 
-			if(viewer.background === "skybox"){
+			if (viewer.background === "skybox") {
 				viewer.renderer.setClearColor(0x000000, 0);
 				viewer.renderer.clear();
 				viewer.skybox.camera.rotation.copy(viewer.scene.cameraP.rotation);
@@ -14582,13 +14602,13 @@ void main() {
 			}
 
 			// TODO adapt to multiple lights
-			if(lights.length > 0 && !(lights[0].disableShadowUpdates)){
+			if (lights.length > 0 && !(lights[0].disableShadowUpdates)) {
 				let light = lights[0];
 
 				this.shadowMap.setLight(light);
 
 				let originalAttributes = new Map();
-				for(let pointcloud of viewer.scene.pointclouds){
+				for (let pointcloud of viewer.scene.pointclouds) {
 					originalAttributes.set(pointcloud, pointcloud.material.pointColorType);
 					pointcloud.material.disableEvents();
 					pointcloud.material.pointColorType = PointColorType.DEPTH;
@@ -14596,7 +14616,7 @@ void main() {
 
 				this.shadowMap.render(viewer.scene.scenePointCloud, camera);
 
-				for(let pointcloud of viewer.scene.pointclouds){
+				for (let pointcloud of viewer.scene.pointclouds) {
 					let originalAttribute = originalAttributes.get(pointcloud);
 					pointcloud.material.pointColorType = originalAttribute;
 					pointcloud.material.enableEvents();
@@ -14609,7 +14629,7 @@ void main() {
 			}
 
 			viewer.renderer.render(viewer.scene.scene, camera);
-			
+
 			//viewer.renderer.clearTarget( this.rtColor, true, true, true );
 			viewer.renderer.clearTarget(this.rtEDL, true, true, true);
 			viewer.renderer.clearTarget(this.rtRegular, true, true, false);
@@ -14632,15 +14652,15 @@ void main() {
 				material.uniforms.octreeSize.value = octreeSize;
 				material.spacing = pointcloud.pcoGeometry.spacing * Math.max(pointcloud.scale.x, pointcloud.scale.y, pointcloud.scale.z);
 			}
-			
+
 			// TODO adapt to multiple lights
-			if(lights.length > 0){
+			if (lights.length > 0) {
 				viewer.pRenderer.render(viewer.scene.scenePointCloud, camera, this.rtEDL, {
 					clipSpheres: viewer.scene.volumes.filter(v => (v instanceof SphereVolume)),
 					shadowMaps: [this.shadowMap],
 					transparent: false,
 				});
-			}else{
+			} else {
 				viewer.pRenderer.render(viewer.scene.scenePointCloud, camera, this.rtEDL, {
 					clipSpheres: viewer.scene.volumes.filter(v => (v instanceof SphereVolume)),
 					transparent: false,
@@ -14650,7 +14670,7 @@ void main() {
 			viewer.renderer.render(viewer.scene.scene, camera, this.rtRegular);
 
 			//viewer.renderer.setRenderTarget(this.rtColor);
-			viewer.dispatchEvent({type: "render.pass.scene", viewer: viewer, renderTarget: this.rtRegular});
+			viewer.dispatchEvent({ type: "render.pass.scene", viewer: viewer, renderTarget: this.rtRegular });
 
 			{ // EDL OCCLUSION PASS
 				this.edlMaterial.uniforms.screenWidth.value = width;
@@ -14666,10 +14686,10 @@ void main() {
 				this.edlMaterial.uniforms.edlStrength.value = viewer.edlStrength;
 				this.edlMaterial.uniforms.radius.value = viewer.edlRadius;
 				this.edlMaterial.uniforms.opacity.value = 1;
-				
+
 				Utils.screenPass.render(viewer.renderer, this.edlMaterial);
 
-				if(this.screenshot){
+				if (this.screenshot) {
 					Utils.screenPass.render(viewer.renderer, this.edlMaterial, this.screenshot.target);
 				}
 
@@ -14679,26 +14699,26 @@ void main() {
 
 			viewer.transformationTool.update();
 
-			viewer.dispatchEvent({type: "render.pass.perspective_overlay",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.perspective_overlay", viewer: viewer });
 
 			viewer.renderer.render(viewer.controls.sceneControls, camera);
 			viewer.renderer.render(viewer.clippingTool.sceneVolume, camera);
 			viewer.renderer.render(viewer.transformationTool.scene, camera);
-			
-			viewer.renderer.setViewport(width - viewer.navigationCube.width, 
-										height - viewer.navigationCube.width, 
-										viewer.navigationCube.width, viewer.navigationCube.width);
-			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
+
+			viewer.renderer.setViewport(width - viewer.navigationCube.width,
+				height - viewer.navigationCube.width,
+				viewer.navigationCube.width, viewer.navigationCube.width);
+			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);
 			viewer.renderer.setViewport(0, 0, width, height);
 
-			viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.end", viewer: viewer });
 
 		}
 	}
 
-	class HQSplatRenderer{
-		
-		constructor(viewer){
+	class HQSplatRenderer {
+
+		constructor(viewer) {
 			this.viewer = viewer;
 
 			this.depthMaterials = new Map();
@@ -14712,7 +14732,7 @@ void main() {
 			this.initialized = false;
 		}
 
-		init(){
+		init () {
 			if (this.initialized) {
 				return;
 			}
@@ -14743,7 +14763,7 @@ void main() {
 				depthTexture: this.rtDepth.depthTexture,
 				//depthTexture: new THREE.DepthTexture(undefined, undefined, THREE.UnsignedIntType)
 			});
-			
+
 			//{
 			//	let geometry = new THREE.PlaneBufferGeometry( 1, 1, 32, 32);
 			//	let material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: this.rtDepth.texture} );
@@ -14762,23 +14782,23 @@ void main() {
 			let pixelRatio = viewer.renderer.getPixelRatio();
 			let width = viewer.renderer.getSize().width;
 			let height = viewer.renderer.getSize().height;
-			this.rtDepth.setSize(width * pixelRatio , height * pixelRatio);
-			this.rtAttribute.setSize(width * pixelRatio , height * pixelRatio);
+			this.rtDepth.setSize(width * pixelRatio, height * pixelRatio);
+			this.rtAttribute.setSize(width * pixelRatio, height * pixelRatio);
 		}
 
 		render () {
 			this.init();
 			const viewer = this.viewer;
 
-			viewer.dispatchEvent({type: "render.pass.begin",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.begin", viewer: viewer });
 
 			this.resize();
 
 			let camera = viewer.scene.getActiveCamera();
-			
+
 			viewer.renderer.setClearColor(0x000000, 0);
-			viewer.renderer.clearTarget( this.rtDepth, true, true, true );
-			viewer.renderer.clearTarget( this.rtAttribute, true, true, true );
+			viewer.renderer.clearTarget(this.rtDepth, true, true, true);
+			viewer.renderer.clearTarget(this.rtAttribute, true, true, true);
 
 			let width = viewer.renderer.getSize().width;
 			let height = viewer.renderer.getSize().height;
@@ -14786,15 +14806,15 @@ void main() {
 			let visiblePointClouds = viewer.scene.pointclouds.filter(pc => pc.visible);
 			let originalMaterials = new Map();
 
-			for(let pointcloud of visiblePointClouds){
+			for (let pointcloud of visiblePointClouds) {
 				originalMaterials.set(pointcloud, pointcloud.material);
 
-				if(!this.attributeMaterials.has(pointcloud)){
+				if (!this.attributeMaterials.has(pointcloud)) {
 					let attributeMaterial = new PointCloudMaterial();
 					this.attributeMaterials.set(pointcloud, attributeMaterial);
 				}
 
-				if(!this.depthMaterials.has(pointcloud)){
+				if (!this.depthMaterials.has(pointcloud)) {
 					let depthMaterial = new PointCloudMaterial();
 
 					depthMaterial.setDefine("depth_pass", "#define hq_depth_pass");
@@ -14833,7 +14853,7 @@ void main() {
 
 					pointcloud.material = depthMaterial;
 				}
-				
+
 				viewer.pRenderer.render(viewer.scene.scenePointCloud, camera, this.rtDepth, {
 					clipSpheres: viewer.scene.volumes.filter(v => (v instanceof SphereVolume)),
 					//material: this.depthMaterial
@@ -14891,7 +14911,7 @@ void main() {
 
 					pointcloud.material = attributeMaterial;
 				}
-				
+
 				let gl = this.gl;
 
 				viewer.renderer.setRenderTarget(null);
@@ -14904,12 +14924,12 @@ void main() {
 				});
 			}
 
-			for(let [pointcloud, material] of originalMaterials){
+			for (let [pointcloud, material] of originalMaterials) {
 				pointcloud.material = material;
 			}
 
 			viewer.renderer.setRenderTarget(null);
-			if(viewer.background === "skybox"){
+			if (viewer.background === "skybox") {
 				viewer.renderer.setClearColor(0x000000, 0);
 				viewer.renderer.clear();
 				viewer.skybox.camera.rotation.copy(viewer.scene.cameraP.rotation);
@@ -14935,7 +14955,7 @@ void main() {
 			{ // NORMALIZATION PASS
 				let normalizationMaterial = this.useEDL ? this.normalizationEDLMaterial : this.normalizationMaterial;
 
-				if(this.useEDL){
+				if (this.useEDL) {
 					normalizationMaterial.uniforms.edlStrength.value = viewer.edlStrength;
 					normalizationMaterial.uniforms.radius.value = viewer.edlRadius;
 					normalizationMaterial.uniforms.screenWidth.value = width;
@@ -14945,31 +14965,31 @@ void main() {
 
 				normalizationMaterial.uniforms.uWeightMap.value = this.rtAttribute.texture;
 				normalizationMaterial.uniforms.uDepthMap.value = this.rtAttribute.depthTexture;
-				
+
 				Utils.screenPass.render(viewer.renderer, normalizationMaterial);
 			}
 
 			viewer.renderer.render(viewer.scene.scene, camera);
 
-			viewer.dispatchEvent({type: "render.pass.scene", viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.scene", viewer: viewer });
 
 			viewer.renderer.clearDepth();
 
 			viewer.transformationTool.update();
 
-			viewer.dispatchEvent({type: "render.pass.perspective_overlay",viewer: viewer});
+			viewer.dispatchEvent({ type: "render.pass.perspective_overlay", viewer: viewer });
 
 			viewer.renderer.render(viewer.controls.sceneControls, camera);
 			viewer.renderer.render(viewer.clippingTool.sceneVolume, camera);
 			viewer.renderer.render(viewer.transformationTool.scene, camera);
 
-			viewer.renderer.setViewport(width - viewer.navigationCube.width, 
-										height - viewer.navigationCube.width, 
-										viewer.navigationCube.width, viewer.navigationCube.width);
-			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
+			viewer.renderer.setViewport(width - viewer.navigationCube.width,
+				height - viewer.navigationCube.width,
+				viewer.navigationCube.width, viewer.navigationCube.width);
+			viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);
 			viewer.renderer.setViewport(0, 0, width, height);
-			
-			viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
+
+			viewer.dispatchEvent({ type: "render.pass.end", viewer: viewer });
 
 		}
 
@@ -14990,12 +15010,12 @@ void main() {
 	 *
 	 */
 
-	 
-	class OrbitControls extends EventDispatcher{
-		
-		constructor(viewer){
+
+	class OrbitControls extends EventDispatcher {
+
+		constructor(viewer) {
 			super();
-			
+
 			this.viewer = viewer;
 			this.renderer = viewer.renderer;
 
@@ -15020,7 +15040,7 @@ void main() {
 				if (e.drag.startHandled === undefined) {
 					e.drag.startHandled = true;
 
-					this.dispatchEvent({type: 'start'});
+					this.dispatchEvent({ type: 'start' });
 				}
 
 				let ndrag = {
@@ -15042,7 +15062,7 @@ void main() {
 			};
 
 			let drop = e => {
-				this.dispatchEvent({type: 'end'});
+				this.dispatchEvent({ type: 'end' });
 			};
 
 			let scroll = (e) => {
@@ -15067,7 +15087,7 @@ void main() {
 			};
 
 			let touchMove = e => {
-				if (e.touches.length === 2 && previousTouch.touches.length === 2){
+				if (e.touches.length === 2 && previousTouch.touches.length === 2) {
 					let prev = previousTouch;
 					let curr = e;
 
@@ -15085,7 +15105,7 @@ void main() {
 					this.radiusDelta = newRadius - resolvedRadius;
 
 					this.stopTweens();
-				}else if(e.touches.length === 3 && previousTouch.touches.length === 3){
+				} else if (e.touches.length === 3 && previousTouch.touches.length === 3) {
 					let prev = previousTouch;
 					let curr = e;
 
@@ -15122,22 +15142,22 @@ void main() {
 			this.scene = scene;
 		}
 
-		stop(){
+		stop () {
 			this.yawDelta = 0;
 			this.pitchDelta = 0;
 			this.radiusDelta = 0;
 			this.panDelta.set(0, 0);
 		}
-		
-		zoomToLocation(mouse){
+
+		zoomToLocation (mouse) {
 			let camera = this.scene.getActiveCamera();
-			
+
 			let I = Utils.getMousePointCloudIntersection(
 				mouse,
 				camera,
 				this.viewer,
 				this.scene.pointclouds,
-				{pickClipped: true});
+				{ pickClipped: true });
 
 			if (I === null) {
 				return;
@@ -15165,8 +15185,8 @@ void main() {
 			let easing = TWEEN.Easing.Quartic.Out;
 
 			{ // animate
-				let value = {x: 0};
-				let tween = new TWEEN.Tween(value).to({x: 1}, animationDuration);
+				let value = { x: 0 };
+				let tween = new TWEEN.Tween(value).to({ x: 1 }, animationDuration);
 				tween.easing(easing);
 				this.tweens.push(tween);
 
@@ -15261,8 +15281,8 @@ void main() {
 		}
 	}
 
-	class View{
-		constructor () {
+	class View {
+		constructor() {
 			this.position = new THREE.Vector3(0, 0, 0);
 
 			this.yaw = Math.PI / 4;
@@ -15307,23 +15327,23 @@ void main() {
 		set direction (dir) {
 
 			//if(dir.x === dir.y){
-			if(dir.x === 0 && dir.y === 0){
+			if (dir.x === 0 && dir.y === 0) {
 				this.pitch = Math.PI / 2 * Math.sign(dir.z);
-			}else{
+			} else {
 				let yaw = Math.atan2(dir.y, dir.x) - Math.PI / 2;
 				let pitch = Math.atan2(dir.z, Math.sqrt(dir.x * dir.x + dir.y * dir.y));
 
 				this.yaw = yaw;
 				this.pitch = pitch;
 			}
-			
+
 		}
 
-		lookAt(t){
+		lookAt (t) {
 			let V;
-			if(arguments.length === 1){
+			if (arguments.length === 1) {
 				V = new THREE.Vector3().subVectors(t, this.position);
-			}else if(arguments.length === 3){
+			} else if (arguments.length === 3) {
 				V = new THREE.Vector3().subVectors(new THREE.Vector3(...arguments), this.position);
 			}
 
@@ -15387,19 +15407,19 @@ void main() {
 		}
 	}
 
-	class Scene extends EventDispatcher{
+	class Scene extends EventDispatcher {
 
-		constructor(){
+		constructor() {
 			super();
 
 			this.annotations = new Annotation();
-			
+
 			this.scene = new THREE.Scene();
 			this.sceneBG = new THREE.Scene();
 			this.scenePointCloud = new THREE.Scene();
 
-			this.cameraP = new THREE.PerspectiveCamera(this.fov, 1, 0.1, 1000*1000);
-			this.cameraO = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000*1000);
+			this.cameraP = new THREE.PerspectiveCamera(this.fov, 1, 0.1, 1000 * 1000);
+			this.cameraO = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000 * 1000);
 			this.cameraBG = new THREE.Camera();
 			this.cameraScreenSpace = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
 			this.cameraMode = CameraMode.PERSPECTIVE;
@@ -15409,7 +15429,7 @@ void main() {
 			this.profiles = [];
 			this.volumes = [];
 			this.polygonClipVolumes = [];
-			
+
 			this.fpControls = null;
 			this.orbitControls = null;
 			this.earthControls = null;
@@ -15476,8 +15496,8 @@ void main() {
 
 			return height;
 		}
-		
-		getBoundingBox(pointclouds = this.pointclouds){
+
+		getBoundingBox (pointclouds = this.pointclouds) {
 			let box = new THREE.Box3();
 
 			this.scenePointCloud.updateMatrixWorld(true);
@@ -15526,7 +15546,7 @@ void main() {
 			}
 		};
 
-		addPolygonClipVolume(volume){
+		addPolygonClipVolume (volume) {
 			this.polygonClipVolumes.push(volume);
 			this.dispatchEvent({
 				"type": "polygon_clip_volume_added",
@@ -15534,8 +15554,8 @@ void main() {
 				"volume": volume
 			});
 		};
-		
-		removePolygonClipVolume(volume){
+
+		removePolygonClipVolume (volume) {
 			let index = this.polygonClipVolumes.indexOf(volume);
 			if (index > -1) {
 				this.polygonClipVolumes.splice(index, 1);
@@ -15546,8 +15566,8 @@ void main() {
 				});
 			}
 		};
-		
-		addMeasurement(measurement){
+
+		addMeasurement (measurement) {
 			measurement.lengthUnit = this.lengthUnit;
 			this.measurements.push(measurement);
 			this.dispatchEvent({
@@ -15604,23 +15624,23 @@ void main() {
 			}
 		}
 
-		removeAllClipVolumes(){
+		removeAllClipVolumes () {
 			let clipVolumes = this.volumes.filter(volume => volume.clip === true);
-			for(let clipVolume of clipVolumes){
+			for (let clipVolume of clipVolumes) {
 				this.removeVolume(clipVolume);
 			}
 
-			while(this.polygonClipVolumes.length > 0){
+			while (this.polygonClipVolumes.length > 0) {
 				this.removePolygonClipVolume(this.polygonClipVolumes[0]);
 			}
 		}
 
-		getActiveCamera() {
-			return this.cameraMode == CameraMode.PERSPECTIVE ? this.cameraP : this.cameraO;		
+		getActiveCamera () {
+			return this.cameraMode == CameraMode.PERSPECTIVE ? this.cameraP : this.cameraO;
 		}
-		
-		initialize(){
-			
+
+		initialize () {
+
 			this.referenceFrame = new THREE.Object3D();
 			this.referenceFrame.matrixAutoUpdate = false;
 			this.scenePointCloud.add(this.referenceFrame);
@@ -15632,14 +15652,14 @@ void main() {
 			//this.camera.rotation.y = -Math.PI / 4;
 			//this.camera.rotation.x = -Math.PI / 6;
 			this.cameraScreenSpace.lookAt(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 1, 0));
-			
-			this.directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-			this.directionalLight.position.set( 10, 10, 10 );
-			this.directionalLight.lookAt( new THREE.Vector3(0, 0, 0));
-			this.scenePointCloud.add( this.directionalLight );
-			
-			let light = new THREE.AmbientLight( 0x555555 ); // soft white light
-			this.scenePointCloud.add( light );
+
+			this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+			this.directionalLight.position.set(10, 10, 10);
+			this.directionalLight.lookAt(new THREE.Vector3(0, 0, 0));
+			this.scenePointCloud.add(this.directionalLight);
+
+			let light = new THREE.AmbientLight(0x555555); // soft white light
+			this.scenePointCloud.add(light);
 
 			{ // background
 				let texture = Utils.createBackgroundTexture(512, 512);
@@ -15680,9 +15700,9 @@ void main() {
 				}
 			}
 		}
-		
-		addAnnotation(position, args = {}){		
-			if(position instanceof Array){
+
+		addAnnotation (position, args = {}) {
+			if (position instanceof Array) {
 				args.position = new THREE.Vector3().fromArray(position);
 			} else if (position instanceof THREE.Vector3) {
 				args.position = position;
@@ -15697,7 +15717,7 @@ void main() {
 			return this.annotations;
 		};
 
-		removeAnnotation(annotationToRemove) {
+		removeAnnotation (annotationToRemove) {
 			this.annotations.remove(annotationToRemove);
 		}
 	}
@@ -15705,9 +15725,9 @@ void main() {
 	// http://epsg.io/
 	proj4.defs('UTM10N', '+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=m +no_defs');
 
-	class MapView{
-		
-		constructor (viewer) {
+	class MapView {
+
+		constructor(viewer) {
 			this.viewer = viewer;
 
 			this.webMapService = 'WMTS';
@@ -15897,7 +15917,7 @@ void main() {
 					mousePositionControl
 				]),
 				layers: [
-					new ol.layer.Tile({source: new ol.source.OSM()}),
+					new ol.layer.Tile({ source: new ol.source.OSM() }),
 					this.toolLayer,
 					this.annotationsLayer,
 					this.sourcesLayer,
@@ -16042,7 +16062,7 @@ void main() {
 			}
 
 			this.viewer.scene.annotations.traverseDescendants(annotation => {
-				this.onAnnotationAdded({annotation: annotation});
+				this.onAnnotationAdded({ annotation: annotation });
 			});
 		}
 
@@ -16370,7 +16390,7 @@ void main() {
 			if (resized) {
 				this.map.updateSize();
 			}
-			
+
 			// 
 			let camera = this.viewer.scene.getActiveCamera();
 
@@ -16598,12 +16618,12 @@ void main() {
 
 			return buffer;
 		}
-		
+
 	}
 
-	class ProfilePointCloudEntry{
+	class ProfilePointCloudEntry {
 
-		constructor(){
+		constructor() {
 
 			this.points = [];
 
@@ -16620,37 +16640,37 @@ void main() {
 			//this.sceneNode = new THREE.Points(geometry, material);
 		}
 
-		static releaseMaterialInstance(instance){
+		static releaseMaterialInstance (instance) {
 			ProfilePointCloudEntry.materialPool.add(instance);
 		}
 
-		static getMaterialInstance(){
+		static getMaterialInstance () {
 
 			let instance = ProfilePointCloudEntry.materialPool.values().next().value;
-			if(!instance){
+			if (!instance) {
 				instance = new PointCloudMaterial();
-			}else{
+			} else {
 				ProfilePointCloudEntry.materialPool.delete(instance);
 			}
 
 			return instance;
 		}
 
-		dispose(){
+		dispose () {
 
-			for(let child of this.sceneNode.children){
+			for (let child of this.sceneNode.children) {
 				ProfilePointCloudEntry.releaseMaterialInstance(child.material);
 				child.geometry.dispose();
 			}
 
-			this.sceneNode.children = [];		
+			this.sceneNode.children = [];
 		}
 
-		addPoints(data){
+		addPoints (data) {
 
 			this.points.push(data);
 
-			let batchSize = 10*1000;
+			let batchSize = 10 * 1000;
 
 			let createNewBatch = () => {
 				let geometry = new THREE.BufferGeometry();
@@ -16680,10 +16700,10 @@ void main() {
 				this.sceneNode.add(this.currentBatch);
 			};
 
-			if(!this.currentBatch){
+			if (!this.currentBatch) {
 				createNewBatch();
 			}
-			
+
 			{ // REBUILD MODEL
 
 				let pointsProcessed = 0;
@@ -16693,13 +16713,13 @@ void main() {
 				};
 
 				let projectedBox = new THREE.Box3();
-				
-				for(let i = 0; i < data.numPoints; i++){
 
-					if(updateRange.start + updateRange.count >= batchSize){
+				for (let i = 0; i < data.numPoints; i++) {
+
+					if (updateRange.start + updateRange.count >= batchSize) {
 						// finalize current batch, start new batch
 
-						for(let key of Object.keys(this.currentBatch.geometry.attributes)){
+						for (let key of Object.keys(this.currentBatch.geometry.attributes)) {
 							let attribute = this.currentBatch.geometry.attributes[key];
 							attribute.updateRange.offset = updateRange.start;
 							attribute.updateRange.count = updateRange.count;
@@ -16732,30 +16752,30 @@ void main() {
 						attributes.position.array[3 * currentIndex + 2] = z;
 					}
 
-					if(data.data.color){
+					if (data.data.color) {
 						attributes.color.array[4 * currentIndex + 0] = data.data.color[4 * i + 0];
 						attributes.color.array[4 * currentIndex + 1] = data.data.color[4 * i + 1];
 						attributes.color.array[4 * currentIndex + 2] = data.data.color[4 * i + 2];
 						attributes.color.array[4 * currentIndex + 3] = 255;
 					}
 
-					if(data.data.intensity){
+					if (data.data.intensity) {
 						attributes.intensity.array[currentIndex] = data.data.intensity[i];
 					}
 
-					if(data.data.classification){
+					if (data.data.classification) {
 						attributes.classification.array[currentIndex] = data.data.classification[i];
 					}
 
-					if(data.data.returnNumber){
+					if (data.data.returnNumber) {
 						attributes.returnNumber.array[currentIndex] = data.data.returnNumber[i];
 					}
 
-					if(data.data.numberOfReturns){
+					if (data.data.numberOfReturns) {
 						attributes.numberOfReturns.array[currentIndex] = data.data.numberOfReturns[i];
 					}
 
-					if(data.data.pointSourceID){
+					if (data.data.pointSourceID) {
 						attributes.pointSourceID.array[currentIndex] = data.data.pointSourceID[i];
 					}
 
@@ -16764,7 +16784,7 @@ void main() {
 				}
 
 				//for(let attribute of Object.values(this.currentBatch.geometry.attributes)){
-				for(let key of Object.keys(this.currentBatch.geometry.attributes)){
+				for (let key of Object.keys(this.currentBatch.geometry.attributes)) {
 					let attribute = this.currentBatch.geometry.attributes[key];
 					attribute.updateRange.offset = updateRange.start;
 					attribute.updateRange.count = updateRange.count;
@@ -16772,8 +16792,8 @@ void main() {
 				}
 
 				data.projectedBox = projectedBox;
-				
-				this.projectedBox = this.points.reduce( (a, i) => a.union(i.projectedBox), new THREE.Box3());
+
+				this.projectedBox = this.points.reduce((a, i) => a.union(i.projectedBox), new THREE.Box3());
 			}
 
 
@@ -16784,7 +16804,7 @@ void main() {
 	ProfilePointCloudEntry.materialPool = new Set();
 
 	class ProfileWindow extends EventDispatcher {
-		constructor (viewer) {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -16877,14 +16897,14 @@ void main() {
 						this.pickSphere.position.set(point.mileage, 0, point.position[2]);
 
 						this.viewerPickSphere.position.set(...point.position);
-						
-						if(!this.viewer.scene.scene.children.includes(this.viewerPickSphere)){
+
+						if (!this.viewer.scene.scene.children.includes(this.viewerPickSphere)) {
 							this.viewer.scene.scene.add(this.viewerPickSphere);
-							if(!this.viewer.hasEventListener("update", viewerPickSphereSizeHandler)){
+							if (!this.viewer.hasEventListener("update", viewerPickSphereSizeHandler)) {
 								this.viewer.addEventListener("update", viewerPickSphereSizeHandler);
 							}
 						}
-						
+
 
 						let info = this.elRoot.find('#profileSelectionProperties');
 						let html = '<table>';
@@ -16938,11 +16958,11 @@ void main() {
 						this.viewer.scene.scene.add(this.viewerPickSphere);
 
 						let index = this.viewer.scene.scene.children.indexOf(this.viewerPickSphere);
-						if(index >= 0){
+						if (index >= 0) {
 							this.viewer.scene.scene.children.splice(index, 1);
 						}
 						this.viewer.removeEventListener("update", viewerPickSphereSizeHandler);
-						
+
 
 					}
 					this.render();
@@ -16990,16 +17010,16 @@ void main() {
 
 			$('#potree_download_csv_icon').click(() => {
 				let points = new Points();
-				
-				for(let [pointcloud, entry] of this.pointclouds){
-					for(let pointSet of entry.points){
+
+				for (let [pointcloud, entry] of this.pointclouds) {
+					for (let pointSet of entry.points) {
 						points.add(pointSet);
 					}
 				}
 
 				let string = CSVExporter.toString(points);
 
-				let blob = new Blob([string], {type: "text/string"});
+				let blob = new Blob([string], { type: "text/string" });
 				$('#potree_download_profile_ortho_link').attr('href', URL.createObjectURL(blob));
 
 				//let uri = 'data:application/octet-stream;base64,' + btoa(string);
@@ -17010,15 +17030,15 @@ void main() {
 
 				let points = new Points();
 
-				for(let [pointcloud, entry] of this.pointclouds){
-					for(let pointSet of entry.points){
+				for (let [pointcloud, entry] of this.pointclouds) {
+					for (let pointSet of entry.points) {
 						points.add(pointSet);
 					}
 				}
 
 				let buffer = LASExporter.toLAS(points);
 
-				let blob = new Blob([buffer], {type: "application/octet-binary"});
+				let blob = new Blob([buffer], { type: "application/octet-binary" });
 				$('#potree_download_profile_link').attr('href', URL.createObjectURL(blob));
 
 				//let u8view = new Uint8Array(buffer);
@@ -17063,7 +17083,7 @@ void main() {
 			let numSkippedPoints = 0;
 
 			for (let [pointcloud, entry] of this.pointclouds) {
-				for(let points of entry.points){
+				for (let points of entry.points) {
 
 					let collisionBox = new THREE.Box2(
 						new THREE.Vector2(points.projectedBox.min.x, points.projectedBox.min.z),
@@ -17072,7 +17092,7 @@ void main() {
 
 					let intersects = collisionBox.intersectsBox(pointBox);
 
-					if(!intersects){
+					if (!intersects) {
 						numSkipped++;
 						numSkippedPoints += points.numPoints;
 						continue;
@@ -17134,7 +17154,7 @@ void main() {
 		}
 
 		initTHREE () {
-			this.renderer = new THREE.WebGLRenderer({alpha: true, premultipliedAlpha: false});
+			this.renderer = new THREE.WebGLRenderer({ alpha: true, premultipliedAlpha: false });
 			this.renderer.setClearColor(0x000000, 0);
 			this.renderer.setSize(10, 10);
 			this.renderer.autoClear = true;
@@ -17148,7 +17168,7 @@ void main() {
 			this.camera.up.set(0, 0, 1);
 			this.camera.rotation.order = "ZXY";
 			this.camera.rotation.x = Math.PI / 2.0;
-			
+
 
 
 			this.scene = new THREE.Scene();
@@ -17215,7 +17235,7 @@ void main() {
 			//this.lastAddPointsTimestamp = new Date().getTime();
 
 			let entry = this.pointclouds.get(pointcloud);
-			if(!entry){
+			if (!entry) {
 				entry = new ProfilePointCloudEntry();
 				this.pointclouds.set(pointcloud, entry);
 
@@ -17232,7 +17252,7 @@ void main() {
 			//console.log(this.projectedBox.min.toArray().map(v => v.toFixed(2)).join(", "));
 			//console.log(this.projectedBox.getSize().toArray().map(v => v.toFixed(2)).join(", "));
 
-			if (this.autoFit) { 
+			if (this.autoFit) {
 				let width = this.renderArea[0].clientWidth;
 				let height = this.renderArea[0].clientHeight;
 
@@ -17255,7 +17275,7 @@ void main() {
 
 			let numPoints = 0;
 			for (let [key, value] of this.pointclouds.entries()) {
-				numPoints += value.points.reduce( (a, i) => a + i.numPoints, 0);
+				numPoints += value.points.reduce((a, i) => a + i.numPoints, 0);
 			}
 			$(`#profile_num_points`).html(Utils.addCommas(numPoints));
 
@@ -17264,13 +17284,13 @@ void main() {
 		reset () {
 			this.lastReset = new Date().getTime();
 
-			this.dispatchEvent({type: "on_reset_once"});
+			this.dispatchEvent({ type: "on_reset_once" });
 			this.removeEventListeners("on_reset_once");
 
 			this.autoFit = true;
 			this.projectedBox = new THREE.Box3();
 
-			for(let [key, entry] of this.pointclouds){
+			for (let [key, entry] of this.pointclouds) {
 				entry.dispose();
 			}
 
@@ -17341,26 +17361,26 @@ void main() {
 				.call(this.yAxis);
 		}
 
-		requestScaleUpdate(){
+		requestScaleUpdate () {
 
 			let threshold = 100;
-			let allowUpdate = ((this.lastReset === undefined) || (this.lastScaleUpdate === undefined)) 
+			let allowUpdate = ((this.lastReset === undefined) || (this.lastScaleUpdate === undefined))
 				|| ((new Date().getTime() - this.lastReset) > threshold && (new Date().getTime() - this.lastScaleUpdate) > threshold);
 
-			if(allowUpdate){
+			if (allowUpdate) {
 
 				this.updateScales();
 
 				this.lastScaleUpdate = new Date().getTime();
 
-				
+
 
 				this.scaleUpdatePending = false;
-			}else if(!this.scaleUpdatePending) {
+			} else if (!this.scaleUpdatePending) {
 				setTimeout(this.requestScaleUpdate.bind(this), 100);
 				this.scaleUpdatePending = true;
 			}
-			
+
 		}
 
 		render () {
@@ -17377,7 +17397,7 @@ void main() {
 
 				for (let [pointcloud, entry] of this.pointclouds) {
 					let material = entry.material;
-				
+
 					material.pointColorType = pointcloud.material.pointColorType;
 					material.uniforms.uColor = pointcloud.material.uniforms.uColor;
 					material.uniforms.intensityRange.value = pointcloud.material.uniforms.intensityRange.value;
@@ -17413,7 +17433,7 @@ void main() {
 	}
 
 	class ProfileWindowController {
-		constructor (viewer) {
+		constructor(viewer) {
 			this.viewer = viewer;
 			this.profileWindow = viewer.profileWindow;
 			this.profile = null;
@@ -17482,7 +17502,7 @@ void main() {
 			this.requests = [];
 		};
 
-		finishLevelThenCancel(){
+		finishLevelThenCancel () {
 			for (let request of this.requests) {
 				request.finishLevelThenCancel();
 			}
@@ -17542,7 +17562,7 @@ void main() {
 	 *
 	 */
 
-	class GeoJSONExporter{
+	class GeoJSONExporter {
 
 		static measurementToFeatures (measurement) {
 			let coords = measurement.points.map(e => e.position.toArray());
@@ -17750,7 +17770,7 @@ SEQEND
 			}
 		}
 
-		static toString(measurements){
+		static toString (measurements) {
 			if (!(measurements instanceof Array)) {
 				measurements = [measurements];
 			}
@@ -17827,9 +17847,9 @@ ENDSEC
 
 	}
 
-	class MeasurePanel{
+	class MeasurePanel {
 
-		constructor(viewer, measurement, propertiesPanel){
+		constructor(viewer, measurement, propertiesPanel) {
 			this.viewer = viewer;
 			this.measurement = measurement;
 			this.propertiesPanel = propertiesPanel;
@@ -17837,7 +17857,7 @@ ENDSEC
 			this._update = () => { this.update(); };
 		}
 
-		createCoordinatesTable(points){
+		createCoordinatesTable (points) {
 			let table = $(`
 			<table class="measurement_value_table">
 				<tr>
@@ -17868,13 +17888,13 @@ ENDSEC
 			`);
 
 				this.elCopy = row.find("img[name=copy]");
-				this.elCopy.click( () => {
+				this.elCopy.click(() => {
 					let msg = point.toArray().map(c => c.toFixed(3)).join(", ");
 					Utils.clipboardCopy(msg);
 
 					this.viewer.postMessage(
 						`Copied value to clipboard: <br>'${msg}'`,
-						{duration: 3000});
+						{ duration: 3000 });
 				});
 
 				table.append(row);
@@ -17883,12 +17903,12 @@ ENDSEC
 			return table;
 		};
 
-		createAttributesTable(){
+		createAttributesTable () {
 			let elTable = $('<table class="measurement_value_table"></table>');
 
 			let point = this.measurement.points[0];
 
-			if(point.color){
+			if (point.color) {
 				let color = point.color;
 				let text = color.join(', ');
 
@@ -17903,13 +17923,13 @@ ENDSEC
 			return elTable;
 		}
 
-		update(){
+		update () {
 
 		}
 	}
 
-	class DistancePanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class DistancePanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -17929,7 +17949,7 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeMeasurement(measurement);
 			});
 
@@ -17940,7 +17960,7 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
@@ -17975,8 +17995,8 @@ ENDSEC
 		}
 	}
 
-	class PointPanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class PointPanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -17996,7 +18016,7 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeMeasurement(measurement);
 			});
 
@@ -18007,7 +18027,7 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
@@ -18018,8 +18038,8 @@ ENDSEC
 		}
 	}
 
-	class AreaPanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class AreaPanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -18040,7 +18060,7 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeMeasurement(measurement);
 			});
 
@@ -18051,7 +18071,7 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
@@ -18061,8 +18081,8 @@ ENDSEC
 		}
 	}
 
-	class AnglePanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class AnglePanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -18093,7 +18113,7 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeMeasurement(measurement);
 			});
 
@@ -18104,13 +18124,13 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
 
 			let angles = [];
-			for(let i = 0; i < this.measurement.points.length; i++){
+			for (let i = 0; i < this.measurement.points.length; i++) {
 				angles.push(this.measurement.getAngle(i) * (180.0 / Math.PI));
 			}
 			angles = angles.map(a => a.toFixed(1) + '\u00B0');
@@ -18125,8 +18145,8 @@ ENDSEC
 		}
 	}
 
-	class HeightPanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class HeightPanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -18146,7 +18166,7 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeMeasurement(measurement);
 			});
 
@@ -18157,7 +18177,7 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
@@ -18179,8 +18199,8 @@ ENDSEC
 		}
 	}
 
-	class VolumePanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class VolumePanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let copyIconPath = Potree.resourcePath + '/icons/copy.svg';
@@ -18280,7 +18300,7 @@ ENDSEC
 			{ // download
 				this.elDownloadButton = this.elContent.find("input[name=download_volume]");
 
-				if(this.propertiesPanel.viewer.server){
+				if (this.propertiesPanel.viewer.server) {
 					this.elDownloadButton.click(() => this.download());
 				} else {
 					this.elDownloadButton.hide();
@@ -18288,29 +18308,29 @@ ENDSEC
 			}
 
 			this.elCopyRotation = this.elContent.find("img[name=copyRotation]");
-			this.elCopyRotation.click( () => {
+			this.elCopyRotation.click(() => {
 				let rotation = this.measurement.rotation.toArray().slice(0, 3);
 				let msg = rotation.map(c => c.toFixed(3)).join(", ");
 				Utils.clipboardCopy(msg);
 
 				this.viewer.postMessage(
-						`Copied value to clipboard: <br>'${msg}'`,
-						{duration: 3000});
+					`Copied value to clipboard: <br>'${msg}'`,
+					{ duration: 3000 });
 			});
 
 			this.elCopyScale = this.elContent.find("img[name=copyScale]");
-			this.elCopyScale.click( () => {
+			this.elCopyScale.click(() => {
 				let scale = this.measurement.scale.toArray();
 				let msg = scale.map(c => c.toFixed(3)).join(", ");
 				Utils.clipboardCopy(msg);
 
 				this.viewer.postMessage(
-						`Copied value to clipboard: <br>'${msg}'`,
-						{duration: 3000});
+					`Copied value to clipboard: <br>'${msg}'`,
+					{ duration: 3000 });
 			});
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeVolume(measurement);
 			});
 
@@ -18341,7 +18361,7 @@ ENDSEC
 			this.update();
 		}
 
-		async download(){
+		async download () {
 
 			let clipBox = this.measurement;
 
@@ -18374,7 +18394,7 @@ ENDSEC
 				];
 
 				let planeQueryParts = [];
-				for(let plane of planes){
+				for (let plane of planes) {
 					let part = [plane.normal.toArray(), plane.constant].join(",");
 					part = `[${part}]`;
 					planeQueryParts.push(part);
@@ -18386,8 +18406,8 @@ ENDSEC
 			let regionsArg = regions.join(",");
 
 			let pointcloudArgs = [];
-			for(let pointcloud of this.viewer.scene.pointclouds){
-				if(!pointcloud.visible){
+			for (let pointcloud of this.viewer.scene.pointclouds) {
+				if (!pointcloud.visible) {
 					continue;
 				}
 
@@ -18422,7 +18442,7 @@ ENDSEC
 			let handle = null;
 			{ // START FILTER
 				let url = `${viewer.server}/create_regions_filter?pointclouds=[${pointcloudsArg}]&regions=[${regionsArg}]`;
-				
+
 				//console.log(url);
 
 				info("estimating results ...");
@@ -18431,10 +18451,10 @@ ENDSEC
 				let jsResponse = await response.json();
 				//console.log(jsResponse);
 
-				if(!jsResponse.handle){
+				if (!jsResponse.handle) {
 					error(jsResponse.message);
 					return;
-				}else{
+				} else {
 					handle = jsResponse.handle;
 				}
 			}
@@ -18442,8 +18462,8 @@ ENDSEC
 			{ // WAIT, CHECK PROGRESS, HANDLE FINISH
 				let url = `${viewer.server}/check_regions_filter?handle=${handle}`;
 
-				let sleep = (function(duration){
-					return new Promise( (res, rej) => {
+				let sleep = (function (duration) {
+					return new Promise((res, rej) => {
 						setTimeout(() => {
 							res();
 						}, duration);
@@ -18451,7 +18471,7 @@ ENDSEC
 				});
 
 				let handleFiltering = (jsResponse) => {
-					let {progress, estimate} = jsResponse;
+					let { progress, estimate } = jsResponse;
 
 					let progressFract = progress["processed points"] / estimate.points;
 					let progressPercents = parseInt(progressFract * 100);
@@ -18463,7 +18483,7 @@ ENDSEC
 					let message = "downloads ready: <br>";
 					message += "<ul>";
 
-					for(let i = 0; i < jsResponse.pointclouds.length; i++){
+					for (let i = 0; i < jsResponse.pointclouds.length; i++) {
 						let url = `${viewer.server}/download_regions_filter_result?handle=${handle}&index=${i}`;
 
 						message += `<li><a href="${url}">result_${i}.las</a> </li>\n`;
@@ -18490,19 +18510,19 @@ ENDSEC
 
 				let start = Date.now();
 
-				while(true){
+				while (true) {
 					let response = await fetch(url);
 					let jsResponse = await response.json();
 
-					if(jsResponse.status === "ERROR"){
+					if (jsResponse.status === "ERROR") {
 						handleError(jsResponse);
-					}else if(jsResponse.status === "FILTERING"){
+					} else if (jsResponse.status === "FILTERING") {
 						handleFiltering(jsResponse);
-					}else if(jsResponse.status === "FINISHED"){
+					} else if (jsResponse.status === "FINISHED") {
 						handleFinish(jsResponse);
 
 						break;
-					}else{
+					} else {
 						handleUnexpected(jsResponse);
 					}
 
@@ -18515,7 +18535,7 @@ ENDSEC
 
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable([this.measurement.position]));
@@ -18561,8 +18581,8 @@ ENDSEC
 		}
 	}
 
-	class ProfilePanel extends MeasurePanel{
-		constructor(viewer, measurement, propertiesPanel){
+	class ProfilePanel extends MeasurePanel {
+		constructor(viewer, measurement, propertiesPanel) {
 			super(viewer, measurement, propertiesPanel);
 
 			let removeIconPath = Potree.resourcePath + '/icons/remove.svg';
@@ -18595,14 +18615,14 @@ ENDSEC
 		`);
 
 			this.elRemove = this.elContent.find("img[name=remove]");
-			this.elRemove.click( () => {
+			this.elRemove.click(() => {
 				this.viewer.scene.removeProfile(measurement);
 			});
 
 			{ // download
 				this.elDownloadButton = this.elContent.find(`input[name=download_profile]`);
 
-				if(this.propertiesPanel.viewer.server){
+				if (this.propertiesPanel.viewer.server) {
 					this.elDownloadButton.click(() => this.download());
 				} else {
 					this.elDownloadButton.hide();
@@ -18615,7 +18635,7 @@ ENDSEC
 				elWidthSlider.spinner({
 					min: 0, max: 10 * 1000 * 1000, step: 0.01,
 					numberFormat: 'n',
-					start: () => {},
+					start: () => { },
 					spin: (event, ui) => {
 						let value = elWidthSlider.spinner('value');
 						measurement.setWidth(value);
@@ -18663,13 +18683,13 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points));
 		}
 
-		async download(){
+		async download () {
 
 			let profile = this.measurement;
 
@@ -18677,32 +18697,32 @@ ENDSEC
 			{
 				let segments = profile.getSegments();
 				let width = profile.width;
-				
-				for(let segment of segments){
+
+				for (let segment of segments) {
 					let start = segment.start.clone().multiply(new THREE.Vector3(1, 1, 0));
 					let end = segment.end.clone().multiply(new THREE.Vector3(1, 1, 0));
 					let center = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
-					
+
 					let startEndDir = new THREE.Vector3().subVectors(end, start).normalize();
 					let endStartDir = new THREE.Vector3().subVectors(start, end).normalize();
 					let upDir = new THREE.Vector3(0, 0, 1);
 					let rightDir = new THREE.Vector3().crossVectors(startEndDir, upDir);
 					let leftDir = new THREE.Vector3().crossVectors(endStartDir, upDir);
-					
+
 					console.log(leftDir);
-					
+
 					let right = rightDir.clone().multiplyScalar(width * 0.5).add(center);
 					let left = leftDir.clone().multiplyScalar(width * 0.5).add(center);
-					
+
 					let planes = [
 						new THREE.Plane().setFromNormalAndCoplanarPoint(startEndDir, start),
 						new THREE.Plane().setFromNormalAndCoplanarPoint(endStartDir, end),
 						new THREE.Plane().setFromNormalAndCoplanarPoint(leftDir, right),
 						new THREE.Plane().setFromNormalAndCoplanarPoint(rightDir, left),
 					];
-					
+
 					let planeQueryParts = [];
-					for(let plane of planes){
+					for (let plane of planes) {
 						let part = [plane.normal.toArray(), plane.constant].join(",");
 						part = `[${part}]`;
 						planeQueryParts.push(part);
@@ -18715,8 +18735,8 @@ ENDSEC
 			let regionsArg = regions.join(",");
 
 			let pointcloudArgs = [];
-			for(let pointcloud of this.viewer.scene.pointclouds){
-				if(!pointcloud.visible){
+			for (let pointcloud of this.viewer.scene.pointclouds) {
+				if (!pointcloud.visible) {
 					continue;
 				}
 
@@ -18751,7 +18771,7 @@ ENDSEC
 			let handle = null;
 			{ // START FILTER
 				let url = `${viewer.server}/create_regions_filter?pointclouds=[${pointcloudsArg}]&regions=[${regionsArg}]`;
-				
+
 				//console.log(url);
 
 				info("estimating results ...");
@@ -18760,10 +18780,10 @@ ENDSEC
 				let jsResponse = await response.json();
 				//console.log(jsResponse);
 
-				if(!jsResponse.handle){
+				if (!jsResponse.handle) {
 					error(jsResponse.message);
 					return;
-				}else{
+				} else {
 					handle = jsResponse.handle;
 				}
 			}
@@ -18771,8 +18791,8 @@ ENDSEC
 			{ // WAIT, CHECK PROGRESS, HANDLE FINISH
 				let url = `${viewer.server}/check_regions_filter?handle=${handle}`;
 
-				let sleep = (function(duration){
-					return new Promise( (res, rej) => {
+				let sleep = (function (duration) {
+					return new Promise((res, rej) => {
 						setTimeout(() => {
 							res();
 						}, duration);
@@ -18780,7 +18800,7 @@ ENDSEC
 				});
 
 				let handleFiltering = (jsResponse) => {
-					let {progress, estimate} = jsResponse;
+					let { progress, estimate } = jsResponse;
 
 					let progressFract = progress["processed points"] / estimate.points;
 					let progressPercents = parseInt(progressFract * 100);
@@ -18792,7 +18812,7 @@ ENDSEC
 					let message = "downloads ready: <br>";
 					message += "<ul>";
 
-					for(let i = 0; i < jsResponse.pointclouds.length; i++){
+					for (let i = 0; i < jsResponse.pointclouds.length; i++) {
 						let url = `${viewer.server}/download_regions_filter_result?handle=${handle}&index=${i}`;
 
 						message += `<li><a href="${url}">result_${i}.las</a> </li>\n`;
@@ -18819,19 +18839,19 @@ ENDSEC
 
 				let start = Date.now();
 
-				while(true){
+				while (true) {
 					let response = await fetch(url);
 					let jsResponse = await response.json();
 
-					if(jsResponse.status === "ERROR"){
+					if (jsResponse.status === "ERROR") {
 						handleError(jsResponse);
-					}else if(jsResponse.status === "FILTERING"){
+					} else if (jsResponse.status === "FILTERING") {
 						handleFiltering(jsResponse);
-					}else if(jsResponse.status === "FINISHED"){
+					} else if (jsResponse.status === "FINISHED") {
 						handleFinish(jsResponse);
 
 						break;
-					}else{
+					} else {
 						handleUnexpected(jsResponse);
 					}
 
@@ -18845,8 +18865,8 @@ ENDSEC
 		}
 	}
 
-	class CameraPanel{
-		constructor(viewer, propertiesPanel){
+	class CameraPanel {
+		constructor(viewer, propertiesPanel) {
 			this.viewer = viewer;
 			this.propertiesPanel = propertiesPanel;
 
@@ -18885,25 +18905,25 @@ ENDSEC
 		`);
 
 			this.elCopyPosition = this.elContent.find("img[name=copyPosition]");
-			this.elCopyPosition.click( () => {
+			this.elCopyPosition.click(() => {
 				let pos = this.viewer.scene.getActiveCamera().position.toArray();
 				let msg = pos.map(c => c.toFixed(3)).join(", ");
 				Utils.clipboardCopy(msg);
 
 				this.viewer.postMessage(
-						`Copied value to clipboard: <br>'${msg}'`,
-						{duration: 3000});
+					`Copied value to clipboard: <br>'${msg}'`,
+					{ duration: 3000 });
 			});
 
 			this.elCopyTarget = this.elContent.find("img[name=copyTarget]");
-			this.elCopyTarget.click( () => {
+			this.elCopyTarget.click(() => {
 				let pos = this.viewer.scene.view.getPivot().toArray();
 				let msg = pos.map(c => c.toFixed(3)).join(", ");
 				Utils.clipboardCopy(msg);
 
 				this.viewer.postMessage(
-						`Copied value to clipboard: <br>'${msg}'`,
-						{duration: 3000});
+					`Copied value to clipboard: <br>'${msg}'`,
+					{ duration: 3000 });
 			});
 
 			this.propertiesPanel.addVolatileListener(viewer, "camera_changed", this._update);
@@ -18911,7 +18931,7 @@ ENDSEC
 			this.update();
 		}
 
-		update(){
+		update () {
 			console.log("updating camera panel");
 
 			let camera = this.viewer.scene.getActiveCamera();
@@ -18929,9 +18949,9 @@ ENDSEC
 		}
 	}
 
-	class PropertiesPanel{
+	class PropertiesPanel {
 
-		constructor(container, viewer){
+		constructor(container, viewer) {
 			this.container = container;
 			this.viewer = viewer;
 			this.object = null;
@@ -18939,31 +18959,31 @@ ENDSEC
 			this.scene = null;
 		}
 
-		setScene(scene){
+		setScene (scene) {
 			this.scene = scene;
 		}
 
-		set(object){
-			if(this.object === object){
+		set (object) {
+			if (this.object === object) {
 				return;
 			}
 
 			this.object = object;
-			
-			for(let task of this.cleanupTasks){
+
+			for (let task of this.cleanupTasks) {
 				task();
 			}
 			this.cleanupTasks = [];
 			this.container.empty();
 
-			if(object instanceof PointCloudTree){
+			if (object instanceof PointCloudTree) {
 				this.setPointCloud(object);
-			}else if(object instanceof Measure || object instanceof Profile || object instanceof Volume){
+			} else if (object instanceof Measure || object instanceof Profile || object instanceof Volume) {
 				this.setMeasurement(object);
-			}else if(object instanceof THREE.Camera){
+			} else if (object instanceof THREE.Camera) {
 				this.setCamera(object);
 			}
-			
+
 		}
 
 		//
@@ -18971,14 +18991,14 @@ ENDSEC
 		// This is for listening to materials, scene, point clouds, etc.
 		// not required for DOM listeners, since they are automatically cleared by removing the DOM subtree.
 		//
-		addVolatileListener(target, type, callback){
+		addVolatileListener (target, type, callback) {
 			target.addEventListener(type, callback);
 			this.cleanupTasks.push(() => {
 				target.removeEventListener(type, callback);
 			});
 		}
 
-		setPointCloud(pointcloud){
+		setPointCloud (pointcloud) {
 
 			let material = pointcloud.material;
 
@@ -19139,10 +19159,10 @@ ENDSEC
 
 				let update = (e) => {
 					lblPointSize.html(material.size.toFixed(2));
-					sldPointSize.slider({value: material.size});
+					sldPointSize.slider({ value: material.size });
 				};
 				this.addVolatileListener(material, "point_size_changed", update);
-				
+
 				update();
 			}
 
@@ -19190,14 +19210,14 @@ ENDSEC
 					min: 0,
 					max: 1,
 					step: 0.001,
-					slide: function (event, ui) { 
+					slide: function (event, ui) {
 						material.opacity = ui.value;
 					}
 				});
 
 				let update = (e) => {
 					lblOpacity.html(material.opacity.toFixed(2));
-					sldOpacity.slider({value: material.opacity});
+					sldOpacity.slider({ value: material.opacity });
 				};
 				this.addVolatileListener(material, "opacity_changed", update);
 
@@ -19222,7 +19242,7 @@ ENDSEC
 				];
 
 				let attributeSelection = panel.find('#optMaterial');
-				for(let option of options){
+				for (let option of options) {
 					let elOption = $(`<option>${option}</option>`);
 					attributeSelection.append(elOption);
 				}
@@ -19265,12 +19285,12 @@ ENDSEC
 						blockIntensity.css('display', 'block');
 					} else if (selectedValue === 'Intensity Gradient') {
 						blockIntensity.css('display', 'block');
-					} else if (selectedValue === "Index" ){
+					} else if (selectedValue === "Index") {
 						blockIndex.css('display', 'block');
 					}
 				};
 
-				attributeSelection.selectmenu({change: updateMaterialPanel});
+				attributeSelection.selectmenu({ change: updateMaterialPanel });
 
 				let update = () => {
 					attributeSelection.val(Utils.toMaterialName(material.pointColorType)).selectmenu('refresh');
@@ -19283,23 +19303,23 @@ ENDSEC
 
 			{
 				let schemes = [
-					{name: "SPECTRAL", icon: `${Potree.resourcePath}/icons/gradients_spectral.png`},
-					{name: "YELLOW_GREEN", icon: `${Potree.resourcePath}/icons/gradients_yellow_green.png`},
-					{name: "PLASMA", icon: `${Potree.resourcePath}/icons/gradients_plasma.png`},
-					{name: "GRAYSCALE", icon: `${Potree.resourcePath}/icons/gradients_grayscale.png`},
-					{name: "RAINBOW", icon: `${Potree.resourcePath}/icons/gradients_rainbow.png`},
+					{ name: "SPECTRAL", icon: `${Potree.resourcePath}/icons/gradients_spectral.png` },
+					{ name: "YELLOW_GREEN", icon: `${Potree.resourcePath}/icons/gradients_yellow_green.png` },
+					{ name: "PLASMA", icon: `${Potree.resourcePath}/icons/gradients_plasma.png` },
+					{ name: "GRAYSCALE", icon: `${Potree.resourcePath}/icons/gradients_grayscale.png` },
+					{ name: "RAINBOW", icon: `${Potree.resourcePath}/icons/gradients_rainbow.png` },
 				];
 
 				let elSchemeContainer = panel.find("#elevation_gradient_scheme_selection");
 
-				for(let scheme of schemes){
+				for (let scheme of schemes) {
 					let elScheme = $(`
 					<span style="flex-grow: 1;">
 						<img src="${scheme.icon}" class="button-icon" style="max-width: 100%" />
 					</span>
 				`);
 
-					elScheme.click( () => {
+					elScheme.click(() => {
 						material.gradient = Gradients[scheme.name];
 					});
 
@@ -19319,19 +19339,19 @@ ENDSEC
 				panel.find('#sldRGBGamma').slider({
 					value: material.rgbGamma,
 					min: 0, max: 4, step: 0.01,
-					slide: (event, ui) => {material.rgbGamma = ui.value;}
+					slide: (event, ui) => { material.rgbGamma = ui.value; }
 				});
 
 				panel.find('#sldRGBContrast').slider({
 					value: material.rgbContrast,
 					min: -1, max: 1, step: 0.01,
-					slide: (event, ui) => {material.rgbContrast = ui.value;}
+					slide: (event, ui) => { material.rgbContrast = ui.value; }
 				});
 
 				panel.find('#sldRGBBrightness').slider({
 					value: material.rgbBrightness,
 					min: -1, max: 1, step: 0.01,
-					slide: (event, ui) => {material.rgbBrightness = ui.value;}
+					slide: (event, ui) => { material.rgbBrightness = ui.value; }
 				});
 
 				panel.find('#sldHeightRange').slider({
@@ -19358,55 +19378,55 @@ ENDSEC
 				panel.find('#sldIntensityGamma').slider({
 					value: material.intensityGamma,
 					min: 0, max: 4, step: 0.01,
-					slide: (event, ui) => {material.intensityGamma = ui.value;}
+					slide: (event, ui) => { material.intensityGamma = ui.value; }
 				});
 
 				panel.find('#sldIntensityContrast').slider({
 					value: material.intensityContrast,
 					min: -1, max: 1, step: 0.01,
-					slide: (event, ui) => {material.intensityContrast = ui.value;}
+					slide: (event, ui) => { material.intensityContrast = ui.value; }
 				});
 
 				panel.find('#sldIntensityBrightness').slider({
 					value: material.intensityBrightness,
 					min: -1, max: 1, step: 0.01,
-					slide: (event, ui) => {material.intensityBrightness = ui.value;}
+					slide: (event, ui) => { material.intensityBrightness = ui.value; }
 				});
 
 				panel.find('#sldWeightRGB').slider({
 					value: material.weightRGB,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightRGB = ui.value;}
+					slide: (event, ui) => { material.weightRGB = ui.value; }
 				});
 
 				panel.find('#sldWeightIntensity').slider({
 					value: material.weightIntensity,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightIntensity = ui.value;}
+					slide: (event, ui) => { material.weightIntensity = ui.value; }
 				});
 
 				panel.find('#sldWeightElevation').slider({
 					value: material.weightElevation,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightElevation = ui.value;}
+					slide: (event, ui) => { material.weightElevation = ui.value; }
 				});
 
 				panel.find('#sldWeightClassification').slider({
 					value: material.weightClassification,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightClassification = ui.value;}
+					slide: (event, ui) => { material.weightClassification = ui.value; }
 				});
 
 				panel.find('#sldWeightReturnNumber').slider({
 					value: material.weightReturnNumber,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightReturnNumber = ui.value;}
+					slide: (event, ui) => { material.weightReturnNumber = ui.value; }
 				});
 
 				panel.find('#sldWeightSourceID').slider({
 					value: material.weightSourceID,
 					min: 0, max: 1, step: 0.01,
-					slide: (event, ui) => {material.weightSourceID = ui.value;}
+					slide: (event, ui) => { material.weightSourceID = ui.value; }
 				});
 
 				panel.find(`#materials\\.color\\.picker`).spectrum({
@@ -19447,7 +19467,7 @@ ENDSEC
 					let range = material.elevationRange;
 
 					panel.find('#lblHeightRange').html(`${range[0].toFixed(2)} to ${range[1].toFixed(2)}`);
-					panel.find('#sldHeightRang').slider({min: bMin, max: bMax, values: range});
+					panel.find('#sldHeightRang').slider({ min: bMin, max: bMax, values: range });
 				};
 
 				let updateIntensityRange = function () {
@@ -19455,7 +19475,7 @@ ENDSEC
 					let [min, max] = range.map(v => Math.log2(v) / 16);
 
 					panel.find('#lblIntensityRange').html(`${parseInt(range[0])} to ${parseInt(range[1])}`);
-					panel.find('#sldIntensityRange').slider({values: [min, max]});
+					panel.find('#sldIntensityRange').slider({ values: [min, max] });
 				};
 
 				{
@@ -19475,9 +19495,9 @@ ENDSEC
 					panel.find('#lblIntensityContrast').html(contrast.toFixed(2));
 					panel.find('#lblIntensityBrightness').html(brightness.toFixed(2));
 
-					panel.find('#sldIntensityGamma').slider({value: gamma});
-					panel.find('#sldIntensityContrast').slider({value: contrast});
-					panel.find('#sldIntensityBrightness').slider({value: brightness});
+					panel.find('#sldIntensityGamma').slider({ value: gamma });
+					panel.find('#sldIntensityContrast').slider({ value: contrast });
+					panel.find('#sldIntensityBrightness').slider({ value: brightness });
 				};
 
 				let onRGBChange = () => {
@@ -19489,9 +19509,9 @@ ENDSEC
 					panel.find('#lblRGBContrast').html(contrast.toFixed(2));
 					panel.find('#lblRGBBrightness').html(brightness.toFixed(2));
 
-					panel.find('#sldRGBGamma').slider({value: gamma});
-					panel.find('#sldRGBContrast').slider({value: contrast});
-					panel.find('#sldRGBBrightness').slider({value: brightness});
+					panel.find('#sldRGBGamma').slider({ value: gamma });
+					panel.find('#sldRGBContrast').slider({ value: contrast });
+					panel.find('#sldRGBBrightness').slider({ value: brightness });
 				};
 
 				this.addVolatileListener(material, "material_property_changed", updateHeightRange);
@@ -19505,18 +19525,18 @@ ENDSEC
 
 		}
 
-		
 
-		setMeasurement(object){
+
+		setMeasurement (object) {
 
 			let TYPE = {
-				DISTANCE: {panel: DistancePanel},
-				AREA: {panel: AreaPanel},
-				POINT: {panel: PointPanel},
-				ANGLE: {panel: AnglePanel},
-				HEIGHT: {panel: HeightPanel},
-				PROFILE: {panel: ProfilePanel},
-				VOLUME: {panel: VolumePanel}
+				DISTANCE: { panel: DistancePanel },
+				AREA: { panel: AreaPanel },
+				POINT: { panel: PointPanel },
+				ANGLE: { panel: AnglePanel },
+				HEIGHT: { panel: HeightPanel },
+				PROFILE: { panel: ProfilePanel },
+				VOLUME: { panel: VolumePanel }
 			};
 
 			let getType = (measurement) => {
@@ -19550,7 +19570,7 @@ ENDSEC
 			this.container.append(panel.elContent);
 		}
 
-		setCamera(camera){
+		setCamera (camera) {
 			let panel = new CameraPanel(this.viewer, this);
 			this.container.append(panel.elContent);
 		}
@@ -19558,7 +19578,7 @@ ENDSEC
 	}
 
 	class EarthControls extends EventDispatcher {
-		constructor (viewer) {
+		constructor(viewer) {
 			super(viewer);
 
 			this.viewer = viewer;
@@ -19596,7 +19616,7 @@ ENDSEC
 				if (e.drag.startHandled === undefined) {
 					e.drag.startHandled = true;
 
-					this.dispatchEvent({type: 'start'});
+					this.dispatchEvent({ type: 'start' });
 				}
 
 				let camStart = this.camStart;
@@ -19669,11 +19689,11 @@ ENDSEC
 
 			let onMouseDown = e => {
 				let I = Utils.getMousePointCloudIntersection(
-					e.mouse, 
-					this.scene.getActiveCamera(), 
-					this.viewer, 
-					this.scene.pointclouds, 
-					{pickClipped: false});
+					e.mouse,
+					this.scene.getActiveCamera(),
+					this.viewer,
+					this.scene.pointclouds,
+					{ pickClipped: false });
 
 				if (I) {
 					this.pivot = I.location;
@@ -19684,7 +19704,7 @@ ENDSEC
 			};
 
 			let drop = e => {
-				this.dispatchEvent({type: 'end'});
+				this.dispatchEvent({ type: 'end' });
 			};
 
 			let onMouseUp = e => {
@@ -19713,14 +19733,14 @@ ENDSEC
 			this.scene = scene;
 		}
 
-		stop(){
+		stop () {
 			this.wheelDelta = 0;
 			this.zoomDelta.set(0, 0, 0);
 		}
-		
-		zoomToLocation(mouse){
+
+		zoomToLocation (mouse) {
 			let camera = this.scene.getActiveCamera();
-			
+
 			let I = Utils.getMousePointCloudIntersection(
 				mouse,
 				camera,
@@ -19753,8 +19773,8 @@ ENDSEC
 			let easing = TWEEN.Easing.Quartic.Out;
 
 			{ // animate
-				let value = {x: 0};
-				let tween = new TWEEN.Tween(value).to({x: 1}, animationDuration);
+				let value = { x: 0 };
+				let tween = new TWEEN.Tween(value).to({ x: 1 }, animationDuration);
 				tween.easing(easing);
 				this.tweens.push(tween);
 
@@ -19786,13 +19806,13 @@ ENDSEC
 			let fade = Math.pow(0.5, this.fadeFactor * delta);
 			let progression = 1 - fade;
 			let camera = this.scene.getActiveCamera();
-			
+
 			// compute zoom
 			if (this.wheelDelta !== 0) {
 				let I = Utils.getMousePointCloudIntersection(
-					this.viewer.inputHandler.mouse, 
-					this.scene.getActiveCamera(), 
-					this.viewer, 
+					this.viewer.inputHandler.mouse,
+					this.scene.getActiveCamera(),
+					this.viewer,
 					this.scene.pointclouds);
 
 				if (I) {
@@ -19856,7 +19876,7 @@ ENDSEC
 
 
 	class FirstPersonControls extends EventDispatcher {
-		constructor (viewer) {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -19894,7 +19914,7 @@ ENDSEC
 				if (e.drag.startHandled === undefined) {
 					e.drag.startHandled = true;
 
-					this.dispatchEvent({type: 'start'});
+					this.dispatchEvent({ type: 'start' });
 				}
 
 				let moveSpeed = this.viewer.getMoveSpeed();
@@ -19914,7 +19934,7 @@ ENDSEC
 			};
 
 			let drop = e => {
-				this.dispatchEvent({type: 'end'});
+				this.dispatchEvent({ type: 'end' });
 			};
 
 			let scroll = (e) => {
@@ -19945,15 +19965,15 @@ ENDSEC
 			this.scene = scene;
 		}
 
-		stop(){
+		stop () {
 			this.yawDelta = 0;
 			this.pitchDelta = 0;
 			this.translationDelta.set(0, 0, 0);
 		}
-		
-		zoomToLocation(mouse){
+
+		zoomToLocation (mouse) {
 			let camera = this.scene.getActiveCamera();
-			
+
 			let I = Utils.getMousePointCloudIntersection(
 				mouse,
 				camera,
@@ -19986,8 +20006,8 @@ ENDSEC
 			let easing = TWEEN.Easing.Quartic.Out;
 
 			{ // animate
-				let value = {x: 0};
-				let tween = new TWEEN.Tween(value).to({x: 1}, animationDuration);
+				let value = { x: 0 };
+				let tween = new TWEEN.Tween(value).to({ x: 1 }, animationDuration);
 				tween.easing(easing);
 				this.tweens.push(tween);
 
@@ -20018,10 +20038,10 @@ ENDSEC
 			let view = this.scene.view;
 
 			{ // cancel move animations on user input
-				let changes = [ this.yawDelta,
-					this.pitchDelta,
-					this.translationDelta.length(),
-					this.translationWorldDelta.length() ];
+				let changes = [this.yawDelta,
+				this.pitchDelta,
+				this.translationDelta.length(),
+				this.translationWorldDelta.length()];
 				let changeHappens = changes.some(e => Math.abs(e) > 0.001);
 				if (changeHappens && this.tweens.length > 0) {
 					this.tweens.forEach(e => e.stop());
@@ -20039,7 +20059,7 @@ ENDSEC
 				let moveUp = this.keys.UP.some(e => ih.pressedKeys[e]);
 				let moveDown = this.keys.DOWN.some(e => ih.pressedKeys[e]);
 
-				if(this.lockElevation){
+				if (this.lockElevation) {
 					let dir = view.direction;
 					dir.z = 0;
 					dir.normalize();
@@ -20051,7 +20071,7 @@ ENDSEC
 					} else if (moveBackward) {
 						this.translationWorldDelta.copy(dir.multiplyScalar(-this.viewer.getMoveSpeed()));
 					}
-				}else{
+				} else {
 					if (moveForward && moveBackward) {
 						this.translationDelta.y = 0;
 					} else if (moveForward) {
@@ -20117,9 +20137,9 @@ ENDSEC
 		}
 	}
 
-	class ZoomableSlider{
+	class ZoomableSlider {
 
-		constructor(){
+		constructor() {
 			this.visibleRange = [0, 10];
 			this.chosenRange = [2, 7];
 			this.step = 0.001;
@@ -20164,8 +20184,8 @@ ENDSEC
 			let onMouseDown = (e) => {
 				e.preventDefault();
 
-				let value = (e.target === this.elLeft) ? 
-					this.chosenRange[0] : 
+				let value = (e.target === this.elLeft) ?
+					this.chosenRange[0] :
 					this.chosenRange[1];
 
 				dragStart = {
@@ -20194,18 +20214,18 @@ ENDSEC
 
 				let newValue = dragStart.value + valueDelta;
 				newValue = Math.round(newValue / this.step) * this.step;
-				
+
 				let newRange;
-				if(dragStart.handle === this.elLeft){
-					 newRange = [newValue, this.chosenRange[1]];
-				}else{
+				if (dragStart.handle === this.elLeft) {
+					newRange = [newValue, this.chosenRange[1]];
+				} else {
 					newRange = [this.chosenRange[0], newValue];
 				}
 
-				if(this.clipDragToVisible){
-					if(dragStart.handle === this.elLeft){
+				if (this.clipDragToVisible) {
+					if (dragStart.handle === this.elLeft) {
 						newRange[0] = Math.max(newRange[0], this.visibleRange[0]);
-					}else{
+					} else {
 						newRange[1] = Math.min(newRange[1], this.visibleRange[1]);
 					}
 				}
@@ -20213,7 +20233,7 @@ ENDSEC
 				this.setRange(newRange);
 			};
 
-			for(let handle of [this.elLeft, this.elRight]){
+			for (let handle of [this.elLeft, this.elRight]) {
 				handle.onmousedown = onMouseDown;
 			}
 
@@ -20222,19 +20242,19 @@ ENDSEC
 			let onWheel = (e) => {
 
 				e.preventDefault();
-				
+
 				let delta = Math.sign(e.deltaY);
-				
+
 				let zoom = 1;
-				if(delta < 0){
+				if (delta < 0) {
 					zoom = 0.8;
-				}else if(delta > 0){
+				} else if (delta > 0) {
 					zoom = 1.2;
 				}
 
 				let oldRangeWidth = this.visibleRange[1] - this.visibleRange[0];
 
-				if(oldRangeWidth <= 3 * this.step && zoom < 1){
+				if (oldRangeWidth <= 3 * this.step && zoom < 1) {
 					return;
 				}
 
@@ -20250,7 +20270,7 @@ ENDSEC
 				let newVisibleRange = [
 					pivot - (newRangeWidth * leftRatio),
 					pivot + (newRangeWidth * rightRatio),
-					];
+				];
 
 				this.setVisibleRange(newVisibleRange);
 
@@ -20261,29 +20281,29 @@ ENDSEC
 			this.update();
 		}
 
-		setRange(range){
+		setRange (range) {
 
-			if(this.chosenRange[0] === range[0] && this.chosenRange[1] === range[1]){
+			if (this.chosenRange[0] === range[0] && this.chosenRange[1] === range[1]) {
 				return;
 			}
 
 			this.chosenRange = range;
 
-			for(let callback of this.changeCallbacks){
+			for (let callback of this.changeCallbacks) {
 				callback();
 			}
 
 			this.update();
 		}
 
-		setVisibleRange(range){
+		setVisibleRange (range) {
 			this.visibleRange = range;
 
 			this.update();
 		}
 
-		update(){
-			let {elLeft, elRight, elInside, visibleRange, chosenRange} = this;
+		update () {
+			let { elLeft, elRight, elInside, visibleRange, chosenRange } = this;
 
 			let pixelWidth = this.elCore.clientWidth;
 
@@ -20291,7 +20311,7 @@ ENDSEC
 			let normalizedRight = (chosenRange[1] - visibleRange[0]) / (visibleRange[1] - visibleRange[0]);
 			let pixelLeft = Math.round(normalizedLeft * pixelWidth) - elLeft.clientWidth / 2;
 			let pixelRight = Math.round(normalizedRight * pixelWidth) - elRight.clientWidth / 2;
-			
+
 			elLeft.style.left = `${pixelLeft}px`;
 			elRight.style.left = `${pixelRight}px`;
 
@@ -20325,15 +20345,15 @@ ENDSEC
 			this.elLabelChosenRight.innerHTML = `${chosenRightString}`;
 		}
 
-		change(callback){
+		change (callback) {
 			this.changeCallbacks.push(callback);
 		}
-		
+
 	}
 
-	class Sidebar{
+	class Sidebar {
 
-		constructor(viewer){
+		constructor(viewer) {
 			this.viewer = viewer;
 
 			this.measuringTool = new MeasuringTool(this.viewer);
@@ -20342,7 +20362,7 @@ ENDSEC
 
 		}
 
-		createToolIcon(icon, title, callback){
+		createToolIcon (icon, title, callback) {
 			let element = $(`
 			<img src="${icon}"
 				style="width: 32px; height: 32px"
@@ -20355,7 +20375,7 @@ ENDSEC
 			return element;
 		}
 
-		init(){
+		init () {
 
 			this.initAccordion();
 			this.initAppearance();
@@ -20365,14 +20385,14 @@ ENDSEC
 			this.initFilters();
 			this.initClippingTool();
 			this.initSettings();
-			
+
 			$('#potree_version_number').html(Potree.version.major + "." + Potree.version.minor + Potree.version.suffix);
 			$('.perfect_scrollbar').perfectScrollbar();
 		}
 
-			
 
-		initToolbar(){
+
+		initToolbar () {
 
 			// ANGLE
 			let elToolbar = $('#tools');
@@ -20387,7 +20407,8 @@ ENDSEC
 						showArea: false,
 						closed: true,
 						maxMarkers: 3,
-						name: 'Angle'});
+						name: 'Angle'
+					});
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === measurement.uuid);
@@ -20409,7 +20430,8 @@ ENDSEC
 						showArea: false,
 						closed: true,
 						maxMarkers: 1,
-						name: 'Point'});
+						name: 'Point'
+					});
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === measurement.uuid);
@@ -20428,7 +20450,8 @@ ENDSEC
 						showDistances: true,
 						showArea: false,
 						closed: false,
-						name: 'Distance'});
+						name: 'Distance'
+					});
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === measurement.uuid);
@@ -20449,7 +20472,8 @@ ENDSEC
 						showArea: false,
 						closed: false,
 						maxMarkers: 2,
-						name: 'Height'});
+						name: 'Height'
+					});
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === measurement.uuid);
@@ -20468,7 +20492,8 @@ ENDSEC
 						showDistances: true,
 						showArea: true,
 						closed: true,
-						name: 'Area'});
+						name: 'Area'
+					});
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === measurement.uuid);
@@ -20482,7 +20507,7 @@ ENDSEC
 				Potree.resourcePath + '/icons/volume.svg',
 				'[title]tt.volume_measurement',
 				() => {
-					let volume = this.volumeTool.startInsertion(); 
+					let volume = this.volumeTool.startInsertion();
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === volume.uuid);
@@ -20495,8 +20520,8 @@ ENDSEC
 			elToolbar.append(this.createToolIcon(
 				Potree.resourcePath + '/icons/sphere_distances.svg',
 				'[title]tt.volume_measurement',
-				() => { 
-					let volume = this.volumeTool.startInsertion({type: SphereVolume}); 
+				() => {
+					let volume = this.volumeTool.startInsertion({ type: SphereVolume });
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === volume.uuid);
@@ -20510,7 +20535,7 @@ ENDSEC
 				Potree.resourcePath + '/icons/profile.svg',
 				'[title]tt.height_profile',
 				() => {
-					$('#menu_measurements').next().slideDown(); 
+					$('#menu_measurements').next().slideDown();
 					let profile = this.profileTool.startInsertion();
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
@@ -20530,12 +20555,12 @@ ENDSEC
 			));
 		}
 
-		initScene(){
+		initScene () {
 
 			let elScene = $("#menu_scene");
 			let elObjects = elScene.next().find("#scene_objects");
 			let elProperties = elScene.next().find("#scene_object_properties");
-			
+
 
 			{
 				let elExport = elScene.next().find("#scene_export");
@@ -20550,31 +20575,31 @@ ENDSEC
 			`);
 
 				let elDownloadJSON = elExport.find("img[name=geojson_export_button]").parent();
-				elDownloadJSON.click( () => {
+				elDownloadJSON.click(() => {
 					let scene = this.viewer.scene;
 					let measurements = [...scene.measurements, ...scene.profiles, ...scene.volumes];
 
 					let geoJson = GeoJSONExporter.toString(measurements);
 
-					let url = window.URL.createObjectURL(new Blob([geoJson], {type: 'data:application/octet-stream'}));
+					let url = window.URL.createObjectURL(new Blob([geoJson], { type: 'data:application/octet-stream' }));
 					elDownloadJSON.attr('href', url);
 				});
 
 				let elDownloadDXF = elExport.find("img[name=dxf_export_button]").parent();
-				elDownloadDXF.click( () => {
+				elDownloadDXF.click(() => {
 					let scene = this.viewer.scene;
 					let measurements = [...scene.measurements, ...scene.profiles, ...scene.volumes];
 
 					let dxf = DXFExporter.toString(measurements);
 
-					let url = window.URL.createObjectURL(new Blob([dxf], {type: 'data:application/octet-stream'}));
+					let url = window.URL.createObjectURL(new Blob([dxf], { type: 'data:application/octet-stream' }));
 					elDownloadDXF.attr('href', url);
 				});
 			}
 
 			let propertiesPanel = new PropertiesPanel(elProperties, this.viewer);
 			propertiesPanel.setScene(this.viewer.scene);
-			
+
 			localStorage.removeItem('jstree');
 
 			let tree = $(`<div id="jstree_scene"></div>`);
@@ -20585,12 +20610,12 @@ ENDSEC
 				'core': {
 					"dblclick_toggle": false,
 					"state": {
-						"checked" : true
+						"checked": true
 					},
 					'check_callback': true,
 					"expand_selected_onload": true
 				},
-				"checkbox" : {
+				"checkbox": {
 					"keep_selected_style": true,
 					"three_state": false,
 					"whole_node": false,
@@ -20599,23 +20624,23 @@ ENDSEC
 			});
 
 			let createNode = (parent, text, icon, object) => {
-				let nodeID = tree.jstree('create_node', parent, { 
-						"text": text, 
-						"icon": icon,
-						"data": object
-					}, 
+				let nodeID = tree.jstree('create_node', parent, {
+					"text": text,
+					"icon": icon,
+					"data": object
+				},
 					"last", false, false);
-				
-				if(object.visible){
+
+				if (object.visible) {
 					tree.jstree('check_node', nodeID);
-				}else{
+				} else {
 					tree.jstree('uncheck_node', nodeID);
 				}
 
 				return nodeID;
 			};
 
-			let pcID = tree.jstree('create_node', "#", { "text": "<b>Point Clouds</b>", "id": "pointclouds"}, "last", false, false);
+			let pcID = tree.jstree('create_node', "#", { "text": "<b>Point Clouds</b>", "id": "pointclouds" }, "last", false, false);
 			let measurementID = tree.jstree('create_node', "#", { "text": "<b>Measurements</b>", "id": "measurements" }, "last", false, false);
 			let annotationsID = tree.jstree('create_node', "#", { "text": "<b>Annotations</b>", "id": "annotations" }, "last", false, false);
 			let otherID = tree.jstree('create_node', "#", { "text": "<b>Other</b>", "id": "other" }, "last", false, false);
@@ -20635,7 +20660,7 @@ ENDSEC
 
 				this.viewer.inputHandler.deselectAll();
 
-				if(object instanceof Volume){
+				if (object instanceof Volume) {
 					this.viewer.inputHandler.toggleSelection(object);
 				}
 
@@ -20650,77 +20675,77 @@ ENDSEC
 				propertiesPanel.set(null);
 			});
 
-			tree.on('dblclick','.jstree-anchor', (e) => {
+			tree.on('dblclick', '.jstree-anchor', (e) => {
 				let instance = $.jstree.reference(this);
 				let node = instance.get_node(this);
 				let object = node.data;
 
 				// ignore double click on checkbox
-				if(e.target.classList.contains("jstree-checkbox")){
+				if (e.target.classList.contains("jstree-checkbox")) {
 					return;
 				}
 
-				if(object instanceof PointCloudTree){
+				if (object instanceof PointCloudTree) {
 					let box = this.viewer.getBoundingBox([object]);
 					let node = new THREE.Object3D();
 					node.boundingBox = box;
 					this.viewer.zoomTo(node, 1, 500);
-				}else if(object instanceof Measure){
+				} else if (object instanceof Measure) {
 					let points = object.points.map(p => p.position);
 					let box = new THREE.Box3().setFromPoints(points);
-					if(box.getSize(new THREE.Vector3()).length() > 0){
+					if (box.getSize(new THREE.Vector3()).length() > 0) {
 						let node = new THREE.Object3D();
 						node.boundingBox = box;
 						this.viewer.zoomTo(node, 2, 500);
 					}
-				}else if(object instanceof Profile){
+				} else if (object instanceof Profile) {
 					let points = object.points;
 					let box = new THREE.Box3().setFromPoints(points);
-					if(box.getSize(new THREE.Vector3()).length() > 0){
+					if (box.getSize(new THREE.Vector3()).length() > 0) {
 						let node = new THREE.Object3D();
 						node.boundingBox = box;
 						this.viewer.zoomTo(node, 1, 500);
 					}
-				}else if(object instanceof Volume){
-					
+				} else if (object instanceof Volume) {
+
 					let box = object.boundingBox.clone().applyMatrix4(object.matrixWorld);
 
-					if(box.getSize(new THREE.Vector3()).length() > 0){
+					if (box.getSize(new THREE.Vector3()).length() > 0) {
 						let node = new THREE.Object3D();
 						node.boundingBox = box;
 						this.viewer.zoomTo(node, 1, 500);
 					}
-				}else if(object instanceof Annotation){
+				} else if (object instanceof Annotation) {
 					object.moveHere(this.viewer.scene.getActiveCamera());
-				}else if(object instanceof PolygonClipVolume){
+				} else if (object instanceof PolygonClipVolume) {
 					let dir = object.camera.getWorldDirection(new THREE.Vector3());
 					let target;
 
-					if(object.camera instanceof THREE.OrthographicCamera){
+					if (object.camera instanceof THREE.OrthographicCamera) {
 						dir.multiplyScalar(object.camera.right);
 						target = new THREE.Vector3().addVectors(object.camera.position, dir);
 						this.viewer.setCameraMode(CameraMode.ORTHOGRAPHIC);
-					}else if(object.camera instanceof THREE.PerspectiveCamera){
+					} else if (object.camera instanceof THREE.PerspectiveCamera) {
 						dir.multiplyScalar(this.viewer.scene.view.radius);
 						target = new THREE.Vector3().addVectors(object.camera.position, dir);
 						this.viewer.setCameraMode(CameraMode.PERSPECTIVE);
 					}
-					
+
 					this.viewer.scene.view.position.copy(object.camera.position);
 					this.viewer.scene.view.lookAt(target);
-				}else if(object instanceof THREE.SpotLight){
+				} else if (object instanceof THREE.SpotLight) {
 					let distance = (object.distance > 0) ? object.distance / 4 : 5 * 1000;
 					let position = object.position;
 					let target = new THREE.Vector3().addVectors(
-						position, 
+						position,
 						object.getWorldDirection(new THREE.Vector3()).multiplyScalar(distance));
 
 					this.viewer.scene.view.position.copy(object.position);
 					this.viewer.scene.view.lookAt(target);
-				}else if(object instanceof THREE.Object3D){
+				} else if (object instanceof THREE.Object3D) {
 					let box = new THREE.Box3().setFromObject(object);
 
-					if(box.getSize(new THREE.Vector3()).length() > 0){
+					if (box.getSize(new THREE.Vector3()).length() > 0) {
 						let node = new THREE.Object3D();
 						node.boundingBox = box;
 						this.viewer.zoomTo(node, 1, 500);
@@ -20731,7 +20756,7 @@ ENDSEC
 			tree.on("uncheck_node.jstree", (e, data) => {
 				let object = data.node.data;
 
-				if(object){
+				if (object) {
 					object.visible = false;
 				}
 			});
@@ -20739,7 +20764,7 @@ ENDSEC
 			tree.on("check_node.jstree", (e, data) => {
 				let object = data.node.data;
 
-				if(object){
+				if (object) {
 					object.visible = true;
 				}
 			});
@@ -20751,9 +20776,9 @@ ENDSEC
 				let node = createNode(pcID, pointcloud.name, cloudIcon, pointcloud);
 
 				pointcloud.addEventListener("visibility_changed", () => {
-					if(pointcloud.visible){
+					if (pointcloud.visible) {
 						tree.jstree('check_node', node);
-					}else{
+					} else {
 						tree.jstree('uncheck_node', node);
 					}
 				});
@@ -20771,9 +20796,9 @@ ENDSEC
 				let node = createNode(measurementID, volume.name, icon, volume);
 
 				volume.addEventListener("visibility_changed", () => {
-					if(volume.visible){
+					if (volume.visible) {
 						tree.jstree('check_node', node);
-					}else{
+					} else {
 						tree.jstree('uncheck_node', node);
 					}
 				});
@@ -20807,21 +20832,21 @@ ENDSEC
 			let onMeasurementRemoved = (e) => {
 				let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 				let jsonNode = measurementsRoot.children.find(child => child.data.uuid === e.measurement.uuid);
-				
+
 				tree.jstree("delete_node", jsonNode.id);
 			};
 
 			let onVolumeRemoved = (e) => {
 				let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 				let jsonNode = measurementsRoot.children.find(child => child.data.uuid === e.volume.uuid);
-				
+
 				tree.jstree("delete_node", jsonNode.id);
 			};
 
 			let onProfileRemoved = (e) => {
 				let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 				let jsonNode = measurementsRoot.children.find(child => child.data.uuid === e.profile.uuid);
-				
+
 				tree.jstree("delete_node", jsonNode.id);
 			};
 
@@ -20831,7 +20856,7 @@ ENDSEC
 
 			{
 				let annotationIcon = `${Potree.resourcePath}/icons/annotation.svg`;
-				this.annotationMapping = new Map(); 
+				this.annotationMapping = new Map();
 				this.annotationMapping.set(this.viewer.scene.annotations, annotationsID);
 				this.viewer.scene.annotations.traverseDescendants(annotation => {
 					let parentID = this.annotationMapping.get(annotation.parent);
@@ -20840,21 +20865,21 @@ ENDSEC
 				});
 			}
 
-			for(let pointcloud of this.viewer.scene.pointclouds){
-				onPointCloudAdded({pointcloud: pointcloud});
+			for (let pointcloud of this.viewer.scene.pointclouds) {
+				onPointCloudAdded({ pointcloud: pointcloud });
 			}
 
-			for(let measurement of this.viewer.scene.measurements){
-				onMeasurementAdded({measurement: measurement});
+			for (let measurement of this.viewer.scene.measurements) {
+				onMeasurementAdded({ measurement: measurement });
 			}
 
-			for(let volume of [...this.viewer.scene.volumes, ...this.viewer.scene.polygonClipVolumes]){
-				onVolumeAdded({volume: volume});
+			for (let volume of [...this.viewer.scene.volumes, ...this.viewer.scene.polygonClipVolumes]) {
+				onVolumeAdded({ volume: volume });
 			}
 
 
-			for(let profile of this.viewer.scene.profiles){
-				onProfileAdded({profile: profile});
+			for (let profile of this.viewer.scene.profiles) {
+				onProfileAdded({ profile: profile });
 			}
 
 			{
@@ -20881,7 +20906,7 @@ ENDSEC
 
 		}
 
-		initClippingTool(){
+		initClippingTool () {
 
 
 			this.viewer.addEventListener("cliptask_changed", (event) => {
@@ -20894,9 +20919,9 @@ ENDSEC
 
 			{
 				let elClipTask = $("#cliptask_options");
-				elClipTask.selectgroup({title: "Clip Task"});
+				elClipTask.selectgroup({ title: "Clip Task" });
 
-				elClipTask.find("input").click( (e) => {
+				elClipTask.find("input").click((e) => {
 					this.viewer.setClipTask(ClipTask[e.target.value]);
 				});
 
@@ -20907,9 +20932,9 @@ ENDSEC
 
 			{
 				let elClipMethod = $("#clipmethod_options");
-				elClipMethod.selectgroup({title: "Clip Method"});
+				elClipMethod.selectgroup({ title: "Clip Method" });
 
-				elClipMethod.find("input").click( (e) => {
+				elClipMethod.find("input").click((e) => {
 					this.viewer.setClipMethod(ClipMethod[e.target.value]);
 				});
 
@@ -20925,7 +20950,7 @@ ENDSEC
 				Potree.resourcePath + '/icons/clip_volume.svg',
 				'[title]tt.clip_volume',
 				() => {
-					let item = this.volumeTool.startInsertion({clip: true}); 
+					let item = this.volumeTool.startInsertion({ clip: true });
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === item.uuid);
@@ -20939,7 +20964,7 @@ ENDSEC
 				Potree.resourcePath + "/icons/clip-polygon.svg",
 				"[title]tt.clip_polygon",
 				() => {
-					let item = this.viewer.clippingTool.startInsertion({type: "polygon"});
+					let item = this.viewer.clippingTool.startInsertion({ type: "polygon" });
 
 					let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
 					let jsonNode = measurementsRoot.children.find(child => child.data.uuid === item.uuid);
@@ -20955,12 +20980,12 @@ ENDSEC
 					Potree.resourcePath + "/icons/clip-screen.svg",
 					"[title]tt.screen_clip_box",
 					() => {
-						if(!(this.viewer.scene.getActiveCamera() instanceof THREE.OrthographicCamera)){
-							this.viewer.postMessage(`Switch to Orthographic Camera Mode before using the Screen-Box-Select tool.`, 
-								{duration: 2000});
+						if (!(this.viewer.scene.getActiveCamera() instanceof THREE.OrthographicCamera)) {
+							this.viewer.postMessage(`Switch to Orthographic Camera Mode before using the Screen-Box-Select tool.`,
+								{ duration: 2000 });
 							return;
 						}
-						
+
 						let item = boxSelectTool.startInsertion();
 
 						let measurementsRoot = $("#jstree_scene").jstree().get_json("measurements");
@@ -20984,14 +21009,14 @@ ENDSEC
 
 		}
 
-		initFilters(){
+		initFilters () {
 			this.initClassificationList();
 			this.initReturnFilters();
 			this.initGPSTimeFilters();
 
 		}
 
-		initReturnFilters(){
+		initReturnFilters () {
 			let elReturnFilterPanel = $('#return_filter_panel');
 
 			{ // RETURN NUMBER
@@ -21011,7 +21036,7 @@ ENDSEC
 					let [from, to] = this.viewer.filterReturnNumberRange;
 
 					lblReturnNumber[0].innerHTML = `${from} to ${to}`;
-					sldReturnNumber.slider({values: [from, to]});
+					sldReturnNumber.slider({ values: [from, to] });
 				};
 
 				this.viewer.addEventListener('filter_return_number_range_changed', onReturnNumberChanged);
@@ -21036,7 +21061,7 @@ ENDSEC
 					let [from, to] = this.viewer.filterNumberOfReturnsRange;
 
 					lblNumberOfReturns[0].innerHTML = `${from} to ${to}`;
-					sldNumberOfReturns.slider({values: [from, to]});
+					sldNumberOfReturns.slider({ values: [from, to] });
 				};
 
 				this.viewer.addEventListener('filter_number_of_returns_range_changed', onNumberOfReturnsChanged);
@@ -21045,7 +21070,7 @@ ENDSEC
 			}
 		}
 
-		initGPSTimeFilters(){
+		initGPSTimeFilters () {
 			let elGPSTimeFilterPanel = $('#gpstime_filter_panel');
 
 			let lblGPSTime = elGPSTimeFilterPanel.find("#lblGPSTime");
@@ -21055,7 +21080,7 @@ ENDSEC
 			elGPS[0].appendChild(slider.element);
 			slider.update();
 
-			slider.change( () => {
+			slider.change(() => {
 				let range = slider.chosenRange;
 				this.viewer.setFilterGPSTimeRange(range[0], range[1]);
 			});
@@ -21072,7 +21097,7 @@ ENDSEC
 				let from = `${Utils.addCommas(range[0].toFixed(precision))}`;
 				let to = `${Utils.addCommas(range[1].toFixed(precision))}`;
 				lblGPSTime[0].innerHTML = `${from} to ${to}`;
-				
+
 				slider.setRange(range);
 			};
 
@@ -21081,7 +21106,7 @@ ENDSEC
 
 		}
 
-		initClassificationList(){
+		initClassificationList () {
 			let elClassificationList = $('#classificationList');
 
 			let addClassificationItem = (code, name) => {
@@ -21118,8 +21143,8 @@ ENDSEC
 			addClassificationItem(12, 'overlap');
 		}
 
-		initAccordion(){
-			$('.accordion > h3').each(function(){
+		initAccordion () {
+			$('.accordion > h3').each(function () {
 				let header = $(this);
 				let content = $(this).next();
 
@@ -21141,19 +21166,19 @@ ENDSEC
 			];
 
 			let elLanguages = $('#potree_languages');
-			for(let i = 0; i < languages.length; i++){
+			for (let i = 0; i < languages.length; i++) {
 				let [key, value] = languages[i];
 				let element = $(`<a>${key}</a>`);
 				element.click(() => this.viewer.setLanguage(value));
 
-				if(i === 0){
+				if (i === 0) {
 					element.css("margin-left", "30px");
 				}
-				
+
 				elLanguages.append(element);
 
-				if(i < languages.length - 1){
-					elLanguages.append($(document.createTextNode(' - ')));	
+				if (i < languages.length - 1) {
+					elLanguages.append($(document.createTextNode(' - ')));
 				}
 			}
 
@@ -21165,7 +21190,7 @@ ENDSEC
 			// $("#menu_tools").next().show()
 		}
 
-		initAppearance(){
+		initAppearance () {
 
 			$('#sldPointBudget').slider({
 				value: this.viewer.getPointBudget(),
@@ -21201,22 +21226,22 @@ ENDSEC
 
 			this.viewer.addEventListener('point_budget_changed', (event) => {
 				$('#lblPointBudget')[0].innerHTML = Utils.addCommas(this.viewer.getPointBudget());
-				$('#sldPointBudget').slider({value: this.viewer.getPointBudget()});
+				$('#sldPointBudget').slider({ value: this.viewer.getPointBudget() });
 			});
 
 			this.viewer.addEventListener('fov_changed', (event) => {
 				$('#lblFOV')[0].innerHTML = parseInt(this.viewer.getFOV());
-				$('#sldFOV').slider({value: this.viewer.getFOV()});
+				$('#sldFOV').slider({ value: this.viewer.getFOV() });
 			});
 
 			this.viewer.addEventListener('edl_radius_changed', (event) => {
 				$('#lblEDLRadius')[0].innerHTML = this.viewer.getEDLRadius().toFixed(1);
-				$('#sldEDLRadius').slider({value: this.viewer.getEDLRadius()});
+				$('#sldEDLRadius').slider({ value: this.viewer.getEDLRadius() });
 			});
 
 			this.viewer.addEventListener('edl_strength_changed', (event) => {
 				$('#lblEDLStrength')[0].innerHTML = this.viewer.getEDLStrength().toFixed(1);
-				$('#sldEDLStrength').slider({value: this.viewer.getEDLStrength()});
+				$('#sldEDLStrength').slider({ value: this.viewer.getEDLStrength() });
 			});
 
 			this.viewer.addEventListener('background_changed', (event) => {
@@ -21228,12 +21253,12 @@ ENDSEC
 			$('#lblEDLRadius')[0].innerHTML = this.viewer.getEDLRadius().toFixed(1);
 			$('#lblEDLStrength')[0].innerHTML = this.viewer.getEDLStrength().toFixed(1);
 			$('#chkEDLEnabled')[0].checked = this.viewer.getEDLEnabled();
-			
+
 			{
 				let elBackground = $(`#background_options`);
 				elBackground.selectgroup();
 
-				elBackground.find("input").click( (e) => {
+				elBackground.find("input").click((e) => {
 					this.viewer.setBackground(e.target.value);
 				});
 
@@ -21241,12 +21266,12 @@ ENDSEC
 				$(`input[name=background_options][value=${currentBackground}]`).trigger("click");
 			}
 
-			$('#chkEDLEnabled').click( () => {
+			$('#chkEDLEnabled').click(() => {
 				this.viewer.setEDLEnabled($('#chkEDLEnabled').prop("checked"));
 			});
 		}
 
-		initNavigation(){
+		initNavigation () {
 			let elNavigation = $('#navigation');
 			let sldMoveSpeed = $('#sldMoveSpeed');
 			let lblMoveSpeed = $('#lblMoveSpeed');
@@ -21269,7 +21294,7 @@ ENDSEC
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + '/icons/helicopter_controls.svg',
 				'[title]tt.heli_control',
-				() => { 
+				() => {
 					this.viewer.setNavigationMode(FirstPersonControls);
 					this.viewer.fpControls.lockElevation = true;
 				}
@@ -21288,11 +21313,11 @@ ENDSEC
 			));
 
 
-			
+
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/navigation_cube.svg",
 				"[title]tt.navigation_cube_control",
-				() => {this.viewer.toggleNavigationCube();}
+				() => { this.viewer.toggleNavigationCube(); }
 			));
 
 			elNavigation.append("<br>");
@@ -21301,37 +21326,37 @@ ENDSEC
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/left.svg",
 				"[title]tt.left_view_control",
-				() => {this.viewer.setLeftView();}
+				() => { this.viewer.setLeftView(); }
 			));
 
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/right.svg",
 				"[title]tt.right_view_control",
-				() => {this.viewer.setRightView();}
+				() => { this.viewer.setRightView(); }
 			));
 
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/front.svg",
 				"[title]tt.front_view_control",
-				() => {this.viewer.setFrontView();}
+				() => { this.viewer.setFrontView(); }
 			));
 
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/back.svg",
 				"[title]tt.back_view_control",
-				() => {this.viewer.setBackView();}
+				() => { this.viewer.setBackView(); }
 			));
 
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/top.svg",
 				"[title]tt.top_view_control",
-				() => {this.viewer.setTopView();}
+				() => { this.viewer.setTopView(); }
 			));
 
 			elNavigation.append(this.createToolIcon(
 				Potree.resourcePath + "/icons/bottom.svg",
 				"[title]tt.bottom_view_control",
-				() => {this.viewer.setBottomView();}
+				() => { this.viewer.setBottomView(); }
 			));
 
 
@@ -21345,8 +21370,8 @@ ENDSEC
 			</selectgroup>
 		`);
 			elNavigation.append(elCameraProjection);
-			elCameraProjection.selectgroup({title: "Camera Projection"});
-			elCameraProjection.find("input").click( (e) => {
+			elCameraProjection.selectgroup({ title: "Camera Projection" });
+			elCameraProjection.find("input").click((e) => {
 				this.viewer.setCameraMode(CameraMode[e.target.value]);
 			});
 			let cameraMode = Object.keys(CameraMode)
@@ -21373,14 +21398,14 @@ ENDSEC
 
 			this.viewer.addEventListener('move_speed_changed', (event) => {
 				lblMoveSpeed.html(this.viewer.getMoveSpeed().toFixed(1));
-				sldMoveSpeed.slider({value: toExpSpeed(this.viewer.getMoveSpeed())});
+				sldMoveSpeed.slider({ value: toExpSpeed(this.viewer.getMoveSpeed()) });
 			});
 
 			lblMoveSpeed.html(this.viewer.getMoveSpeed().toFixed(1));
 		}
 
 
-		initSettings(){
+		initSettings () {
 
 			{
 				$('#sldMinNodeSize').slider({
@@ -21393,19 +21418,19 @@ ENDSEC
 
 				this.viewer.addEventListener('minnodesize_changed', (event) => {
 					$('#lblMinNodeSize').html(parseInt(this.viewer.getMinNodeSize()));
-					$('#sldMinNodeSize').slider({value: this.viewer.getMinNodeSize()});
+					$('#sldMinNodeSize').slider({ value: this.viewer.getMinNodeSize() });
 				});
 				$('#lblMinNodeSize').html(parseInt(this.viewer.getMinNodeSize()));
 			}
 
 			{
 				let elSplatQuality = $("#splat_quality_options");
-				elSplatQuality.selectgroup({title: "Splat Quality"});
+				elSplatQuality.selectgroup({ title: "Splat Quality" });
 
-				elSplatQuality.find("input").click( (e) => {
-					if(e.target.value === "standard"){
+				elSplatQuality.find("input").click((e) => {
+					if (e.target.value === "standard") {
 						this.viewer.useHQ = false;
-					}else if(e.target.value === "hq"){
+					} else if (e.target.value === "hq") {
 						this.viewer.useHQ = true;
 					}
 				});
@@ -22149,20 +22174,20 @@ ENDSEC
 
 	class NavigationCube extends THREE.Object3D {
 
-		constructor(viewer){
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
 
 			let createPlaneMaterial = (img) => {
-				let material = new THREE.MeshBasicMaterial( {
-					depthTest: true, 
+				let material = new THREE.MeshBasicMaterial({
+					depthTest: true,
 					depthWrite: true,
 					side: THREE.DoubleSide
 				});
 				new THREE.TextureLoader().load(
 					exports.resourcePath + '/textures/navigation/' + img,
-					function(texture) {
+					function (texture) {
 						texture.anisotropy = viewer.renderer.capabilities.getMaxAnisotropy();
 						material.map = texture;
 						material.needsUpdate = true;
@@ -22226,7 +22251,7 @@ ENDSEC
 				mouse.x = event.clientX - (window.innerWidth - this.width);
 				mouse.y = event.clientY;
 
-				if(mouse.x < 0 || mouse.y > this.width) return;
+				if (mouse.x < 0 || mouse.y > this.width) return;
 
 				mouse.x = (mouse.x / this.width) * 2 - 1;
 				mouse.y = -(mouse.y / this.width) * 2 + 1;
@@ -22239,12 +22264,12 @@ ENDSEC
 
 				let minDistance = 1000;
 				for (let i = 0; i < intersects.length; i++) {
-					if(intersects[i].distance < minDistance) {
+					if (intersects[i].distance < minDistance) {
 						this.pickedFace = intersects[i].object.name;
 						minDistance = intersects[i].distance;
 					}
 				}
-				if(this.pickedFace) {
+				if (this.pickedFace) {
 					this.viewer.setView(this.pickedFace);
 				}
 			};
@@ -22252,7 +22277,7 @@ ENDSEC
 			this.viewer.renderer.domElement.addEventListener('mousedown', onMouseDown, false);
 		}
 
-		update(rotation) {
+		update (rotation) {
 			this.camera.rotation.copy(rotation);
 			this.camera.updateMatrixWorld();
 		}
@@ -22275,8 +22300,8 @@ ENDSEC
 	 *
 	 */
 
-	class DeviceOrientationControls extends EventDispatcher{
-		constructor(viewer){
+	class DeviceOrientationControls extends EventDispatcher {
+		constructor(viewer) {
 			super();
 
 			this.viewer = viewer;
@@ -22337,13 +22362,13 @@ ENDSEC
 		}
 	}
 
-	class Viewer extends EventDispatcher{
-		
-		constructor(domElement, args = {}){
+	class Viewer extends EventDispatcher {
+
+		constructor(domElement, args = {}) {
 			super();
 
 			this.renderArea = domElement;
-			this.guiLoaded = false;	
+			this.guiLoaded = false;
 			this.guiLoadTasks = [];
 
 			this.messages = [];
@@ -22352,217 +22377,217 @@ ENDSEC
 			style="position: absolute; z-index: 1000; left: 10px; bottom: 10px">
 		</div>`);
 			$(domElement).append(this.elMessages);
-			
-			try{
 
-			{ // generate missing dom hierarchy
-				if ($(domElement).find('#potree_map').length === 0) {
-					let potreeMap = $(`
+			try {
+
+				{ // generate missing dom hierarchy
+					if ($(domElement).find('#potree_map').length === 0) {
+						let potreeMap = $(`
 					<div id="potree_map" class="mapBox" style="position: absolute; left: 50px; top: 50px; width: 400px; height: 400px; display: none">
 						<div id="potree_map_header" style="position: absolute; width: 100%; height: 25px; top: 0px; background-color: rgba(0,0,0,0.5); z-index: 1000; border-top-left-radius: 3px; border-top-right-radius: 3px;">
 						</div>
 						<div id="potree_map_content" class="map" style="position: absolute; z-index: 100; top: 25px; width: 100%; height: calc(100% - 25px); border: 2px solid rgba(0,0,0,0.5); box-sizing: border-box;"></div>
 					</div>
 				`);
-					$(domElement).append(potreeMap);
-				}
+						$(domElement).append(potreeMap);
+					}
 
-				if ($(domElement).find('#potree_description').length === 0) {
-					let potreeDescription = $(`<div id="potree_description" class="potree_info_text"></div>`);
-					$(domElement).append(potreeDescription);
-				}
+					if ($(domElement).find('#potree_description').length === 0) {
+						let potreeDescription = $(`<div id="potree_description" class="potree_info_text"></div>`);
+						$(domElement).append(potreeDescription);
+					}
 
-				if ($(domElement).find('#potree_annotations').length === 0) {
-					let potreeAnnotationContainer = $(`
+					if ($(domElement).find('#potree_annotations').length === 0) {
+						let potreeAnnotationContainer = $(`
 					<div id="potree_annotation_container" 
 						style="position: absolute; z-index: 100000; width: 100%; height: 100%; pointer-events: none;"></div>`);
-					$(domElement).append(potreeAnnotationContainer);
+						$(domElement).append(potreeAnnotationContainer);
+					}
 				}
-			}
 
-			this.pointCloudLoadedCallback = args.onPointCloudLoaded || function () {};
+				this.pointCloudLoadedCallback = args.onPointCloudLoaded || function () { };
 
-			// if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-			//	defaultSettings.navigation = "Orbit";
-			// }
+				// if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				//	defaultSettings.navigation = "Orbit";
+				// }
 
-			this.server = null;
+				this.server = null;
 
-			this.fov = 60;
-			this.isFlipYZ = false;
-			this.useDEMCollisions = false;
-			this.generateDEM = false;
-			this.minNodeSize = 30;
-			this.edlStrength = 1.0;
-			this.edlRadius = 1.4;
-			this.useEDL = false;
-			this.classifications = {
-				0: { visible: true, name: 'never classified' },
-				1: { visible: true, name: 'unclassified' },
-				2: { visible: true, name: 'ground' },
-				3: { visible: true, name: 'low vegetation' },
-				4: { visible: true, name: 'medium vegetation' },
-				5: { visible: true, name: 'high vegetation' },
-				6: { visible: true, name: 'building' },
-				7: { visible: true, name: 'low point(noise)' },
-				8: { visible: true, name: 'key-point' },
-				9: { visible: true, name: 'water' },
-				12: { visible: true, name: 'overlap' }
-			};
-
-			this.moveSpeed = 10;
-
-			this.LENGTH_UNITS = {
-				METER: {code: 'm'},
-				FEET: {code: 'ft'},
-				INCH: {code: '\u2033'}
-			};
-			this.lengthUnit = this.LENGTH_UNITS.METER;
-
-			this.showBoundingBox = false;
-			this.showAnnotations = true;
-			this.freeze = false;
-			this.clipTask = ClipTask.HIGHLIGHT;
-			this.clipMethod = ClipMethod.INSIDE_ANY;
-
-			this.filterReturnNumberRange = [1, 7];
-			this.filterNumberOfReturnsRange = [1, 7];
-			this.filterGPSTimeRange = [0, Infinity];
-			this.filterGPSTimeExtent = [0, 1];
-
-			this.potreeRenderer = null;
-			this.edlRenderer = null;
-			this.renderer = null;
-			this.pRenderer = null;
-
-			this.scene = null;
-			this.overlay = null;
-			this.overlayCamera = null;
-
-			this.inputHandler = null;
-
-			this.clippingTool =  null;
-			this.transformationTool = null;
-			this.navigationCube = null;
-			
-			this.skybox = null;
-			this.clock = new THREE.Clock();
-			this.background = null;
-			this.defaultGPSTimeChanged = false;
-
-			this.initThree();
-
-			{
-				let canvas = this.renderer.domElement;
-				canvas.addEventListener("webglcontextlost", (e) => {
-					console.log(e);
-					this.postMessage("WebGL context lost. \u2639");
-
-					let gl = this.renderer.getContext();
-					let error = gl.getError();
-					console.log(error);
-				}, false);
-			}
-
-			{
-				this.overlay = new THREE.Scene();
-				this.overlayCamera = new THREE.OrthographicCamera(
-					0, 1,
-					1, 0,
-					-1000, 1000
-				);
-			}
-			
-			this.pRenderer = new Renderer(this.renderer);
-			
-			{
-				let near = 2.5;
-				let far = 10.0;
-				let fov = 90;
-				
-				this.shadowTestCam = new THREE.PerspectiveCamera(90, 1, near, far);
-				this.shadowTestCam.position.set(3.50, -2.80, 8.561);
-				this.shadowTestCam.lookAt(new THREE.Vector3(0, 0, 4.87));
-			}
-			
-
-			let scene = new Scene(this.renderer);
-			this.setScene(scene);
-
-			{
-				this.inputHandler = new InputHandler(this);
-				this.inputHandler.setScene(this.scene);
-
-				this.clippingTool = new ClippingTool(this);
-				this.transformationTool = new TransformationTool(this);
-				this.navigationCube = new NavigationCube(this);
-				this.navigationCube.visible = false;
-				
-				this.createControls();
-
-				this.clippingTool.setScene(this.scene);
-				
-				let onPointcloudAdded = (e) => {
-					if (this.scene.pointclouds.length === 1) {
-						let speed = e.pointcloud.boundingBox.getSize(new THREE.Vector3()).length();
-						speed = speed / 5;
-						this.setMoveSpeed(speed);
-					}
+				this.fov = 60;
+				this.isFlipYZ = false;
+				this.useDEMCollisions = false;
+				this.generateDEM = false;
+				this.minNodeSize = 30;
+				this.edlStrength = 1.0;
+				this.edlRadius = 1.4;
+				this.useEDL = false;
+				this.classifications = {
+					0: { visible: true, name: 'never classified' },
+					1: { visible: true, name: 'unclassified' },
+					2: { visible: true, name: 'ground' },
+					3: { visible: true, name: 'low vegetation' },
+					4: { visible: true, name: 'medium vegetation' },
+					5: { visible: true, name: 'high vegetation' },
+					6: { visible: true, name: 'building' },
+					7: { visible: true, name: 'low point(noise)' },
+					8: { visible: true, name: 'key-point' },
+					9: { visible: true, name: 'water' },
+					12: { visible: true, name: 'overlap' }
 				};
 
-				let onVolumeRemoved = (e) => {
-					this.inputHandler.deselect(e.volume);
-				};
+				this.moveSpeed = 10;
 
-				this.addEventListener('scene_changed', (e) => {
-					this.inputHandler.setScene(e.scene);
+				this.LENGTH_UNITS = {
+					METER: { code: 'm' },
+					FEET: { code: 'ft' },
+					INCH: { code: '\u2033' }
+				};
+				this.lengthUnit = this.LENGTH_UNITS.METER;
+
+				this.showBoundingBox = false;
+				this.showAnnotations = true;
+				this.freeze = false;
+				this.clipTask = ClipTask.HIGHLIGHT;
+				this.clipMethod = ClipMethod.INSIDE_ANY;
+
+				this.filterReturnNumberRange = [1, 7];
+				this.filterNumberOfReturnsRange = [1, 7];
+				this.filterGPSTimeRange = [0, Infinity];
+				this.filterGPSTimeExtent = [0, 1];
+
+				this.potreeRenderer = null;
+				this.edlRenderer = null;
+				this.renderer = null;
+				this.pRenderer = null;
+
+				this.scene = null;
+				this.overlay = null;
+				this.overlayCamera = null;
+
+				this.inputHandler = null;
+
+				this.clippingTool = null;
+				this.transformationTool = null;
+				this.navigationCube = null;
+
+				this.skybox = null;
+				this.clock = new THREE.Clock();
+				this.background = null;
+				this.defaultGPSTimeChanged = false;
+
+				this.initThree();
+
+				{
+					let canvas = this.renderer.domElement;
+					canvas.addEventListener("webglcontextlost", (e) => {
+						console.log(e);
+						this.postMessage("WebGL context lost. \u2639");
+
+						let gl = this.renderer.getContext();
+						let error = gl.getError();
+						console.log(error);
+					}, false);
+				}
+
+				{
+					this.overlay = new THREE.Scene();
+					this.overlayCamera = new THREE.OrthographicCamera(
+						0, 1,
+						1, 0,
+						-1000, 1000
+					);
+				}
+
+				this.pRenderer = new Renderer(this.renderer);
+
+				{
+					let near = 2.5;
+					let far = 10.0;
+					let fov = 90;
+
+					this.shadowTestCam = new THREE.PerspectiveCamera(90, 1, near, far);
+					this.shadowTestCam.position.set(3.50, -2.80, 8.561);
+					this.shadowTestCam.lookAt(new THREE.Vector3(0, 0, 4.87));
+				}
+
+
+				let scene = new Scene(this.renderer);
+				this.setScene(scene);
+
+				{
+					this.inputHandler = new InputHandler(this);
+					this.inputHandler.setScene(this.scene);
+
+					this.clippingTool = new ClippingTool(this);
+					this.transformationTool = new TransformationTool(this);
+					this.navigationCube = new NavigationCube(this);
+					this.navigationCube.visible = false;
+
+					this.createControls();
+
 					this.clippingTool.setScene(this.scene);
-					
-					if(!e.scene.hasEventListener("pointcloud_added", onPointcloudAdded)){
-						e.scene.addEventListener("pointcloud_added", onPointcloudAdded);
-					}
 
-					if(!e.scene.hasEventListener("volume_removed", onPointcloudAdded)){
-						e.scene.addEventListener("volume_removed", onVolumeRemoved);
-					}
-					
-				});
+					let onPointcloudAdded = (e) => {
+						if (this.scene.pointclouds.length === 1) {
+							let speed = e.pointcloud.boundingBox.getSize(new THREE.Vector3()).length();
+							speed = speed / 5;
+							this.setMoveSpeed(speed);
+						}
+					};
 
-				this.scene.addEventListener("volume_removed", onVolumeRemoved);
-				this.scene.addEventListener('pointcloud_added', onPointcloudAdded);
-			}
+					let onVolumeRemoved = (e) => {
+						this.inputHandler.deselect(e.volume);
+					};
 
-			{ // set defaults
-				this.setFOV(60);
-				this.setEDLEnabled(false);
-				this.setEDLRadius(1.4);
-				this.setEDLStrength(0.4);
-				this.setClipTask(ClipTask.HIGHLIGHT);
-				this.setClipMethod(ClipMethod.INSIDE_ANY);
-				this.setPointBudget(1*1000*1000);
-				this.setShowBoundingBox(false);
-				this.setFreeze(false);
-				this.setNavigationMode(OrbitControls);
-				this.setBackground('gradient');
+					this.addEventListener('scene_changed', (e) => {
+						this.inputHandler.setScene(e.scene);
+						this.clippingTool.setScene(this.scene);
 
-				this.scaleFactor = 1;
+						if (!e.scene.hasEventListener("pointcloud_added", onPointcloudAdded)) {
+							e.scene.addEventListener("pointcloud_added", onPointcloudAdded);
+						}
 
-				this.loadSettingsFromURL();
-			}
+						if (!e.scene.hasEventListener("volume_removed", onPointcloudAdded)) {
+							e.scene.addEventListener("volume_removed", onVolumeRemoved);
+						}
 
-			// start rendering!
-			if(args.useDefaultRenderLoop === undefined || args.useDefaultRenderLoop === true){
-				requestAnimationFrame(this.loop.bind(this));
-			}
+					});
 
-			this.loadGUI = this.loadGUI.bind(this);
+					this.scene.addEventListener("volume_removed", onVolumeRemoved);
+					this.scene.addEventListener('pointcloud_added', onPointcloudAdded);
+				}
 
-			}catch(e){
+				{ // set defaults
+					this.setFOV(60);
+					this.setEDLEnabled(false);
+					this.setEDLRadius(1.4);
+					this.setEDLStrength(0.4);
+					this.setClipTask(ClipTask.HIGHLIGHT);
+					this.setClipMethod(ClipMethod.INSIDE_ANY);
+					this.setPointBudget(1 * 1000 * 1000);
+					this.setShowBoundingBox(false);
+					this.setFreeze(false);
+					this.setNavigationMode(OrbitControls);
+					this.setBackground('gradient');
+
+					this.scaleFactor = 1;
+
+					this.loadSettingsFromURL();
+				}
+
+				// start rendering!
+				if (args.useDefaultRenderLoop === undefined || args.useDefaultRenderLoop === true) {
+					requestAnimationFrame(this.loop.bind(this));
+				}
+
+				this.loadGUI = this.loadGUI.bind(this);
+
+			} catch (e) {
 				this.onCrash(e);
 			}
 		}
 
-		onCrash(error){
+		onCrash (error) {
 
 			$(this.renderArea).empty();
 
@@ -22637,7 +22662,7 @@ ENDSEC
 
 				if (!this.onAnnotationAdded) {
 					this.onAnnotationAdded = e => {
-					// console.log("annotation added: " + e.annotation.title);
+						// console.log("annotation added: " + e.annotation.title);
 
 						e.annotation.traverse(node => {
 
@@ -22676,7 +22701,7 @@ ENDSEC
 		setMinNodeSize (value) {
 			if (this.minNodeSize !== value) {
 				this.minNodeSize = value;
-				this.dispatchEvent({'type': 'minnodesize_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'minnodesize_changed', 'viewer': this });
 			}
 		};
 
@@ -22684,17 +22709,17 @@ ENDSEC
 			return this.background;
 		};
 
-		setBackground(bg){
+		setBackground (bg) {
 			if (this.background === bg) {
 				return;
 			}
 
-			if(bg === "skybox"){
+			if (bg === "skybox") {
 				this.skybox = Utils.loadSkybox(new URL(Potree.resourcePath + '/textures/skybox2/').href);
 			}
 
 			this.background = bg;
-			this.dispatchEvent({'type': 'background_changed', 'viewer': this});
+			this.dispatchEvent({ 'type': 'background_changed', 'viewer': this });
 		}
 
 		setDescription (value) {
@@ -22708,7 +22733,7 @@ ENDSEC
 		setShowBoundingBox (value) {
 			if (this.showBoundingBox !== value) {
 				this.showBoundingBox = value;
-				this.dispatchEvent({'type': 'show_boundingbox_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'show_boundingbox_changed', 'viewer': this });
 			}
 		};
 
@@ -22719,7 +22744,7 @@ ENDSEC
 		setMoveSpeed (value) {
 			if (this.moveSpeed !== value) {
 				this.moveSpeed = value;
-				this.dispatchEvent({'type': 'move_speed_changed', 'viewer': this, 'speed': value});
+				this.dispatchEvent({ 'type': 'move_speed_changed', 'viewer': this, 'speed': value });
 			}
 		};
 
@@ -22730,7 +22755,7 @@ ENDSEC
 		setWeightClassification (w) {
 			for (let i = 0; i < this.scene.pointclouds.length; i++) {
 				this.scene.pointclouds[i].material.weightClassification = w;
-				this.dispatchEvent({'type': 'attribute_weights_changed' + i, 'viewer': this});
+				this.dispatchEvent({ 'type': 'attribute_weights_changed' + i, 'viewer': this });
 			}
 		};
 
@@ -22738,7 +22763,7 @@ ENDSEC
 			value = Boolean(value);
 			if (this.freeze !== value) {
 				this.freeze = value;
-				this.dispatchEvent({'type': 'freeze_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'freeze_changed', 'viewer': this });
 			}
 		};
 
@@ -22746,40 +22771,42 @@ ENDSEC
 			return this.freeze;
 		};
 
-		getClipTask(){
+		getClipTask () {
 			return this.clipTask;
 		}
 
-		getClipMethod(){
+		getClipMethod () {
 			return this.clipMethod;
 		}
 
-		setClipTask(value){
-			if(this.clipTask !== value){
+		setClipTask (value) {
+			if (this.clipTask !== value) {
 
 				this.clipTask = value;
 
 				this.dispatchEvent({
-					type: "cliptask_changed", 
-					viewer: this});		
+					type: "cliptask_changed",
+					viewer: this
+				});
 			}
 		}
 
-		setClipMethod(value){
-			if(this.clipMethod !== value){
+		setClipMethod (value) {
+			if (this.clipMethod !== value) {
 
 				this.clipMethod = value;
-				
+
 				this.dispatchEvent({
-					type: "clipmethod_changed", 
-					viewer: this});		
+					type: "clipmethod_changed",
+					viewer: this
+				});
 			}
 		}
 
 		setPointBudget (value) {
 			if (Potree.pointBudget !== value) {
 				Potree.pointBudget = parseInt(value);
-				this.dispatchEvent({'type': 'point_budget_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'point_budget_changed', 'viewer': this });
 			}
 		};
 
@@ -22790,18 +22817,18 @@ ENDSEC
 		setShowAnnotations (value) {
 			if (this.showAnnotations !== value) {
 				this.showAnnotations = value;
-				this.dispatchEvent({'type': 'show_annotations_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'show_annotations_changed', 'viewer': this });
 			}
 		}
 
 		getShowAnnotations () {
 			return this.showAnnotations;
 		}
-		
-		setDEMCollisionsEnabled(value){
-			if(this.useDEMCollisions !== value){
+
+		setDEMCollisionsEnabled (value) {
+			if (this.useDEMCollisions !== value) {
 				this.useDEMCollisions = value;
-				this.dispatchEvent({'type': 'use_demcollisions_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'use_demcollisions_changed', 'viewer': this });
 			}
 		};
 
@@ -22813,7 +22840,7 @@ ENDSEC
 			value = Boolean(value);
 			if (this.useEDL !== value) {
 				this.useEDL = value;
-				this.dispatchEvent({'type': 'use_edl_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'use_edl_changed', 'viewer': this });
 			}
 		};
 
@@ -22824,7 +22851,7 @@ ENDSEC
 		setEDLRadius (value) {
 			if (this.edlRadius !== value) {
 				this.edlRadius = value;
-				this.dispatchEvent({'type': 'edl_radius_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'edl_radius_changed', 'viewer': this });
 			}
 		};
 
@@ -22835,7 +22862,7 @@ ENDSEC
 		setEDLStrength (value) {
 			if (this.edlStrength !== value) {
 				this.edlStrength = value;
-				this.dispatchEvent({'type': 'edl_strength_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'edl_strength_changed', 'viewer': this });
 			}
 		};
 
@@ -22846,7 +22873,7 @@ ENDSEC
 		setFOV (value) {
 			if (this.fov !== value) {
 				this.fov = value;
-				this.dispatchEvent({'type': 'fov_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'fov_changed', 'viewer': this });
 			}
 		};
 
@@ -22872,32 +22899,32 @@ ENDSEC
 
 		setClassificationVisibility (key, value) {
 			if (!this.classifications[key]) {
-				this.classifications[key] = {visible: value, name: 'no name'};
-				this.dispatchEvent({'type': 'classification_visibility_changed', 'viewer': this});
+				this.classifications[key] = { visible: value, name: 'no name' };
+				this.dispatchEvent({ 'type': 'classification_visibility_changed', 'viewer': this });
 			} else if (this.classifications[key].visible !== value) {
 				this.classifications[key].visible = value;
-				this.dispatchEvent({'type': 'classification_visibility_changed', 'viewer': this});
+				this.dispatchEvent({ 'type': 'classification_visibility_changed', 'viewer': this });
 			}
 		};
 
-		setFilterReturnNumberRange(from, to){
+		setFilterReturnNumberRange (from, to) {
 			this.filterReturnNumberRange = [from, to];
-			this.dispatchEvent({'type': 'filter_return_number_range_changed', 'viewer': this});
+			this.dispatchEvent({ 'type': 'filter_return_number_range_changed', 'viewer': this });
 		}
 
-		setFilterNumberOfReturnsRange(from, to){
+		setFilterNumberOfReturnsRange (from, to) {
 			this.filterNumberOfReturnsRange = [from, to];
-			this.dispatchEvent({'type': 'filter_number_of_returns_range_changed', 'viewer': this});
+			this.dispatchEvent({ 'type': 'filter_number_of_returns_range_changed', 'viewer': this });
 		}
 
-		setFilterGPSTimeRange(from, to){
+		setFilterGPSTimeRange (from, to) {
 			this.filterGPSTimeRange = [from, to];
-			this.dispatchEvent({'type': 'filter_gps_time_range_changed', 'viewer': this});
+			this.dispatchEvent({ 'type': 'filter_gps_time_range_changed', 'viewer': this });
 		}
 
-		setFilterGPSTimeExtent(from, to){
+		setFilterGPSTimeExtent (from, to) {
 			this.filterGPSTimeExtent = [from, to];
-			this.dispatchEvent({'type': 'filter_gps_time_extent_changed', 'viewer': this});
+			this.dispatchEvent({ 'type': 'filter_gps_time_extent_changed', 'viewer': this });
 		}
 
 		setLengthUnit (value) {
@@ -22913,10 +22940,10 @@ ENDSEC
 					break;
 			}
 
-			this.dispatchEvent({'type': 'length_unit_changed', 'viewer': this, value: value});
+			this.dispatchEvent({ 'type': 'length_unit_changed', 'viewer': this, value: value });
 		}
 
-		zoomTo(node, factor, animationDuration = 0){
+		zoomTo (node, factor, animationDuration = 0) {
 			let view = this.scene.view;
 
 			let camera = this.scene.cameraP.clone();
@@ -22936,7 +22963,7 @@ ENDSEC
 			} else {
 				bs = node.boundingBox.getBoundingSphere(new THREE.Sphere());
 			}
-			bs = bs.clone().applyMatrix4(node.matrixWorld); 
+			bs = bs.clone().applyMatrix4(node.matrixWorld);
 
 			let startPosition = view.position.clone();
 			let endPosition = camera.position.clone();
@@ -22968,10 +22995,10 @@ ENDSEC
 				});
 				tween.onComplete(() => {
 					view.lookAt(target);
-					this.dispatchEvent({type: 'focusing_finished', target: this});
+					this.dispatchEvent({ type: 'focusing_finished', target: this });
 				});
 
-				this.dispatchEvent({type: 'focusing_started', target: this});
+				this.dispatchEvent({ type: 'focusing_started', target: this });
 				tween.start();
 			}
 		};
@@ -22996,14 +23023,14 @@ ENDSEC
 			this.controls.stop();
 		};
 
-		toggleNavigationCube() {
+		toggleNavigationCube () {
 			this.navigationCube.visible = !this.navigationCube.visible;
 		}
 
-		setView(view) {
-			if(!view) return;
+		setView (view) {
+			if (!view) return;
 
-			switch(view) {
+			switch (view) {
 				case "F":
 					this.setFrontView();
 					break;
@@ -23024,36 +23051,36 @@ ENDSEC
 					break;
 			}
 		}
-		
-		setTopView(){
+
+		setTopView () {
 			this.scene.view.yaw = 0;
 			this.scene.view.pitch = -Math.PI / 2;
 
 			this.fitToScreen();
 		};
-		
-		setBottomView(){
+
+		setBottomView () {
 			this.scene.view.yaw = -Math.PI;
 			this.scene.view.pitch = Math.PI / 2;
-			
+
 			this.fitToScreen();
 		};
 
-		setFrontView(){
+		setFrontView () {
 			this.scene.view.yaw = 0;
 			this.scene.view.pitch = 0;
 
 			this.fitToScreen();
 		};
-		
-		setBackView(){
+
+		setBackView () {
 			this.scene.view.yaw = Math.PI;
 			this.scene.view.pitch = 0;
-			
+
 			this.fitToScreen();
 		};
 
-		setLeftView(){
+		setLeftView () {
 			this.scene.view.yaw = -Math.PI / 2;
 			this.scene.view.pitch = 0;
 
@@ -23073,29 +23100,29 @@ ENDSEC
 			// TODO flipyz
 			console.log('TODO');
 		}
-		
-		setCameraMode(mode){
+
+		setCameraMode (mode) {
 			this.scene.cameraMode = mode;
 
-			for(let pointcloud of this.scene.pointclouds) {
+			for (let pointcloud of this.scene.pointclouds) {
 				pointcloud.material.useOrthographicCamera = mode == CameraMode.ORTHOGRAPHIC;
 			}
 		}
-		
-		loadSettingsFromURL(){
-			if(Utils.getParameterByName("pointSize")){
+
+		loadSettingsFromURL () {
+			if (Utils.getParameterByName("pointSize")) {
 				this.setPointSize(parseFloat(Utils.getParameterByName("pointSize")));
 			}
-			
-			if(Utils.getParameterByName("FOV")){
+
+			if (Utils.getParameterByName("FOV")) {
 				this.setFOV(parseFloat(Utils.getParameterByName("FOV")));
 			}
-			
-			if(Utils.getParameterByName("opacity")){
+
+			if (Utils.getParameterByName("opacity")) {
 				this.setOpacity(parseFloat(Utils.getParameterByName("opacity")));
 			}
-			
-			if(Utils.getParameterByName("edlEnabled")){
+
+			if (Utils.getParameterByName("edlEnabled")) {
 				let enabled = Utils.getParameterByName("edlEnabled") === "true";
 				this.setEDLEnabled(enabled);
 			}
@@ -23246,15 +23273,15 @@ ENDSEC
 			}
 		};
 
-		onGUILoaded(callback){
-			if(this.guiLoaded){
+		onGUILoaded (callback) {
+			if (this.guiLoaded) {
 				callback();
-			}else{
+			} else {
 				this.guiLoadTasks.push(callback);
 			}
 		}
 
-		loadGUI(callback){
+		loadGUI (callback) {
 
 			this.onGUILoaded(callback);
 
@@ -23317,18 +23344,18 @@ ENDSEC
 
 						$(() => {
 							this.guiLoaded = true;
-							for(let task of this.guiLoadTasks){
+							for (let task of this.guiLoadTasks) {
 								task();
 							}
 
 						});
 					});
 
-					
+
 
 				});
 
-				
+
 			});
 		}
 
@@ -23345,7 +23372,7 @@ ENDSEC
 			let width = this.renderArea.clientWidth;
 			let height = this.renderArea.clientHeight;
 
-			this.renderer = new THREE.WebGLRenderer({alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true});
+			this.renderer = new THREE.WebGLRenderer({ alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
 			this.renderer.sortObjects = false;
 			this.renderer.setSize(width, height);
 			this.renderer.autoClear = false;
@@ -23361,24 +23388,24 @@ ENDSEC
 			let gl = this.renderer.context;
 			gl.getExtension('EXT_frag_depth');
 			gl.getExtension('WEBGL_depth_texture');
-			
+
 			let extVAO = gl.getExtension('OES_vertex_array_object');
 			gl.createVertexArray = extVAO.createVertexArrayOES.bind(extVAO);
 			gl.bindVertexArray = extVAO.bindVertexArrayOES.bind(extVAO);
 			//gl.bindVertexArray = extVAO.asdfbindVertexArrayOES.bind(extVAO);
-			
+
 		}
 
 		updateAnnotations () {
 
-			if(!this.visibleAnnotations){
+			if (!this.visibleAnnotations) {
 				this.visibleAnnotations = new Set();
 			}
 
 			this.scene.annotations.updateBounds();
 			this.scene.cameraP.updateMatrixWorld();
 			this.scene.cameraO.updateMatrixWorld();
-			
+
 			let distances = [];
 
 			let renderAreaWidth = this.renderer.getSize().width;
@@ -23421,10 +23448,10 @@ ENDSEC
 
 
 					// SCREEN SIZE
-					if(viewer.scene.cameraMode == CameraMode.PERSPECTIVE) {
+					if (viewer.scene.cameraMode == CameraMode.PERSPECTIVE) {
 						let fov = Math.PI * viewer.scene.cameraP.fov / 180;
 						let slope = Math.tan(fov / 2.0);
-						let projFactor =  0.5 * renderAreaHeight / (slope * distance);
+						let projFactor = 0.5 * renderAreaHeight / (slope * distance);
 						screenSize = radius * projFactor;
 					} else {
 						screenSize = Utils.projectedRadiusOrtho(radius, viewer.scene.cameraO.projectionMatrix, renderAreaWidth, renderAreaHeight);
@@ -23436,19 +23463,19 @@ ENDSEC
 				//element.css("display", "block");
 
 				let zIndex = 10000000 - distance * (10000000 / this.scene.cameraP.far);
-				if(annotation.descriptionVisible){
+				if (annotation.descriptionVisible) {
 					zIndex += 10000000;
 				}
 				element.css("z-index", parseInt(zIndex));
 
-				if(annotation.children.length > 0){
+				if (annotation.children.length > 0) {
 					let expand = screenSize > annotation.collapseThreshold || annotation.boundingBox.containsPoint(this.scene.getActiveCamera().position);
 					annotation.expand = expand;
 
 					if (!expand) {
 						//annotation.display = (screenPos.z >= -1 && screenPos.z <= 1);
 						let inFrustum = (screenPos.z >= -1 && screenPos.z <= 1);
-						if(inFrustum){
+						if (inFrustum) {
 							visibleNow.push(annotation);
 						}
 					}
@@ -23457,30 +23484,30 @@ ENDSEC
 				} else {
 					//annotation.display = (screenPos.z >= -1 && screenPos.z <= 1);
 					let inFrustum = (screenPos.z >= -1 && screenPos.z <= 1);
-					if(inFrustum){
+					if (inFrustum) {
 						visibleNow.push(annotation);
 					}
 				}
-				
+
 			});
 
 			let notVisibleAnymore = new Set(this.visibleAnnotations);
-			for(let annotation of visibleNow){
+			for (let annotation of visibleNow) {
 				annotation.display = true;
-				
+
 				notVisibleAnymore.delete(annotation);
 			}
 			this.visibleAnnotations = visibleNow;
 
-			for(let annotation of notVisibleAnymore){
+			for (let annotation of notVisibleAnymore) {
 				annotation.display = false;
 			}
 
 		}
 
-		update(delta, timestamp){
+		update (delta, timestamp) {
 
-			if(Potree.measureTimings) performance.mark("update-start");
+			if (Potree.measureTimings) performance.mark("update-start");
 
 			// if(window.urlToggle === undefined){
 			//	window.urlToggle = 0;
@@ -23517,21 +23544,21 @@ ENDSEC
 			//
 			//	window.urlToggle += delta;
 			//}
-			
+
 			{
 				let u = Math.sin(0.0005 * timestamp) * 0.5 - 0.4;
-				
+
 				let x = Math.cos(u);
 				let y = Math.sin(u);
-				
+
 				this.shadowTestCam.position.set(7 * x, 7 * y, 8.561);
 				this.shadowTestCam.lookAt(new THREE.Vector3(0, 0, 0));
 			}
-			
-			
+
+
 			let scene = this.scene;
 			let camera = scene.getActiveCamera();
-			
+
 			Potree.pointLoadLimit = Potree.pointBudget * 2;
 
 			this.scene.directionalLight.position.copy(camera.position);
@@ -23567,11 +23594,11 @@ ENDSEC
 					}
 				}
 
-				if(this.defaultGPSTimeChanged === false){
+				if (this.defaultGPSTimeChanged === false) {
 
 					let root = pointcloud.pcoGeometry.root;
 					if (root != null && root.loaded) {
-						if(root.gpsTime){
+						if (root.gpsTime) {
 
 							let gpsTime = root.gpsTime;
 							let min = gpsTime.offset;
@@ -23587,7 +23614,7 @@ ENDSEC
 					}
 
 				}
-				
+
 				pointcloud.showBoundingBox = this.showBoundingBox;
 				pointcloud.generateDEM = this.generateDEM;
 				pointcloud.minimumNodePixelSize = this.minNodeSize;
@@ -23620,7 +23647,7 @@ ENDSEC
 			}
 
 			for (let pointcloud of this.scene.pointclouds) {
-				if(!pointcloud.visible){
+				if (!pointcloud.visible) {
 					continue;
 				}
 
@@ -23632,9 +23659,9 @@ ENDSEC
 			}
 
 			{
-				if(this.showBoundingBox){
+				if (this.showBoundingBox) {
 					let bbRoot = this.scene.scene.getObjectByName("potree_bounding_box_root");
-					if(!bbRoot){
+					if (!bbRoot) {
 						let node = new THREE.Object3D();
 						node.name = "potree_bounding_box_root";
 						this.scene.scene.add(node);
@@ -23642,8 +23669,8 @@ ENDSEC
 					}
 
 					let visibleBoxes = [];
-					for(let pointcloud of this.scene.pointclouds){
-						for(let node of pointcloud.visibleNodes.filter(vn => vn.boundingBoxNode !== undefined)){
+					for (let pointcloud of this.scene.pointclouds) {
+						for (let node of pointcloud.visibleNodes.filter(vn => vn.boundingBoxNode !== undefined)) {
 							let box = node.boundingBoxNode;
 							visibleBoxes.push(box);
 						}
@@ -23688,7 +23715,7 @@ ENDSEC
 				//	}
 				//}
 
-				if(result.lowestSpacing !== Infinity){
+				if (result.lowestSpacing !== Infinity) {
 					let near = result.lowestSpacing * 10.0;
 					let far = -this.getBoundingBox().applyMatrix4(camera.matrixWorldInverse).min.z;
 
@@ -23696,23 +23723,23 @@ ENDSEC
 					near = Math.min(100.0, Math.max(0.01, near));
 					far = Math.max(far, near + 1000);
 
-					if(near === Infinity){
+					if (near === Infinity) {
 						near = 0.1;
 					}
-					
+
 					camera.near = near;
 					camera.far = far;
-				}else{
+				} else {
 					// don't change near and far in this case
 				}
 
-				if(this.scene.cameraMode == CameraMode.ORTHOGRAPHIC) {
+				if (this.scene.cameraMode == CameraMode.ORTHOGRAPHIC) {
 					camera.near = -camera.far;
 				}
-			} 
-			
+			}
+
 			this.scene.cameraP.fov = this.fov;
-			
+
 			// Navigation mode changed?
 			if (this.getControls(scene.view.navigationMode) !== this.controls) {
 				if (this.controls) {
@@ -23724,7 +23751,7 @@ ENDSEC
 				this.controls.enabled = true;
 				this.inputHandler.addInputListener(this.controls);
 			}
-			
+
 			if (this.getControls(scene.view.navigationMode) === this.deviceControls) {
 				this.controls.setScene(scene);
 				this.controls.update(delta);
@@ -23745,24 +23772,24 @@ ENDSEC
 				this.scene.cameraO.rotation.x = Math.PI / 2 + this.scene.view.pitch;
 				this.scene.cameraO.rotation.z = this.scene.view.yaw;
 			}
-			
+
 			camera.updateMatrix();
 			camera.updateMatrixWorld();
 			camera.matrixWorldInverse.getInverse(camera.matrixWorld);
 
 			{
-				if(this._previousCamera === undefined){
+				if (this._previousCamera === undefined) {
 					this._previousCamera = this.scene.getActiveCamera().clone();
 					this._previousCamera.rotation.copy(this.scene.getActiveCamera());
 				}
 
-				if(!this._previousCamera.matrixWorld.equals(camera.matrixWorld)){
+				if (!this._previousCamera.matrixWorld.equals(camera.matrixWorld)) {
 					this.dispatchEvent({
 						type: "camera_changed",
 						previous: this._previousCamera,
 						camera: camera
 					});
-				}else if(!this._previousCamera.projectionMatrix.equals(camera.projectionMatrix)){
+				} else if (!this._previousCamera.projectionMatrix.equals(camera.projectionMatrix)) {
 					this.dispatchEvent({
 						type: "camera_changed",
 						previous: this._previousCamera,
@@ -23777,45 +23804,45 @@ ENDSEC
 
 			{ // update clip boxes
 				let boxes = [];
-				
+
 				// volumes with clipping enabled
 				//boxes.push(...this.scene.volumes.filter(v => (v.clip)));
 				boxes.push(...this.scene.volumes.filter(v => (v.clip && v instanceof BoxVolume)));
 
 				// profile segments
-				for(let profile of this.scene.profiles){
+				for (let profile of this.scene.profiles) {
 					boxes.push(...profile.boxes);
 				}
-				
-				let clipBoxes = boxes.map( box => {
+
+				let clipBoxes = boxes.map(box => {
 					box.updateMatrixWorld();
 					let boxInverse = new THREE.Matrix4().getInverse(box.matrixWorld);
 					let boxPosition = box.getWorldPosition(new THREE.Vector3());
-					return {box: box, inverse: boxInverse, position: boxPosition};
+					return { box: box, inverse: boxInverse, position: boxPosition };
 				});
 
 				let clipPolygons = this.scene.polygonClipVolumes.filter(vol => vol.initialized);
-				
+
 				// set clip volumes in material
-				for(let pointcloud of this.scene.pointclouds.filter(pc => pc.visible)){
+				for (let pointcloud of this.scene.pointclouds.filter(pc => pc.visible)) {
 					pointcloud.material.setClipBoxes(clipBoxes);
 					pointcloud.material.setClipPolygons(clipPolygons, this.clippingTool.maxPolygonVertices);
 					pointcloud.material.clipTask = this.clipTask;
 					pointcloud.material.clipMethod = this.clipMethod;
 				}
 			}
-			
+
 			{ // update navigation cube
 				this.navigationCube.update(camera.rotation);
 			}
 
 			this.updateAnnotations();
-			
-			if(this.mapView){
+
+			if (this.mapView) {
 				this.mapView.update(delta);
-				if(this.mapView.sceneProjection){
-					$( "#potree_map_toggle" ).css("display", "block");
-					
+				if (this.mapView.sceneProjection) {
+					$("#potree_map_toggle").css("display", "block");
+
 				}
 			}
 
@@ -23824,16 +23851,17 @@ ENDSEC
 			this.dispatchEvent({
 				type: 'update',
 				delta: delta,
-				timestamp: timestamp});
-				
-			if(Potree.measureTimings) {
+				timestamp: timestamp
+			});
+
+			if (Potree.measureTimings) {
 				performance.mark("update-end");
 				performance.measure("update", "update-start", "update-end");
 			}
 		}
-		
-		render(){
-			if(Potree.measureTimings) performance.mark("render-start");
+
+		render () {
+			if (Potree.measureTimings) performance.mark("render-start");
 
 			{ // resize
 				let width = this.scaleFactor * this.renderArea.clientWidth;
@@ -23847,98 +23875,98 @@ ENDSEC
 				//let frustumScale = viewer.moveSpeed * 2.0;
 				let frustumScale = this.scene.view.radius;
 				this.scene.cameraO.left = -frustumScale;
-				this.scene.cameraO.right = frustumScale;		
+				this.scene.cameraO.right = frustumScale;
 				this.scene.cameraO.top = frustumScale * 1 / aspect;
-				this.scene.cameraO.bottom = -frustumScale * 1 / aspect;		
+				this.scene.cameraO.bottom = -frustumScale * 1 / aspect;
 				this.scene.cameraO.updateProjectionMatrix();
 
-				this.scene.cameraScreenSpace.top = 1/aspect;
-				this.scene.cameraScreenSpace.bottom = -1/aspect;
+				this.scene.cameraScreenSpace.top = 1 / aspect;
+				this.scene.cameraScreenSpace.bottom = -1 / aspect;
 				this.scene.cameraScreenSpace.updateProjectionMatrix();
-				
+
 				this.renderer.setSize(width, height);
 			}
 
-			try{
+			try {
 
 
-			if(this.useRep){
-				if (!this.repRenderer) {
-					this.repRenderer = new RepRenderer(this);
-				}
-				this.repRenderer.render(this.renderer);
-			}else if(this.useHQ){
-				if (!this.hqRenderer) {
-					this.hqRenderer = new HQSplatRenderer(this);
-				}
-				this.hqRenderer.useEDL = this.useEDL;
-				this.hqRenderer.render(this.renderer);
-			}else{
-				if (this.useEDL && Features.SHADER_EDL.isSupported()) {
-					if (!this.edlRenderer) {
-						this.edlRenderer = new EDLRenderer(this);
+				if (this.useRep) {
+					if (!this.repRenderer) {
+						this.repRenderer = new RepRenderer(this);
 					}
-					this.edlRenderer.render(this.renderer);
+					this.repRenderer.render(this.renderer);
+				} else if (this.useHQ) {
+					if (!this.hqRenderer) {
+						this.hqRenderer = new HQSplatRenderer(this);
+					}
+					this.hqRenderer.useEDL = this.useEDL;
+					this.hqRenderer.render(this.renderer);
 				} else {
-					if (!this.potreeRenderer) {
-						this.potreeRenderer = new PotreeRenderer(this);
+					if (this.useEDL && Features.SHADER_EDL.isSupported()) {
+						if (!this.edlRenderer) {
+							this.edlRenderer = new EDLRenderer(this);
+						}
+						this.edlRenderer.render(this.renderer);
+					} else {
+						if (!this.potreeRenderer) {
+							this.potreeRenderer = new PotreeRenderer(this);
+						}
+						this.potreeRenderer.render();
 					}
-					this.potreeRenderer.render();
 				}
-			}
 
-			//if(this.useRep){
-			//	if (!this.repRenderer) {
-			//		this.repRenderer = new RepRenderer(this);
-			//	}
-			//	this.repRenderer.render(this.renderer);
-			//} else if (this.useHQ && Features.SHADER_SPLATS.isSupported()) {
-			//	if (!this.hqRenderer) {
-			//		this.hqRenderer = new HQSplatRenderer(this);
-			//	}
-			//	this.hqRenderer.render(this.renderer);
-			//} else if (this.useEDL && Features.SHADER_EDL.isSupported()) {
-			//	if (!this.edlRenderer) {
-			//		this.edlRenderer = new EDLRenderer(this);
-			//	}
-			//	this.edlRenderer.render(this.renderer);
-			//} else {
-			//	if (!this.potreeRenderer) {
-			//		this.potreeRenderer = new PotreeRenderer(this);
-			//	}
+				//if(this.useRep){
+				//	if (!this.repRenderer) {
+				//		this.repRenderer = new RepRenderer(this);
+				//	}
+				//	this.repRenderer.render(this.renderer);
+				//} else if (this.useHQ && Features.SHADER_SPLATS.isSupported()) {
+				//	if (!this.hqRenderer) {
+				//		this.hqRenderer = new HQSplatRenderer(this);
+				//	}
+				//	this.hqRenderer.render(this.renderer);
+				//} else if (this.useEDL && Features.SHADER_EDL.isSupported()) {
+				//	if (!this.edlRenderer) {
+				//		this.edlRenderer = new EDLRenderer(this);
+				//	}
+				//	this.edlRenderer.render(this.renderer);
+				//} else {
+				//	if (!this.potreeRenderer) {
+				//		this.potreeRenderer = new PotreeRenderer(this);
+				//	}
 
-			//	this.potreeRenderer.render();
-			//}
+				//	this.potreeRenderer.render();
+				//}
 
-			this.renderer.render(this.overlay, this.overlayCamera);
+				this.renderer.render(this.overlay, this.overlayCamera);
 
-			}catch(e){
+			} catch (e) {
 				this.onCrash(e);
 			}
-			
-			if(Potree.measureTimings){
+
+			if (Potree.measureTimings) {
 				performance.mark("render-end");
 				performance.measure("render", "render-start", "render-end");
 			}
 		}
 
-		resolveTimings(timestamp){
-			if(Potree.measureTimings){
-				if(!this.toggle){
+		resolveTimings (timestamp) {
+			if (Potree.measureTimings) {
+				if (!this.toggle) {
 					this.toggle = timestamp;
 				}
 				let duration = timestamp - this.toggle;
-				if(duration > 1000.0){
-				
+				if (duration > 1000.0) {
+
 					let measures = performance.getEntriesByType("measure");
-					
+
 					let names = new Set();
-					for(let measure of measures){
+					for (let measure of measures) {
 						names.add(measure.name);
 					}
-					
+
 					let groups = new Map();
-					for(let name of names){
+					for (let name of names) {
 						groups.set(name, {
 							measures: [],
 							sum: 0,
@@ -23947,8 +23975,8 @@ ENDSEC
 							max: -Infinity
 						});
 					}
-					
-					for(let measure of measures){
+
+					for (let measure of measures) {
 						let group = groups.get(measure.name);
 						group.measures.push(measure);
 						group.sum += measure.duration;
@@ -23958,11 +23986,11 @@ ENDSEC
 					}
 
 					let glQueries = Potree.resolveQueries(this.renderer.getContext());
-					for(let [key, value] of glQueries){
+					for (let [key, value] of glQueries) {
 
 						let group = {
-							measures: value.map(v => {return {duration: v}}),
-							sum: value.reduce( (a, i) => a + i, 0),
+							measures: value.map(v => { return { duration: v } }),
+							sum: value.reduce((a, i) => a + i, 0),
 							n: value.length,
 							min: Math.min(...value),
 							max: Math.max(...value)
@@ -23972,40 +24000,40 @@ ENDSEC
 						groups.set(groupname, group);
 						names.add(groupname);
 					}
-					
-					for(let [name, group] of groups){
+
+					for (let [name, group] of groups) {
 						group.mean = group.sum / group.n;
-						group.measures.sort( (a, b) => a.duration - b.duration );
-						
-						if(group.n === 1){
+						group.measures.sort((a, b) => a.duration - b.duration);
+
+						if (group.n === 1) {
 							group.median = group.measures[0].duration;
-						}else if(group.n > 1){
+						} else if (group.n > 1) {
 							group.median = group.measures[parseInt(group.n / 2)].duration;
 						}
-						
+
 					}
-					
-					let cn = Array.from(names).reduce( (a, i) => Math.max(a, i.length), 0) + 5;
+
+					let cn = Array.from(names).reduce((a, i) => Math.max(a, i.length), 0) + 5;
 					let cmin = 10;
 					let cmed = 10;
 					let cmax = 10;
 					let csam = 6;
-					
-					let message = ` ${"NAME".padEnd(cn)} |` 
+
+					let message = ` ${"NAME".padEnd(cn)} |`
 						+ ` ${"MIN".padStart(cmin)} |`
 						+ ` ${"MEDIAN".padStart(cmed)} |`
 						+ ` ${"MAX".padStart(cmax)} |`
 						+ ` ${"SAMPLES".padStart(csam)} \n`;
-					message += ` ${"-".repeat(message.length) }\n`;
-					
+					message += ` ${"-".repeat(message.length)}\n`;
+
 					names = Array.from(names).sort();
-					for(let name of names){
+					for (let name of names) {
 						let group = groups.get(name);
 						let min = group.min.toFixed(3);
 						let median = group.median.toFixed(3);
 						let max = group.max.toFixed(3);
 						let n = group.n;
-						
+
 						message += ` ${name.padEnd(cn)} |`
 							+ ` ${min.padStart(cmin)} |`
 							+ ` ${median.padStart(cmed)} |`
@@ -24014,7 +24042,7 @@ ENDSEC
 					}
 					message += `\n`;
 					console.log(message);
-					
+
 					performance.clearMarks();
 					performance.clearMeasures();
 					this.toggle = timestamp;
@@ -24022,11 +24050,11 @@ ENDSEC
 			}
 		}
 
-		loop(timestamp){
+		loop (timestamp) {
 			requestAnimationFrame(this.loop.bind(this));
 
 			let queryAll;
-			if(Potree.measureTimings){
+			if (Potree.measureTimings) {
 				performance.mark("loop-start");
 			}
 
@@ -24034,17 +24062,17 @@ ENDSEC
 
 			this.render();
 
-			if(Potree.measureTimings){
+			if (Potree.measureTimings) {
 				performance.mark("loop-end");
 				performance.measure("loop", "loop-start", "loop-end");
 			}
-			
+
 			this.resolveTimings(timestamp);
 
 			Potree.framenumber++;
 		}
 
-		postError(content, params = {}){
+		postError (content, params = {}) {
 			let message = this.postMessage(content, params);
 
 			message.element.addClass("potree_message_error");
@@ -24052,17 +24080,17 @@ ENDSEC
 			return message;
 		}
 
-		postMessage(content, params = {}){
+		postMessage (content, params = {}) {
 			let message = new Message(content);
 
 			let animationDuration = 100;
 
 			message.element.css("display", "none");
-			message.elClose.click( () => {
+			message.elClose.click(() => {
 				message.element.slideToggle(animationDuration);
 
 				let index = this.messages.indexOf(message);
-				if(index >= 0){
+				if (index >= 0) {
 					this.messages.splice(index, 1);
 				}
 			});
@@ -24073,12 +24101,12 @@ ENDSEC
 
 			this.messages.push(message);
 
-			if(params.duration !== undefined){
+			if (params.duration !== undefined) {
 				let fadeDuration = 500;
 				let slideOutDuration = 200;
 				setTimeout(() => {
 					message.element.animate({
-						opacity: 0	
+						opacity: 0
 					}, fadeDuration);
 					message.element.slideToggle(slideOutDuration);
 				}, params.duration);
@@ -24088,9 +24116,9 @@ ENDSEC
 		}
 	}
 
-	THREE.OrthographicCamera.prototype.zoomTo = function( node, factor = 1){
+	THREE.OrthographicCamera.prototype.zoomTo = function (node, factor = 1) {
 
-		if ( !node.geometry && !node.boundingBox) {
+		if (!node.geometry && !node.boundingBox) {
 			return;
 		}
 
@@ -24103,7 +24131,7 @@ ENDSEC
 		//let bottom	= node.boundingBox.min.y;
 		//let top = node.boundingBox.max.y;
 
-		this.updateProjectionMatrix();	
+		this.updateProjectionMatrix();
 	};
 
 	THREE.PerspectiveCamera.prototype.zoomTo = function (node, factor) {
@@ -24191,16 +24219,16 @@ ENDSEC
 	let resourcePath = exports.scriptPath + '/resources';
 
 
-	function loadPointCloud(path, name, callback){
-		let loaded = function(pointcloud){
+	function loadPointCloud (path, name, callback) {
+		let loaded = function (pointcloud) {
 			pointcloud.name = name;
-			callback({type: 'pointcloud_loaded', pointcloud: pointcloud});
+			callback({ type: 'pointcloud_loaded', pointcloud: pointcloud });
 		};
 
 		// load pointcloud
-		if (!path){
+		if (!path) {
 			// TODO: callback? comment? Hello? Bueller? Anyone?
-		} else if (path.indexOf('greyhound://') === 0){
+		} else if (path.indexOf('greyhound://') === 0) {
 			// We check if the path string starts with 'greyhound:', if so we assume it's a greyhound server URL.
 			GreyhoundLoader.load(path, function (geometry) {
 				if (!geometry) {
@@ -24239,9 +24267,9 @@ ENDSEC
 
 
 	// add selectgroup
-	(function($){
+	(function ($) {
 		$.fn.extend({
-			selectgroup: function(args = {}){
+			selectgroup: function (args = {}) {
 
 				let elGroup = $(this);
 				let rootID = elGroup.prop("id");
@@ -24263,12 +24291,12 @@ ENDSEC
 					let elLabel = elButton.find("label");
 					let elInput = elButton.find("input");
 
-					elInput.change( () => {
+					elInput.change(() => {
 						elGroup.find("label").removeClass("ui-state-active");
 						elGroup.find("label").addClass("ui-state-default");
-						if(elInput.is(":checked")){
+						if (elInput.is(":checked")) {
 							elLabel.addClass("ui-state-active");
-						}else{
+						} else {
 							//elLabel.addClass("ui-state-default");
 						}
 					});
@@ -24286,21 +24314,21 @@ ENDSEC
 			`);
 
 				let elButtonContainer = elFieldset.find("span");
-				for(let elButton of elButtons){
+				for (let elButton of elButtons) {
 					elButtonContainer.append(elButton);
 				}
 
-				elButtonContainer.find("label").each( (index, value) => {
+				elButtonContainer.find("label").each((index, value) => {
 					$(value).css("margin", "0px");
 					$(value).css("border-radius", "0px");
 					$(value).css("border", "1px solid black");
 					$(value).css("border-left", "none");
 				});
-				elButtonContainer.find("label:first").each( (index, value) => {
+				elButtonContainer.find("label:first").each((index, value) => {
 					$(value).css("border-radius", "4px 0px 0px 4px");
-					
+
 				});
-				elButtonContainer.find("label:last").each( (index, value) => {
+				elButtonContainer.find("label:last").each((index, value) => {
 					$(value).css("border-radius", "0px 4px 4px 0px");
 					$(value).css("border-left", "none");
 				});
