@@ -977,10 +977,10 @@
 				let mouseover = (e) => e.object.material.emissive.setHex(0x888888);
 				let mouseleave = (e) => e.object.material.emissive.setHex(0x000000);
 
-				sphere.addEventListener('drag', drag);
-				sphere.addEventListener('drop', drop);
-				sphere.addEventListener('mouseover', mouseover);
-				sphere.addEventListener('mouseleave', mouseleave);
+				// sphere.addEventListener('drag', drag);
+				// sphere.addEventListener('drop', drop);
+				// sphere.addEventListener('mouseover', mouseover);
+				// sphere.addEventListener('mouseleave', mouseleave);
 			}
 
 			let event = {
@@ -1407,7 +1407,8 @@
 			for (let i = 0; i < this.points.length; i++) {
 				let p1 = this.points[i].position;
 				let p2 = this.points[j].position;
-				area += (p2.x + p1.x) * (p1.y - p2.y);
+				//Hack
+				area += (p2.x * 10 + p1.x * 10) * (p1.y * 10 - p2.y * 10);
 				j = i;
 			}
 
@@ -1526,7 +1527,12 @@
 					let distance = point.position.distanceTo(nextPoint.position);
 
 					edgeLabel.position.copy(center);
-					edgeLabel.setText(Utils.addCommas(distance.toFixed(2)) + ' ' + this.lengthUnit.code);
+
+					//HACK
+					//We are doing this in order to Fake the real size model
+					let displayDistance = distance * 5;
+
+					edgeLabel.setText(Utils.addCommas(displayDistance.toFixed(2)) + ' ' + this.lengthUnit.code);
 					edgeLabel.visible = this.showDistances && (index < lastIndex || this.closed) && this.points.length >= 2 && distance > 0;
 				}
 
@@ -1584,7 +1590,8 @@
 
 					let heightLabelPosition = start.clone().add(end).multiplyScalar(0.5);
 					this.heightLabel.position.copy(heightLabelPosition);
-					let msg = Utils.addCommas(height.toFixed(2)) + ' ' + this.lengthUnit.code;
+					//Hack
+					let msg = Utils.addCommas((height * 5).toFixed(2)) + ' ' + this.lengthUnit.code;
 					this.heightLabel.setText(msg);
 				}
 			}
@@ -21626,6 +21633,18 @@ ENDSEC
 					changedTouches: e.changedTouches
 				});
 			}
+
+			// DEBUG CODE
+			// let debugTouches = [...e.touches, {
+			//	pageX: this.domElement.clientWidth / 2,
+			//	pageY: this.domElement.clientHeight / 2}];
+			// for(let inputListener of this.getSortedListeners()){
+			//	inputListener.dispatchEvent({
+			//		type: e.type,
+			//		touches: debugTouches,
+			//		changedTouches: e.changedTouches
+			//	});
+			// }
 		}
 
 		onKeyDown (e) {
@@ -22101,7 +22120,7 @@ ENDSEC
 		getHoveredElements () {
 			let scenes = this.interactiveScenes.concat(this.scene.scene);
 
-			let interactableListeners = ['mouseup', 'mousemove', 'mouseover', 'mouseleave', 'drag', 'drop', 'click', 'select', 'deselect'];
+			let interactableListeners = ['touchmove', 'touchstart', 'touchend', 'mouseup', 'mousemove', 'mouseover', 'mouseleave', 'drag', 'drop', 'click', 'select', 'deselect'];
 			let interactables = [];
 			for (let scene of scenes) {
 				scene.traverseVisible(node => {
